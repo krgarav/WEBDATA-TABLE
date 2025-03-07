@@ -4,7 +4,7 @@ const Files = require("../../models/TempleteModel/files");
 const path = require("path");
 const fs = require("fs-extra");
 const unzipper = require("unzipper");
-const { DataTypes, Op ,QueryTypes } = require("sequelize");
+const { DataTypes, Op, QueryTypes } = require("sequelize");
 const csv = require("csv-parser");
 const { createExtractorFromFile } = require("node-unrar-js");
 const sequelize = require("../../utils/database");
@@ -24,15 +24,18 @@ async function insertDataIntoTable(tableName, data) {
   const columnsForRead = Object.keys(data[0]);
   const columns = Object.keys(data[0]).map((col) => `\`${col}\``);
   const values = data
-  .map((row) => `(${columnsForRead.map((col) => `'${row[col] || ""}'`).join(",")})`)
-  .join(",");
-
+    .map(
+      (row) =>
+        `(${columnsForRead.map((col) => `'${row[col] || ""}'`).join(",")})`
+    )
+    .join(",");
 
   const query = `INSERT INTO ${tableName} (${columns.join(
     ","
   )}) VALUES ${values};`;
 
   await sequelize.query(query, { type: QueryTypes.INSERT });
+  return columns;
 }
 /**
  * Function to process the uploaded CSV file
@@ -226,7 +229,7 @@ async function processAndInsertCSV(mergedRecords) {
 
   await DynamicModel.bulkCreate(formattedRecords);
 
-  return tableName;
+  return { tableName, headersArray };
 }
 async function mergeCSVFiles(fileNames) {
   let headersSet = new Set(); // Stores headers from the first file
@@ -382,7 +385,9 @@ const handleUpload = async (req, res) => {
           const mergedData = await mergeCSVFiles([csvFileName]);
           // console.log(pathDir, "pathDir");
           // Process merged CSV data and insert into SQL table
-          const tableName = await processAndInsertCSV(mergedData);
+          const { tableName, headersArray } = await processAndInsertCSV(
+            mergedData
+          );
 
           // **Update the Template with the new table name**
 
@@ -398,7 +403,11 @@ const handleUpload = async (req, res) => {
           template.csvTableName = tableName;
           template.imageColName = req.query.imageNames;
           await template.save();
-          res.status(200).json({ message: `New Table Created.` });
+          res.status(200).json({
+            success: true,
+            message: `New Table Created.`,
+            templeteId: id
+          });
           // if (fs.existsSync(csvFilePath)) {
           //   await processCSV(csvFilePath, res, req, createdFile, pathDir);
           // } else {
@@ -408,17 +417,26 @@ const handleUpload = async (req, res) => {
           // }
         } else {
           const csvJson = await csvToJson(csvFilePath);
-          await insertDataIntoTable(templateTable.csvTableName, csvJson);
-          res.status(200).json({ message: `Inserted into existing table.` });
+          const columns = await insertDataIntoTable(
+            templateTable.csvTableName,
+            csvJson
+          );
+          res.status(200).json({
+            success: true,
+            message: `Inserted into existing table.`,
+            templeteId: id
+          });
           //insert the csv file into the table
         }
       } else {
         // Step 9: Respond with the status of the chunk upload
-        res.status(200).json({ message: `Chunk ${chunkIndex} uploaded.` });
+        res
+          .status(200)
+          .json({ success: true, message: `Chunk ${chunkIndex} uploaded.` });
       }
     } catch (error) {
       console.error("Error during chunk upload:", error);
-      res.status(500).json({ error: "Chunk upload failed." });
+      res.status(500).json({ success: false, error: "Chunk upload failed." });
     }
   });
 };
