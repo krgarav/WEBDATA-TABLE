@@ -4,7 +4,7 @@ function extractIP(serverString) {
   const match = serverString.match(/(\d+\.\d+\.\d+\.\d+)/);
   return match ? match[0] : null;
 }
-export const REACT_APP_IP = window.location.hostname;
+export const REACT_APP_IP = window.APP_IP;
 export const SERVER_IP = window.SERVER_IP;
 
 export const onGetTemplateHandler = async () => {

@@ -8,6 +8,7 @@ const {
 const { checkDuplicates } = require("../controllers/MergeCsv/checkDuplicate");
 const { viewDuplicates, getImageCol } = require("../controllers/MergeCsv/viewDuplicates");
 const { deleteDuplicate, updateDuplicate } = require("../controllers/MergeCsv/updateDuplicate");
+const { downloadCsvController } = require("../controllers/MergeCsv/downloadCsv");
 const router = express.Router();
 
 router.post("/mergecsv", mergeCSV);
@@ -19,5 +20,6 @@ router.post("/viewDuplicates",viewDuplicates);
 router.get("/getImageCol",getImageCol);
 router.put("/updateRow",updateDuplicate);
 router.delete("/deleteRow",deleteDuplicate);
+router.get("/downloadUpdatedCsv",downloadCsvController)
 
 module.exports = router;

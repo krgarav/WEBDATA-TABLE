@@ -378,7 +378,7 @@ const handleUpload = async (req, res) => {
           "/"
         )}`;
         const templateTable = await Templete.findByPk(id);
-        if (!templateTable.mergedTableName) {
+        if (!templateTable.csvTableName) {
           const mergedData = await mergeCSVFiles([csvFileName]);
           // console.log(pathDir, "pathDir");
           // Process merged CSV data and insert into SQL table
@@ -395,21 +395,21 @@ const handleUpload = async (req, res) => {
             templeteId: id,
           });
           const template = await Templete.findByPk(id);
-          template.mergedTableName = tableName;
+          template.csvTableName = tableName;
           template.imageColName = req.query.imageNames;
           await template.save();
-
-          if (fs.existsSync(csvFilePath)) {
-            await processCSV(csvFilePath, res, req, createdFile, pathDir);
-          } else {
-            res
-              .status(404)
-              .json({ error: "CSV file not found after extraction." });
-          }
+          res.status(200).json({ message: `New Table Created.` });
+          // if (fs.existsSync(csvFilePath)) {
+          //   await processCSV(csvFilePath, res, req, createdFile, pathDir);
+          // } else {
+          //   res
+          //     .status(404)
+          //     .json({ error: "CSV file not found after extraction." });
+          // }
         } else {
           const csvJson = await csvToJson(csvFilePath);
-          await insertDataIntoTable(templateTable.mergedTableName, csvJson);
-        
+          await insertDataIntoTable(templateTable.csvTableName, csvJson);
+          res.status(200).json({ message: `Inserted into existing table.` });
           //insert the csv file into the table
         }
       } else {
