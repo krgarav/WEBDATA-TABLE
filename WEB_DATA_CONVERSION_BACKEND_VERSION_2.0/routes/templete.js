@@ -33,6 +33,8 @@ const getCsvHeaderByTemplate = require("../controllers/Templete/getCsvHeaderByTe
 const { checkDuplicates } = require("../controllers/MergeCsv/checkDuplicate");
 const {
   checkDuplicateController,
+  checkMappedDataExistsController,
+  getTotalCsvDataController,
 } = require("../controllers/Templete/checkDuplicates");
 const getCsvHeaderController = require("../controllers/Templete/getCsvHeaders");
 const router = express.Router();
@@ -76,5 +78,7 @@ router.post("/gettaskstatusdetails/:id", TaskStatusDetails); //fileId
 //
 router.get("/getcsvheaders", getCsvHeaderController);
 router.post("/checkduplicatekey", checkDuplicateController);
+router.get("/checkmappeddataexits", checkMappedDataExistsController);
+router.get("/gettotaldata", getTotalCsvDataController);
 
 module.exports = router;

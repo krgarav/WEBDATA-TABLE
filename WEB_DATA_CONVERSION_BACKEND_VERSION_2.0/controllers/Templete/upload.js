@@ -394,6 +394,7 @@ const handleUpload = async (req, res) => {
           // template.mergedTableName = tableName;
 
           const createdFile = await Files.create({
+            totalFiles: mergedData.length,
             csvFileTable: tableName,
             csvFile: csvFileName,
             zipFile: `${timestamp}_${zipFileName}`,
@@ -406,7 +407,8 @@ const handleUpload = async (req, res) => {
           res.status(200).json({
             success: true,
             message: `New Table Created.`,
-            templeteId: id
+            templeteId: id,
+            fileId: createdFile.id,
           });
           // if (fs.existsSync(csvFilePath)) {
           //   await processCSV(csvFilePath, res, req, createdFile, pathDir);
@@ -421,10 +423,17 @@ const handleUpload = async (req, res) => {
             templateTable.csvTableName,
             csvJson
           );
+          const createdFile = await Files.create({
+            totalFiles: csvJson .length,
+            csvFile: csvFileName,
+            zipFile: `${timestamp}_${zipFileName}`,
+            templeteId: id,
+          });
           res.status(200).json({
             success: true,
             message: `Inserted into existing table.`,
-            templeteId: id
+            templeteId: id,
+            fileId: createdFile.id,
           });
           //insert the csv file into the table
         }
