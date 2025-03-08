@@ -1,4 +1,5 @@
-import React from "react";
+import React, { use, useEffect, useState } from "react";
+import { fetchHeadersInDuplicate } from "../../services/common";
 
 const FindDuplicate = ({
   csvHeaders,
@@ -6,6 +7,18 @@ const FindDuplicate = ({
   onFindDuplicatesHandler,
   onDuplicateCheckedHandler,
 }) => {
+
+  const [headers, setHeaders] = useState([]);
+
+  useEffect(() => {
+    const data = JSON.parse(localStorage.getItem("fileId"));
+    async function fetchData() {
+      const response = await fetchHeadersInDuplicate(data.templeteId);
+      setHeaders(response.headers);
+    }
+    fetchData();
+  }, []);
+
   return (
     <div className="flex justify-center items-center w-[100%] pt-20 h-[100vh]">
       <div className=" w-[800px]">
@@ -29,7 +42,7 @@ const FindDuplicate = ({
                       </div>
                     </div>
                     <div className="divide-y divide-gray-200 bg-white overflow-y-auto max-h-[300px] w-full">
-                      {csvHeaders?.map((columnName, index) =>
+                      {headers?.map((columnName, index) =>
                         columnName === "Previous Values" ||
                           columnName === "Updated Values" ||
                           columnName === "User Details" ||
@@ -65,7 +78,10 @@ const FindDuplicate = ({
               </div>
             </div>
           </div>
-          <div className="text-right">
+          <div>
+            
+          </div>
+          <div className="text-right mt-2">
             <button
               onClick={onDuplicateCheckedHandler}
               class="group inline-block rounded-3xl bg-teal-500 p-[2px] text-white hover:bg-blue-600 focus:outline-none focus:ring active:text-opacity-75"

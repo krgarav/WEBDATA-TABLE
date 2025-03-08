@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import dataContext from "../../Store/DataContext";
 import {
+  assignTasksToUsers,
+  getTotalCSVData,
   onGetAllUsersHandler,
   onGetVerifiedUserHandler,
 } from "../../services/common";
@@ -24,7 +26,6 @@ const TemplateMapping = () => {
   const navigate = useNavigate();
   const { fileId } = JSON.parse(localStorage.getItem("fileId")) || "";
   const token = JSON.parse(localStorage.getItem("userData"));
-  const totalData = JSON.parse(localStorage.getItem("totalData")) || "";
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -51,6 +52,17 @@ const TemplateMapping = () => {
     fetchUsers();
   }, [selectedUser]);
 
+  const [totalData, setTotalData] = useState(null);
+
+  useEffect(() => {
+    const data = JSON.parse(localStorage.getItem("fileId"));
+    async function fetchData() {
+      const response = await getTotalCSVData(data.templeteId);
+      setTotalData(response.totalRows);
+    }
+    fetchData();
+  }, []);
+
   const onTaskAssignedHandler = () => {
     if (Number(taskValue.max) > totalData) {
       toast.warning("Max value must be less than or equal to the total data.");
@@ -76,7 +88,7 @@ const TemplateMapping = () => {
       return;
     }
 
-    if (!selectedUser) {
+    if (selectedUser.length <= 0 || selectedUser.length > 1) {
       toast.warning("Please select the file id or username!");
       return;
     }
@@ -89,7 +101,7 @@ const TemplateMapping = () => {
         min: taskValue.min,
         max: taskValue.max,
         userName: data.userName,
-        taskName: taskName
+        taskName: taskName,
       };
       return task;
     });
@@ -112,20 +124,16 @@ const TemplateMapping = () => {
       toast.warning("Please assign all the data.");
       return;
     }
-    
+
     try {
-      await axios.post(
-        `${window.SERVER_IP}/assign/user`,
-        assignedUsers,
-        {
-          headers: {
-            token: token,
-          },
-        }
-      );
-      toast.success("Task assignment successful.");
-      dataCtx.modifyIsLoading(false);
-      navigate(`/csvuploader`);
+      const response = await assignTasksToUsers(assignedUsers);
+      if (response.success) {
+        toast.success("Task assignment successful.");
+        dataCtx.modifyIsLoading(false);
+        navigate(`/csvuploader`, { replace: true });
+      } else {
+        toast.error("Something Went Wrong! Cannot Assign Tasks to Users!!!");
+      }
     } catch (error) {
       console.error("Error uploading files: ", error);
       toast.error("Error submitting task. Please try again.");

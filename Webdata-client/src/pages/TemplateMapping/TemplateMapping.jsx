@@ -2,7 +2,11 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { onGetTemplateHandler } from "../../services/common";
+import {
+  fetchHeadersInDuplicate,
+  onGetTemplateHandler,
+  submitMappedData,
+} from "../../services/common";
 import HeaderData from "./HeaderData";
 import HeaderMappedReview from "./HeaderMappedReview";
 
@@ -11,7 +15,7 @@ const TemplateMapping = () => {
   const [templateHeaders, setTemplateHeaders] = useState();
   const [selectedAssociations, setSelectedAssociations] = useState({});
   const [showModal, setShowModal] = useState(false);
-  const [submitLoading, setSubmitLoading] = useState(false)
+  const [submitLoading, setSubmitLoading] = useState(false);
 
   const { id } = useParams();
 
@@ -37,29 +41,35 @@ const TemplateMapping = () => {
   }, [id]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `${window.SERVER_IP}/get/headerdata/${fileId}`,
-          {
-            headers: {
-              token: token,
-            },
-          }
-        );
-        console.log("rowData", response)
-        localStorage.setItem(
-          "totalData",
-          JSON.stringify(response.data.rowCount)
-        );
-        setCsvHeaders(response.data.headers);
-      } catch (error) {
-        console.log(error);
-      }
-
-    };
+    const data = JSON.parse(localStorage.getItem("fileId"));
+    async function fetchData() {
+      const response = await fetchHeadersInDuplicate(data.templeteId);
+      setCsvHeaders(response.headers);
+    }
     fetchData();
-  }, [fileId, token]);
+  }, []); // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         `${window.SERVER_IP}/get/headerdata/${fileId}`,
+  //         {
+  //           headers: {
+  //             token: token,
+  //           },
+  //         }
+  //       );
+  //       console.log("rowData", response);
+  //       localStorage.setItem(
+  //         "totalData",
+  //         JSON.stringify(response.data.rowCount)
+  //       );
+  //       setCsvHeaders(response.data.headers);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   fetchData();
+  // }, [fileId, token]);
 
   const handleCsvHeaderChange = (csvHeader, index) => {
     const updatedAssociations = { ...selectedAssociations };
@@ -114,7 +124,7 @@ const TemplateMapping = () => {
         return;
       }
     }
-    setSubmitLoading(true)
+    setSubmitLoading(true);
     const associationData = [];
     const obj = { ...selectedAssociations };
     for (let i = 0; i < csvHeaders.length; i++) {
@@ -133,22 +143,17 @@ const TemplateMapping = () => {
     };
 
     try {
-      await axios.post(
-        `${window.SERVER_IP}/data`,
-        { mappedData },
-        {
-          headers: {
-            token: token,
-          },
-        }
-      );
-      toast.success("Mapping successfully done.");
-      navigate(`/csvuploader/fieldDecision/${id}`);
+      const response = await submitMappedData(mappedData)
+      if(response.success){
+        toast.success("Mapping successfully done.");
+        navigate(`/csvuploader/fieldDecision/${id}`);
+      } else {
+        toast.error("Something went wrong")
+      }
     } catch (error) {
       toast.error(error.message);
-    }
-    finally {
-      setSubmitLoading(false)
+    } finally {
+      setSubmitLoading(false);
     }
   };
 
@@ -171,7 +176,7 @@ const TemplateMapping = () => {
           submitLoading={submitLoading}
         />
       </div>
-    </div >
+    </div>
   );
 };
 export default TemplateMapping;

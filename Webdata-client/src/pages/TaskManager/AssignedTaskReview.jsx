@@ -13,7 +13,7 @@ const AssignedTaskReview = ({
         className="font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-700 rounded-3xl
        shadow-md cursor-pointer select-none text-xl px-12 py-2 hover:shadow-xl active:shadow-md"
       >
-        <span>Save</span>
+        <span>Preview</span>
       </label>
 
       {showModal && (

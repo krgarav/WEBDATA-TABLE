@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { getTotalCSVData } from "../../services/common";
 
 const AssigningTask = ({
   allUsers,
@@ -9,8 +10,14 @@ const AssigningTask = ({
   onTaskAssignedHandler,
   totalData,
   setTaskName,
-  taskName
+  taskName,
 }) => {
+  const [remaingData, setRemaingData] = useState(0);
+  const [checked, setChecked] = useState(false)
+
+  useEffect(() => {
+    setRemaingData(totalData);
+  });
 
   const handleCheckboxChange = (userId, userName) => {
     const existingIndex = selectedUser.findIndex(
@@ -29,7 +36,6 @@ const AssigningTask = ({
     }
   };
 
-
   return (
     <>
       <div className="flex  space-y-4  flex-row items-center justify-between">
@@ -46,10 +52,14 @@ const AssigningTask = ({
                   value={taskName}
                   onChange={(e) => setTaskName(e.target.value)}
                   placeholder="Enter task name.."
-                  className="rounded border border-indigo-500 bg-indigo-500 px-3 py-2 font-medium text-white" />
+                  className="rounded border border-indigo-500 bg-indigo-500 px-3 py-2 font-medium text-white placeholder:text-slate-200"
+                />
               </div>
               <h1 className="rounded border border-indigo-500 bg-indigo-500 px-3 py-2 font-medium text-white">
-                Total Data - {totalData}
+                Remaing Data - {remaingData-taskValue.max>0 ? remaingData-taskValue.max-taskValue.min+1 : 0 }
+              </h1>
+              <h1 className="rounded border border-indigo-500 bg-indigo-500 px-3 py-2 font-medium text-white">
+                Total Data - {totalData || 0}
               </h1>
             </div>
           </div>
@@ -99,13 +109,13 @@ const AssigningTask = ({
                             {allUsers?.map((user, i) => {
                               if (user.role !== "Admin") {
                                 return (
-                                  <div
-                                    key={user.id}
-                                    className="group flex items-center justify-between mt-2 rounded-lg hover:bg-blue-200 hover:text-black w-full bg-blue-100 px-4 py-2 text-gray-700"
+                                  <label
+                                    htmlFor={`userId-${user.id}`}
+                                    className="flex items-center"
                                   >
-                                    <label
-                                      htmlFor={`userId-${user.id}`}
-                                      className="flex items-center"
+                                    <div
+                                      key={user.id}
+                                      className="group flex items-center mt-2 rounded-lg hover:bg-blue-200 hover:text-black w-full bg-blue-100 px-4 py-2 text-gray-700"
                                     >
                                       <input
                                         type="checkbox"
@@ -124,8 +134,8 @@ const AssigningTask = ({
                                       <span className="ml-2 text-md font-medium">
                                         {user.userName}
                                       </span>
-                                    </label>
-                                  </div>
+                                    </div>
+                                  </label>
                                 );
                               } else {
                                 return null;

@@ -160,6 +160,8 @@ const CsvUploader = () => {
         }
       );
 
+      // localStorage.setItem("templeteId", JSON.stringify(imageNamesString));
+      // console.log(response.data.templeteId);
       return response.data; // Return the response from the server
     } catch (error) {
       throw new Error(error.response?.data?.error || "Upload failed.");
@@ -205,10 +207,10 @@ const CsvUploader = () => {
       // All chunks have been uploaded, navigate and finalize
       toast.success("Files uploaded successfully!");
       dataCtx.modifyIsLoading(false);
-      navigate(`/csvuploader/duplicatedetector/${selectedId}`);
       localStorage.setItem("fileId", JSON.stringify(fileId));
       localStorage.setItem("pageCount", JSON.stringify(data.pageCount));
       localStorage.setItem("imageName", JSON.stringify(imageNamesString));
+      navigate(`/csvuploader/duplicatedetector/${fileId.templeteId}`);
     } catch (error) {
       toast.error(error.message);
     } finally {
@@ -362,7 +364,7 @@ const CsvUploader = () => {
         return;
       }
       const expectedHeaders = response.data || [];
-console.log(expectedHeaders)
+// console.log(expectedHeaders)
       // If expectedHeaders is empty, skip the validation
       if (expectedHeaders.length === 0) {
         setConfirmationModal(true);

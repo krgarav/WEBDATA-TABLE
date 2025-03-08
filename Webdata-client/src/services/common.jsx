@@ -141,3 +141,96 @@ export const fetchIP = async () => {
   return response.data;
 };
 
+export const fetchHeadersInDuplicate = async (templateId) => {
+  const token = JSON.parse(localStorage.getItem("userData"));
+  // http://localhost:4000/getcsvheaders?templateId=1
+  try {
+    const response = await axios.get(
+      `http://${window.APP_IP}:4000/getcsvheaders?templateId=${templateId}`,
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const checkMappedDataExits = async (templateId) => {
+  const token = JSON.parse(localStorage.getItem("userData"));
+  // http://localhost:4000/getcsvheaders?templateId=1
+  try {
+    const response = await axios.get(
+      `http://${window.APP_IP}:4000/checkmappeddataexits?templateId=${templateId}`,
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const submitMappedData = async (mappedData) => {
+  const token = JSON.parse(localStorage.getItem("userData"));
+  // http://localhost:4000/getcsvheaders?templateId=1
+  try {
+    const data = await JSON.parse(localStorage.getItem("fileId"));
+    const templateId=data.templeteId
+    const response = await axios.post(
+      `http://${window.APP_IP}:4000/data`,
+      { mappedData, templateId },
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getTotalCSVData = async (templateId) => {
+  const token = JSON.parse(localStorage.getItem("userData"));
+  // http://localhost:4000/getcsvheaders?templateId=1
+  try {
+    const response = await axios.get(
+      `http://${window.APP_IP}:4000/gettotaldata?templateId=${templateId}`,
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const assignTasksToUsers = async (assignedUsers) => {
+  const token = JSON.parse(localStorage.getItem("userData"));
+  // http://localhost:4000/getcsvheaders?templateId=1
+  try {
+    const response = await axios.post(
+      `${window.SERVER_IP}/assign/user`,
+      assignedUsers,
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
