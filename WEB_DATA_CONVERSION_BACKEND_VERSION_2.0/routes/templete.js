@@ -28,8 +28,15 @@ const getFormCheckedData = require("../controllers/Templete/getFormCheckedData")
 const verifyUpdatedDetails = require("../controllers/Templete/verifyUpdatedDetails");
 const getCsvInfoData = require("../controllers/Templete/getCsvInfo");
 const TaskStatusDetails = require("../controllers/Templete/taskStatusDetails");
-const getUserTasksDetails = require('../controllers/Templete/getUserTasksDetails')
-const getCsvHeaderByTemplate = require('../controllers/Templete/getCsvHeaderByTemplate');
+const getUserTasksDetails = require("../controllers/Templete/getUserTasksDetails");
+const getCsvHeaderByTemplate = require("../controllers/Templete/getCsvHeaderByTemplate");
+const { checkDuplicates } = require("../controllers/MergeCsv/checkDuplicate");
+const {
+  checkDuplicateController,
+  checkMappedDataExistsController,
+  getTotalCsvDataController,
+} = require("../controllers/Templete/checkDuplicates");
+const getCsvHeaderController = require("../controllers/Templete/getCsvHeaders");
 const router = express.Router();
 
 router.get("/get/templetedata/:id", authMiddleware, getTempleteData); //templeteId
@@ -41,9 +48,12 @@ router.get("/user/details/:id", authMiddleware, userDetails); //userId
 router.get("/get/mappeddata/:id", authMiddleware, getMappedData); //templateId
 router.get("/formcheckeddata", authMiddleware, getFormCheckedData); //fileId
 router.get("/getcsvinfo/:id", authMiddleware, getCsvInfoData); //templateId
-router.get('/get/usertaskdetails/:email', authMiddleware, getUserTasksDetails)
-router.get('/get/csvheader/:template_id', authMiddleware, getCsvHeaderByTemplate)
-
+router.get("/get/usertaskdetails/:email", authMiddleware, getUserTasksDetails);
+router.get(
+  "/get/csvheader/:template_id",
+  authMiddleware,
+  getCsvHeaderByTemplate
+);
 
 router.post("/updated/details", authMiddleware, updatedDetails); //userId
 router.post("/edit/template/:id", authMiddleware, editTemplateData); //template Id
@@ -64,5 +74,11 @@ router.post("/edit/assigned/task", authMiddleware, editAssignedTask); //assigned
 router.post("/formcheckeddata", authMiddleware, postFormCheckedData); //fileId
 router.post("/verify/updateddetails", authMiddleware, verifyUpdatedDetails); //Id
 router.post("/gettaskstatusdetails/:id", TaskStatusDetails); //fileId
+
+//
+router.get("/getcsvheaders", getCsvHeaderController);
+router.post("/checkduplicatekey", checkDuplicateController);
+router.get("/checkmappeddataexits", checkMappedDataExistsController);
+router.get("/gettotaldata", getTotalCsvDataController);
 
 module.exports = router;

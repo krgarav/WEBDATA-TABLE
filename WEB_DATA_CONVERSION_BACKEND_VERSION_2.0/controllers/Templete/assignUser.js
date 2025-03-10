@@ -5,7 +5,18 @@ const assignUser = async (req, res, next) => {
 
   try {
     const creationPromises = userTasks.map(async (task) => {
-      const { userId, templeteId, fileId, max, min, moduleType, correctedFilePath, taskName, errorFilePath, imageDirectoryPath } = task;
+      const {
+        userId,
+        templeteId,
+        fileId,
+        max,
+        min,
+        moduleType,
+        correctedFilePath,
+        taskName,
+        errorFilePath,
+        imageDirectoryPath,
+      } = task;
       await Assigndata.create({
         userId: userId,
         templeteId: templeteId,
@@ -16,12 +27,14 @@ const assignUser = async (req, res, next) => {
         currentIndex: min,
         moduleType: "Data Entry",
         correctedCsvFilePath: correctedFilePath,
-        errorFilePath: errorFilePath,
-        imageDirectoryPath: imageDirectoryPath
+        errorFilePath: errorFilePath, 
+        imageDirectoryPath: imageDirectoryPath,
       });
     });
     await Promise.all(creationPromises);
-    return res.status(200).json({ message: "Users assigned successfully" });
+    return res
+      .status(200)
+      .json({ success: true, message: "Users assigned successfully" });
   } catch (error) {
     console.error("Error assigning users:", error);
     return res.status(500).json({ error: "Internal Server Error" });

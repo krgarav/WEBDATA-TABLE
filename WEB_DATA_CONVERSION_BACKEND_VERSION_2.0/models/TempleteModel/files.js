@@ -1,6 +1,5 @@
 const Sequelize = require("sequelize");
 
-
 const sequelize = require("../../utils/database");
 
 const Files = sequelize.define("filedata", {
@@ -14,6 +13,10 @@ const Files = sequelize.define("filedata", {
   },
 
   zipFile: {
+    type: Sequelize.STRING,
+    defaultValue: null,
+  },
+  totalFiles: {
     type: Sequelize.STRING,
     defaultValue: null,
   },
