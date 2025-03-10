@@ -32,6 +32,8 @@ const ImageScanner = () => {
   const cancelButtonRef = useRef(null);
   const navigate = useNavigate();
 
+  const [duplicateCheckedData, setDuplicateCheckedData] = useState([])
+
   // useEffect(() => {
   //   const fetchData = async () => {
   //     setLoading(true);
@@ -300,10 +302,11 @@ const ImageScanner = () => {
     try {
       const data = await JSON.parse(localStorage.getItem("fileId"));
       const response = await checkMappedDataExits(data?.templeteId);
+      setDuplicateCheckedData(response)
       if(response?.success){
         navigate(`/csvuploader/templatemap/${id}`);
       } else {
-        toast.error("Cannot move to mapped page!!")
+        // toast.error("Cannot move to mapped page!!")
       }
     } catch (error) {
       toast.error(error?.message)
@@ -323,6 +326,7 @@ const ImageScanner = () => {
               imageNames={imageNames}
               onFindDuplicatesHandler={onFindDuplicatesHandler}
               loading={loading}
+              duplicateCheckedData={duplicateCheckedData}
             />
           ) : (
             <div className="flex flex-col w-full justify-center items-center lg:items-start lg:flex-row pt-20  ">
