@@ -7,6 +7,7 @@ import { PageNotFound } from "./pages/PageNotFound";
 import { useContext, useEffect, useState } from "react";
 import CsvHomepage from "./pages/CSV Comparer/CsvHomepage";
 import Correction from "./pages/CSV Comparer/Correction";
+import UserTaskAssined from "./pages/DataMatching/UserTaskAssined";
 import ImageUploader from "./pages/ImageUploader/ImageUploader";
 import ImageScanner from "./pages/ImageScanner/ImageScanner";
 import dataContext from "./Store/DataContext";
@@ -98,7 +99,9 @@ function App() {
               permissions.dataEntry && (
                 <>
                   <Route path="/profile" element={<Profile />} />
-                  <Route path="/datamatching" element={<DataMatching />} />
+
+                  <Route path="/datamatching" element={<UserTaskAssined />} />
+                  <Route path="/datamatching/:id" element={<DataMatching />} />
                   {/* <Route
                     path="datamatching/correct_compare_csv"
                     element={<Correction />}

@@ -59,6 +59,8 @@ const getCsvData = async (req, res, next) => {
     const maxIndex = parseInt(max);
 
     // Validate min and max indices
+
+
     if (
       isNaN(minIndex) ||
       isNaN(maxIndex) ||

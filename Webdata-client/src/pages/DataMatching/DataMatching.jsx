@@ -46,6 +46,50 @@ const DataMatching = () => {
   const [focusedIndex, setFocusedIndex] = useState(null);
   const [os, setOs] = useState("Unknown OS");
 
+
+  useEffect(() => {
+   (async() => {
+    const taskData = JSON.parse(localStorage.getItem("taskdata"))
+    try {
+      const response = await axios.post(
+        `${window.SERVER_IP}/get/csvdata`,
+        { taskData: taskData },
+        {
+          headers: {
+            token: token,
+          },
+        }
+      );
+
+      if (response.data.length === 1) {
+        toast.warning("No matching data was found.");
+        return;
+      }
+
+      setCsvData(response.data);
+      let matchingIndex;
+      for (let i = 0; i < response.data.length; i++) {
+        if (response.data[i]["rowIndex"] == taskData.currentIndex) {
+          matchingIndex = i;
+          break;
+        }
+      }
+
+      if (matchingIndex === undefined || matchingIndex === 0) {
+        matchingIndex = 1;
+      }
+      setCurrentIndex(matchingIndex);
+      onImageHandler("initial", matchingIndex, response.data, taskData);
+    } catch (error) {
+      setConfirmationModal(true);
+      toast.error(error?.response?.data?.error);
+    }
+   })();
+  } , [])
+
+console.log(csvData)
+
+
   useEffect(() => {
     if (errorKey && inputRefs.current) {
       const index = Object.keys(csvCurrentData).indexOf(errorKey);
@@ -829,18 +873,6 @@ const DataMatching = () => {
       {(userRole === "Operator" || userRole === "Moderator") && (
         <div>
           <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-[100vh] pt-16">
-            {popUp && (
-              <>
-                <UserTaskAssined
-                  onCompareTaskStartHandler={onCompareTaskStartHandler}
-                  allTasks={allTasks}
-                  compareTask={compareTask}
-                  onTaskStartHandler={onTaskStartHandler}
-                  setCurrentTaskData={setCurrentTaskData}
-                />
-              </>
-            )}
-            {!popUp && (
               <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-600 dataEntry ">
                 {/* LEFT SECTION */}
                 <FormDataSection
@@ -922,7 +954,6 @@ const DataMatching = () => {
                   )}
                 </div>
               </div>
-            )}
           </div>
         </div>
       )}

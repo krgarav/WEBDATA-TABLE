@@ -1,15 +1,92 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
-const UserTaskAssined = ({
-  onCompareTaskStartHandler,
-  allTasks,
-  compareTask,
-  onTaskStartHandler,
-  setCurrentTaskData,
-}) => {
+import {
+  onGetTaskHandler,
+  onGetTemplateHandler,
+  onGetVerifiedUserHandler,
+  REACT_APP_IP,
+} from "../../services/common";
+import { useNavigate } from "react-router-dom";
+
+const UserTaskAssined = () => {
   const [loadingTaskId, setLoadingTaskId] = useState(null);
+  const [allTasks, setAllTasks] = useState([]);
   const [taskType, setTaskType] = useState("ALL");
+  const [compareTask, setCompareTask] = useState([]);
+  const [currentTaskData, setCurrentTaskData] = useState({});
+  const [os, setOs] = useState("Unknown OS");
+  const [userRole, setUserRole] = useState();
+  const navigate = useNavigate();
+
+
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const verifiedUser = await onGetVerifiedUserHandler();
+        setUserRole(verifiedUser.user.role);
+        const tasks = await onGetTaskHandler(verifiedUser.user.id);
+        const templateData = await onGetTemplateHandler();
+        const uploadTask = tasks.filter((task) => {
+          return task.moduleType === "Data Entry";
+        });
+        const comTask = tasks.filter((task) => {
+          return task.moduleType === "CSV Compare";
+        });
+
+        const updatedCompareTasks = comTask.map((task) => {
+          const matchedTemplate = templateData.find(
+            (template) => template.id === parseInt(task.templeteId)
+          );
+          if (matchedTemplate) {
+            return {
+              ...task,
+              templateName: matchedTemplate.name,
+            };
+          }
+          return task;
+        });
+        const updatedTasks = uploadTask.map((task) => {
+          const matchedTemplate = templateData.find(
+            (template) => template.id === parseInt(task.templeteId)
+          );
+          if (matchedTemplate) {
+            return {
+              ...task,
+              templateName: matchedTemplate.name,
+            };
+          }
+          return task;
+        });
+        setAllTasks(updatedTasks);
+        setCompareTask(updatedCompareTasks);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchCurrentUser();
+  }, []);
+
+
+  useEffect(() => {
+    const userAgent = window.navigator.userAgent;
+    const platform = window.navigator.platform;
+    if (platform.includes("Win")) {
+      setOs("Windows");
+    } else if (platform.includes("Mac")) {
+      setOs("macOS");
+    } else if (userAgent.includes("Ubuntu")) {
+      setOs("Ubuntu");
+    } else if (platform.includes("Linux") || userAgent.includes("Linux")) {
+      setOs("Linux");
+    } else if (/Android/.test(userAgent)) {
+      setOs("Android");
+    } else if (/iPhone|iPad|iPod/.test(userAgent)) {
+      setOs("iOS");
+    }
+  }, []);
+
 
   const handleStartClick = (taskData) => {
     if (taskData?.taskStatus) {
@@ -17,21 +94,73 @@ const UserTaskAssined = ({
       return;
     }
 
-    setLoadingTaskId(taskData.id);
-    onTaskStartHandler(taskData);
-    setCurrentTaskData(taskData);
-    setTimeout(() => setLoadingTaskId(null), 3000);
+    if (taskData.moduleType === "Data Entry") {
+      localStorage.setItem("taskdata", JSON.stringify(taskData));
+      navigate(`/datamatching/${taskData.id}`, { state: taskData });
+    }
   };
+
+  const onCompareTaskStartHandler = (taskdata) => {
+    if (taskdata.taskStatus) {
+      toast.warning("Task already completed");
+      return
+    }
+
+    localStorage.setItem("taskdata", JSON.stringify(taskdata));
+    navigate("/datamatching/correct_compare_csv", { state: taskdata });
+  };
+
+
+  const onTaskStartHandler = async (taskData) => {
+    try {
+      const response = await axios.post(
+        `${window.SERVER_IP}/get/csvdata`,
+        { taskData: taskData },
+        {
+          headers: {
+            token: token,
+          },
+        }
+      );
+
+      if (response.data.length === 1) {
+        toast.warning("No matching data was found.");
+        return;
+      }
+
+      setCsvData(response.data);
+      let matchingIndex;
+      for (let i = 0; i < response.data.length; i++) {
+        if (response.data[i]["rowIndex"] == taskData.currentIndex) {
+          matchingIndex = i;
+          break;
+        }
+      }
+
+      if (matchingIndex === undefined || matchingIndex === 0) {
+        matchingIndex = 1;
+      }
+      setCurrentIndex(matchingIndex);
+      onImageHandler("initial", matchingIndex, response.data, taskData);
+      setPopUp(false);
+    } catch (error) {
+      setConfirmationModal(true);
+      toast.error(error?.response?.data?.error);
+    }
+  };
+
 
   const filteredTasks =
     taskType === "ALL"
       ? allTasks
       : taskType === "pending"
-      ? allTasks?.filter((task) => task?.taskStatus === false)
-      : taskType === "completed"
-      ? allTasks?.filter((task) => task?.taskStatus === true)
-      : allTasks;
-      console.log(filteredTasks)
+        ? allTasks?.filter((task) => task?.taskStatus === false)
+        : taskType === "completed"
+          ? allTasks?.filter((task) => task?.taskStatus === true)
+          : allTasks;
+
+
+
   return (
     <div className="h-[100vh] flex justify-center bg-gradient-to-r from-blue-400 to-blue-600 items-center templatemapping">
       <div className="">
@@ -46,27 +175,24 @@ const UserTaskAssined = ({
             <nav className="flex gap-6" aria-label="Tabs">
               <button
                 onClick={() => setTaskType("All")}
-                className={`shrink-0 rounded-lg p-2 text-sm border-2  font-medium ${
-                  taskType === "All" && "bg-sky-100 text-sky-600"
-                } hover:bg-sky-100 hover:text-gray-700`}
+                className={`shrink-0 rounded-lg p-2 text-sm border-2  font-medium ${taskType === "All" && "bg-sky-100 text-sky-600"
+                  } hover:bg-sky-100 hover:text-gray-700`}
               >
                 ALL TASKS
               </button>
 
               <button
                 onClick={() => setTaskType("completed")}
-                className={`shrink-0 rounded-lg p-2 text-sm border-2  font-medium ${
-                  taskType === "completed" && "bg-sky-100 text-sky-600"
-                } hover:bg-sky-100 hover:text-gray-700`}
+                className={`shrink-0 rounded-lg p-2 text-sm border-2  font-medium ${taskType === "completed" && "bg-sky-100 text-sky-600"
+                  } hover:bg-sky-100 hover:text-gray-700`}
               >
                 COMPLETED
               </button>
 
               <button
                 onClick={() => setTaskType("pending")}
-                className={`shrink-0 border-2  rounded-lg ${
-                  taskType === "pending" && "bg-sky-100 text-sky-600"
-                } p-2 text-sm font-medium hover:bg-sky-100`}
+                className={`shrink-0 border-2  rounded-lg ${taskType === "pending" && "bg-sky-100 text-sky-600"
+                  } p-2 text-sm font-medium hover:bg-sky-100`}
                 aria-current="page"
               >
                 PENDING
@@ -113,7 +239,7 @@ const UserTaskAssined = ({
                                 {taskData.templateName}
                               </div>
                             </div>
-                            
+
                             <div className="whitespace-nowrap w-[150px] px-4">
                               <div className="text-md text-center">
                                 {taskData.taskName}
@@ -139,11 +265,10 @@ const UserTaskAssined = ({
                             <div className="whitespace-nowrap w-[150px] px-4">
                               <div className="text-md text-center">
                                 <span
-                                  className={`inline-flex items-center justify-center rounded-full ${
-                                    !taskData.taskStatus
-                                      ? "bg-amber-100 text-amber-700"
-                                      : "bg-emerald-100 text-emerald-700"
-                                  } px-2.5 py-0.5 `}
+                                  className={`inline-flex items-center justify-center rounded-full ${!taskData.taskStatus
+                                    ? "bg-amber-100 text-amber-700"
+                                    : "bg-emerald-100 text-emerald-700"
+                                    } px-2.5 py-0.5 `}
                                 >
                                   {!taskData.taskStatus ? (
                                     <svg
@@ -192,13 +317,12 @@ const UserTaskAssined = ({
                                 onClick={() => handleStartClick(taskData)}
                                 type="button"
                                 disabled={loadingTaskId === taskData.id}
-                                className={`relative rounded-3xl border border-indigo-500 bg-indigo-500 px-6 py-1 font-semibold text-white ${
-                                  loadingTaskId === taskData.id
-                                    ? "opacity-50 cursor-not-allowed"
-                                    : taskData.taskStatus
+                                className={`relative rounded-3xl border border-indigo-500 bg-indigo-500 px-6 py-1 font-semibold text-white ${loadingTaskId === taskData.id
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : taskData.taskStatus
                                     ? "before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-20 before:blur-sm"
                                     : ""
-                                }`}
+                                  }`}
                               >
                                 {loadingTaskId === taskData.id ? (
                                   <div className="flex items-center justify-center">
@@ -301,7 +425,7 @@ const UserTaskAssined = ({
                         </div>
                       ))} */}
                       {compareTask?.map((taskData) => (
-                    
+
                         <>
                           <div key={taskData.id} className="flex  py-2 w-full">
                             <div className="whitespace-nowrap w-[150px] px-4">
@@ -309,7 +433,7 @@ const UserTaskAssined = ({
                                 {taskData.templateName}
                               </div>
                             </div>
-                    
+
                             <div className="whitespace-nowrap w-[150px] px-4">
                               <div className="text-md text-center">
                                 {taskData.taskName}
@@ -335,11 +459,10 @@ const UserTaskAssined = ({
                             <div className="whitespace-nowrap w-[150px] px-4">
                               <div className="text-md text-center">
                                 <span
-                                  className={`inline-flex items-center justify-center rounded-full ${
-                                    !taskData.taskStatus
-                                      ? "bg-amber-100 text-amber-700"
-                                      : "bg-emerald-100 text-emerald-700"
-                                  } px-2.5 py-0.5 `}
+                                  className={`inline-flex items-center justify-center rounded-full ${!taskData.taskStatus
+                                    ? "bg-amber-100 text-amber-700"
+                                    : "bg-emerald-100 text-emerald-700"
+                                    } px-2.5 py-0.5 `}
                                 >
                                   {!taskData.taskStatus ? (
                                     <svg
@@ -385,19 +508,18 @@ const UserTaskAssined = ({
                               key={taskData.id}
                             >
                               <button
-                                 onClick={() =>
+                                onClick={() =>
                                   onCompareTaskStartHandler(taskData)
                                 }
                                 type="button"
                                 // disabled
                                 disabled={loadingTaskId === taskData.id}
-                                className={`relative rounded-3xl border border-indigo-500 bg-indigo-500 px-6 py-1 font-semibold text-white ${
-                                  loadingTaskId === taskData.id
-                                    ? "opacity-50 cursor-not-allowed"
-                                    : taskData.taskStatus
+                                className={`relative rounded-3xl border border-indigo-500 bg-indigo-500 px-6 py-1 font-semibold text-white ${loadingTaskId === taskData.id
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : taskData.taskStatus
                                     ? "before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-20 before:blur-sm"
                                     : ""
-                                }`}
+                                  }`}
                               >
                                 {loadingTaskId === taskData.id ? (
                                   <div className="flex items-center justify-center">
