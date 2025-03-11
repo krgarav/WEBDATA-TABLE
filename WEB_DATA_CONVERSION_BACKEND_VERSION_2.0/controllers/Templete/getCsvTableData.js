@@ -5,7 +5,7 @@ const MappedData = require("../../models/TempleteModel/mappedData");
 const MetaData = require("../../models/TempleteModel/metadata");
 const { QueryTypes, Op } = require("sequelize");
 const path = require("path");
-const FileData =require("../../models/TempleteModel/files");
+const FileData = require("../../models/TempleteModel/files");
 
 const getCsvTableData = async (req, res) => {
   try {
@@ -142,8 +142,8 @@ const getCsvTableData = async (req, res) => {
       return res.status(404).json({ error: "Assigned data not found" });
     }
 
-    const { templeteId, min, max, currentIndex,fileId } = assignedData;
-    const fileName = await FileData.findByPk(fileId)
+    const { templeteId, min, max, currentIndex, fileId } = assignedData;
+    const fileName = await FileData.findByPk(fileId);
     const template = await Template.findByPk(templeteId);
 
     if (!template) {
@@ -223,6 +223,7 @@ const getCsvTableData = async (req, res) => {
     // Split data into formData and questionData
     const formData = {};
     const questionData = {};
+    const primaryId = filteredData[currentIndex - 1].id;
     const imageName = filteredData[currentIndex - 1][imageColName];
     const baseName = path.basename(imageName);
     Object.entries(filteredData[currentIndex - 1]).forEach(([key, value]) => {
@@ -238,12 +239,15 @@ const getCsvTableData = async (req, res) => {
       formdata: formData,
       questionData: questionData,
       total_error: filteredData.length,
-      imageName: path.join(fileName.zipFile,baseName),
-      currentIndex : currentIndex
+      imageName: path.join(fileName.zipFile, baseName),
+      currentIndex: currentIndex,
+      id: primaryId,
     });
   } catch (error) {
     console.error("Error fetching CSV table data:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error", error });
   }
 };
 
