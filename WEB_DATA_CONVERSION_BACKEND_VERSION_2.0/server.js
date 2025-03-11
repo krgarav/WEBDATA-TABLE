@@ -11,6 +11,7 @@ const userRoutes = require("./routes/userManagement");
 const compareCsv = require("./routes/compareCsv");
 const mergeCsv = require("./routes/merge");
 const Templete = require("./models/TempleteModel/templete");
+// const MappedData = require("./models/TempleteModel/mappedData")
 const User = require("./models/User");
 const MetaData = require("./models/TempleteModel/metadata");
 const Files = require("./models/TempleteModel/files");
@@ -170,6 +171,20 @@ MappedData.belongsTo(Templete, {
   },
   onUpdate: "CASCADE",
 });
+
+// MappedData.belongsTo(MetaData);
+// MetaData.hasMany(MappedData);
+MetaData.belongsTo(MappedData, {
+  foreignKey: 'templeteId',
+  as: 'templetedatum'  // 👈 Alias added here
+});
+MappedData.hasMany(MetaData, {
+  foreignKey: 'templeteId',
+  as: 'templetedatum'  // 👈 Alias added here
+});
+
+// MappedData.hasOne(MetaData, { foreignKey: 'attribute', sourceKey: 'value' });
+// MetaData.belongsTo(MappedData, { foreignKey: 'attribute', targetKey: 'value' });
 
 sequelize
   .sync({ alter: !true })

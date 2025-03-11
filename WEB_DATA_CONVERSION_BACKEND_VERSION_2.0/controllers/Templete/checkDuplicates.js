@@ -49,12 +49,17 @@ exports.checkMappedDataExistsController = async (req, res) => {
 
     const mappedDataRecords = await MappedData.findAll({
       where: { templeteId: templateId },
+      attributes: ["key", "value"],
     });
-
+    const records = mappedDataRecords.map((record) => record.dataValues);
     if (mappedDataRecords.length > 0) {
       return res
         .status(400)
-        .json({ success: false, message: "Mapped data already exists" });
+        .json({
+          success: false,
+          message: "Mapped data already exists",
+          records,
+        });
     }
 
     return res
@@ -70,26 +75,34 @@ exports.checkMappedDataExistsController = async (req, res) => {
 exports.getTotalCsvDataController = async (req, res) => {
   try {
     const { templateId } = req.query;
-    
+
     if (!templateId) {
-      return res.status(400).json({ success: false, message: "Template ID is required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Template ID is required" });
     }
 
     // Find template by ID
     const template = await Template.findByPk(templateId);
 
     if (!template) {
-      return res.status(404).json({ success: false, message: "Template not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Template not found" });
     }
 
     const tableName = template.csvTableName;
 
     // Count total rows in the table
-    const [result] = await sequelize.query(`SELECT COUNT(*) as count FROM ${tableName}`);
-    
+    const [result] = await sequelize.query(
+      `SELECT COUNT(*) as count FROM ${tableName}`
+    );
+
     return res.status(200).json({ success: true, totalRows: result[0].count });
   } catch (error) {
     console.error("Error fetching CSV data:", error);
-    return res.status(500).json({ success: false, message: "Internal server error" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 };

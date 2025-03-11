@@ -63,12 +63,12 @@ const getCsvData = async (req, res, next) => {
 
     if (
       isNaN(minIndex) ||
-      isNaN(maxIndex) ||
-      minIndex < 0 ||
-      minIndex >= jsonData.length ||
-      maxIndex < 0 ||
-      maxIndex >= jsonData.length ||
-      maxIndex < minIndex
+      isNaN(maxIndex) 
+      // minIndex < 0 ||
+      // minIndex >= jsonData.length ||
+      // maxIndex < 0 ||
+      // maxIndex >= jsonData.length ||
+      // maxIndex < minIndex
     ) {
       return res.status(400).json({ error: "Invalid min or max value" });
     }

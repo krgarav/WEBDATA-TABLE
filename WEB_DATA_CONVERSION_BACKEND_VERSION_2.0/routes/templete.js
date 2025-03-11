@@ -37,6 +37,7 @@ const {
   getTotalCsvDataController,
 } = require("../controllers/Templete/checkDuplicates");
 const getCsvHeaderController = require("../controllers/Templete/getCsvHeaders");
+const getCsvTableData = require("../controllers/Templete/getCsvTableData");
 const router = express.Router();
 
 router.get("/get/templetedata/:id", authMiddleware, getTempleteData); //templeteId
@@ -58,7 +59,7 @@ router.get(
 router.post("/updated/details", authMiddleware, updatedDetails); //userId
 router.post("/edit/template/:id", authMiddleware, editTemplateData); //template Id
 router.post("/get/templetes", authMiddleware, getTemplete);
-router.post("/get/csvdata", authMiddleware, getCsvData);
+// router.post("/get/csvdata", authMiddleware, getCsvData);
 router.post("/get/image", authMiddleware, getImage);
 router.post("/add/templete", authMiddleware, addOrUpdateTemplate);
 router.post("/upload/:id", authMiddleware, handleUpload); //templeteId
@@ -80,5 +81,6 @@ router.get("/getcsvheaders", getCsvHeaderController);
 router.post("/checkduplicatekey", checkDuplicateController);
 router.get("/checkmappeddataexits", checkMappedDataExistsController);
 router.get("/gettotaldata", getTotalCsvDataController);
+router.post("/get/csvdata", authMiddleware, getCsvTableData);
 
 module.exports = router;
