@@ -64,6 +64,9 @@ const QuestionDataEntrySection = ({ data }) => {
                         onClick={() => {
                           setColumnName(key)
                         }}
+                        onFocus={() => {
+                          setColumnName(key)
+                        }}
                       />
                     </div>
                   </div>
