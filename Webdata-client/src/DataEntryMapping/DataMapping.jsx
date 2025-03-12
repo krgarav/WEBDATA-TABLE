@@ -10,7 +10,7 @@ const DataMapping = () => {
   const token = JSON.parse(localStorage.getItem("userData"));
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
 
-  const [data, setData] = useState([])
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,13 +25,13 @@ const DataMapping = () => {
           }
         );
         console.log(response.data);
-        setData(response.data)
+        setData(response.data);
       } catch (error) {
         toast.error(error?.message);
       }
     };
     fetchData();
-  },[]);
+  }, []);
 
   return (
     <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-[100vh] pt-16">
@@ -40,13 +40,12 @@ const DataMapping = () => {
         <FormDataEntrySection data={data} />
 
         <div className="flex-col w-full">
-        {/* Button and Data */}
-        <ButtonDataEntrySection data={data} />
+          {/* Button and Data */}
+          <ButtonDataEntrySection data={data} />
 
-        <ImageDataEntrySection data={data}/>
+          <ImageDataEntrySection data={data} />
 
-        <QuestionDataEntrySection data={data} />
-
+          <QuestionDataEntrySection data={data} />
         </div>
       </div>
     </div>
