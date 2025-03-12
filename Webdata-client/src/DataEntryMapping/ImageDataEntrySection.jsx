@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { GrPrevious } from "react-icons/gr";
 import { MdOutlineArrowForwardIos } from "react-icons/md";
 
-const ImageDataEntrySection = ({ data }) => {
+const ImageDataEntrySection = ({ data,imageData }) => {
   const [imageUrl, setImageUrl] = useState("");
   useEffect(() => {
     setImageUrl(`${window.SERVER_IP}/images/${data.imageName}`);
@@ -61,10 +61,10 @@ const ImageDataEntrySection = ({ data }) => {
               border: "2px solid rgba(0, 123, 255, 0.8)",
               position: "absolute",
               backgroundColor: "rgba(0, 123, 255, 0.2)",
-              //   left: `${data.coordinateX}px`,
-              //   top: `${data.coordinateY}px`,
-              //   width: `${data.width}px`,
-              //   height: `${data.height}px`,
+                left: `${imageData?.coordinateX}px`,
+                top: `${imageData?.coordinateY}px`,
+                width: `${imageData?.width}px`,
+                height: `${imageData?.height}px`,
               //   transform: `scale(${zoomLevel})`,
               transformOrigin: "center center",
               borderRadius: "0.25rem",

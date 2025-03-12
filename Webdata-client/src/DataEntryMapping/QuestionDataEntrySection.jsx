@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { dataEntryMetaData } from "../services/common";
 import { toast } from "react-toastify";
 
-const QuestionDataEntrySection = ({ data }) => {
+const QuestionDataEntrySection = ({ data, setImageData }) => {
   const [questionData, setQuestionData] = useState([]);
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
   const [columnName, setColumnName] = useState("");
@@ -12,20 +12,37 @@ const QuestionDataEntrySection = ({ data }) => {
       Array.isArray(data.questionData) ? data.questionData : [data.questionData]
     );
   }, [data]);
-
-  const getMetaDataHandler = async () => {
-    try {
-      const response = await dataEntryMetaData(taskData.templeteId, columnName);
-    } catch (error) {
-      toast.error(error?.message);
-    }
-  };
+  // useEffect(() => {
+  //   setImageData();
+  // }, [columnName]);
+  // const getMetaDataHandler = async () => {
+  //   try {
+  //     const response = await dataEntryMetaData(taskData.templeteId, columnName);
+  //     return response.data;
+  //   } catch (error) {
+  //     toast.error(error?.message);
+  //   }
+  // };
 
   useEffect(() => {
     if (columnName !== "") {
-      getMetaDataHandler();
+      const fetchData = async () => {
+        try {
+          const response = await dataEntryMetaData(
+            taskData.templeteId,
+            columnName
+          );
+          const data = response.data;
+          console.log(data);
+          setImageData(data[0]);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      fetchData();
+      //  const res =  getMetaDataHandler();
     }
-  }, [columnName, taskData]);
+  }, [columnName]);
 
   return (
     <div className="w-full xl:w-2/3 xl:px-6 mx-auto text-white">
@@ -62,10 +79,10 @@ const QuestionDataEntrySection = ({ data }) => {
                           red ? "bg-red-500" : ""
                         } `}
                         onClick={() => {
-                          setColumnName(key)
+                          setColumnName(key);
                         }}
                         onFocus={() => {
-                          setColumnName(key)
+                          setColumnName(key);
                         }}
                       />
                     </div>

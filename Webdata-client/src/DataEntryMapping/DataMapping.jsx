@@ -11,6 +11,7 @@ const DataMapping = () => {
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
 
   const [data, setData] = useState([]);
+  const [imageData, setImageData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,9 +44,9 @@ const DataMapping = () => {
           {/* Button and Data */}
           <ButtonDataEntrySection data={data} />
 
-          <ImageDataEntrySection data={data} />
+          <ImageDataEntrySection data={data} imageData={imageData} />
 
-          <QuestionDataEntrySection data={data} />
+          <QuestionDataEntrySection data={data} setImageData={setImageData} />
         </div>
       </div>
     </div>
