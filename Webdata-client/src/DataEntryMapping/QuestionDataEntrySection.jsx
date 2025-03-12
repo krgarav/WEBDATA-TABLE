@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 const QuestionDataEntrySection = ({ data }) => {
   const [questionData, setQuestionData] = useState([]);
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
-  const [columnName, setColumnName] = useState(0);
+  const [columnName, setColumnName] = useState("");
 
   useEffect(() => {
     setQuestionData(
@@ -22,7 +22,7 @@ const QuestionDataEntrySection = ({ data }) => {
   };
 
   useEffect(() => {
-    if (columnName > 0) {
+    if (columnName !== "") {
       getMetaDataHandler();
     }
   }, [columnName, taskData]);
@@ -62,13 +62,7 @@ const QuestionDataEntrySection = ({ data }) => {
                           red ? "bg-red-500" : ""
                         } `}
                         onClick={() => {
-                          if (key) {
-                            setColumnName(
-                              key.startsWith("Q")
-                                ? Number(key.replace("Q", ""))
-                                : Number(key)
-                            );
-                          }
+                          setColumnName(key)
                         }}
                       />
                     </div>
