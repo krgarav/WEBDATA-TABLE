@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GrPrevious } from "react-icons/gr";
 import { MdOutlineArrowForwardIos } from "react-icons/md";
 
-const ImageDataEntrySection = () => {
-  const [imageUrl, setImageUrl] = useState(false);
+const ImageDataEntrySection = ({ data }) => {
+  const [imageUrl, setImageUrl] = useState("");
+  useEffect(() => {
+    setImageUrl(`${window.SERVER_IP}/images/${data.imageName}`);
+  });
   return (
     <div className="flex gap-5 justify-center items-center">
       <div className="text-white px-3 py-8 bg-blue-400 rounded-3xl mx-2 hover:bg-blue-600 text-lg transition-all cursor-pointer">
@@ -25,7 +28,7 @@ const ImageDataEntrySection = () => {
         >
           {imageUrl ? (
             <img
-              //   src={`${window.SERVER_IP}/images/${imageUrl}`}
+              src={imageUrl}
               alt="Selected"
               style={{
                 width: "48rem",

@@ -235,3 +235,21 @@ export const assignTasksToUsers = async (assignedUsers) => {
     console.log(error);
   }
 };
+
+export const dataEntryMetaData = async (templateId,columnName) => {
+  const token = JSON.parse(localStorage.getItem("userData"));
+  // http://localhost:4000/getcsvheaders?templateId=1
+  try {
+    const response = await axios.get(
+      `http://${window.APP_IP}:4000/get/metadata?templateId=${templateId}&columnName=${columnName}`,
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

@@ -33,7 +33,7 @@ fetch("/config.json")
     console.log(window.APP_IP)
     const root = ReactDOM.createRoot(document.getElementById("root"));
     root.render(
-      <React.StrictMode>
+      // <React.StrictMode>
         <DataProvider>
           <App />
           <ToastContainer
@@ -49,7 +49,7 @@ fetch("/config.json")
             theme="light"
           />
         </DataProvider>
-      </React.StrictMode>
+      // </React.StrictMode>
     );
   })
   .catch((error) => console.error("Error loading config:", error));
