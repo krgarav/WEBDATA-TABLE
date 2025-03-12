@@ -33,6 +33,7 @@ import Merge from "./pages/Merge/Merge";
 import MergeDuplicateDetect from "./pages/MergeDuplicateDetect/MergeDuplicateDetect";
 import MergeDuplicateData from "./pages/MergeDuplicateDetect/MergeDuplicateData";
 import MergeEditDuplicateData from "./pages/MergeDuplicateDetect/MergeEditDuplicateData";
+import DataMapping from "./DataEntryMapping/DataMapping";
 
 function App() {
   const datactx = useContext(dataContext);
@@ -101,7 +102,8 @@ function App() {
                   <Route path="/profile" element={<Profile />} />
 
                   <Route path="/datamatching" element={<UserTaskAssined />} />
-                  <Route path="/datamatching/:id" element={<DataMatching />} />
+                  {/* <Route path="/datamatching/:id" element={<DataMatching />} /> */}
+                  <Route path="/datamatching/:id" element={<DataMapping />} />
                   {/* <Route
                     path="datamatching/correct_compare_csv"
                     element={<Correction />}
