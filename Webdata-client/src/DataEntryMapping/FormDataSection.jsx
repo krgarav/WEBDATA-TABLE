@@ -33,8 +33,10 @@ const FormDataEntrySection = ({ data }) => {
                 />
               </div>
             ))
+          ) : formData.length <= 0 ? (
+            <div className="text-white">No Data Found</div>
           ) : (
-            formData.length<=0 ? <div className="text-white">No Data Found</div> : <div className="text-white">Loading..</div>
+            <div className="text-white">Loading..</div>
           )}
 
           {/* <div className="w-5/6 px-3 lg:px-0 py-1 overflow-x font-bold justify-center items-center">
