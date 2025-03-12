@@ -1,13 +1,31 @@
 import React, { useEffect, useState } from "react";
+import { dataEntryMetaData } from "../services/common";
+import { toast } from "react-toastify";
 
 const QuestionDataEntrySection = ({ data }) => {
   const [questionData, setQuestionData] = useState([]);
+  const taskData = JSON.parse(localStorage.getItem("taskdata"));
+  const [columnName, setColumnName] = useState(0);
 
   useEffect(() => {
     setQuestionData(
       Array.isArray(data.questionData) ? data.questionData : [data.questionData]
     );
   }, [data]);
+
+  const getMetaDataHandler = async () => {
+    try {
+      const response = await dataEntryMetaData(taskData.templeteId, columnName);
+    } catch (error) {
+      toast.error(error?.message);
+    }
+  };
+
+  useEffect(() => {
+    if (columnName > 0) {
+      getMetaDataHandler();
+    }
+  }, [columnName, taskData]);
 
   return (
     <div className="w-full xl:w-2/3 xl:px-6 mx-auto text-white">
@@ -43,6 +61,15 @@ const QuestionDataEntrySection = ({ data }) => {
                         className={`h-7 w-7 text-center text-black rounded text-sm ${
                           red ? "bg-red-500" : ""
                         } `}
+                        onClick={() => {
+                          if (key) {
+                            setColumnName(
+                              key.startsWith("Q")
+                                ? Number(key.replace("Q", ""))
+                                : Number(key)
+                            );
+                          }
+                        }}
                       />
                     </div>
                   </div>
