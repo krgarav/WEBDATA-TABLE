@@ -39,6 +39,7 @@ const {
 const getCsvHeaderController = require("../controllers/Templete/getCsvHeaders");
 const getCsvTableData = require("../controllers/Templete/getCsvTableData");
 const getMetaData = require("../controllers/Templete/getMetaData");
+const updateCurrentIndex = require("../controllers/Templete/updateCurrentIndex");
 const router = express.Router();
 
 router.get("/get/templetedata/:id", authMiddleware, getTempleteData); //templeteId
@@ -83,8 +84,8 @@ router.post("/checkduplicatekey", checkDuplicateController);
 router.get("/checkmappeddataexits", checkMappedDataExistsController);
 router.get("/gettotaldata", getTotalCsvDataController);
 router.post("/get/csvdata", authMiddleware, getCsvTableData);
-router.get("/get/metadata",getMetaData);
-router.get("/update/assignedData",authMiddleware,getMetaData);
-
+router.get("/get/metadata", getMetaData);
+router.get("/update/assignedData", authMiddleware, getMetaData);
+router.post("/update/currentIndex", authMiddleware, updateCurrentIndex);
 
 module.exports = router;

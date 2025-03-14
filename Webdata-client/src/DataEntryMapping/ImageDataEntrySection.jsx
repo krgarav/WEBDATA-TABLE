@@ -2,16 +2,20 @@ import React, { useEffect, useRef, useState } from "react";
 import { GrPrevious } from "react-icons/gr";
 import { MdOutlineArrowForwardIos } from "react-icons/md";
 
-const ImageDataEntrySection = ({ data, imageData }) => {
+const ImageDataEntrySection = ({
+  data,
+  imageData,
+  prevHandler,
+  nextHandler,
+}) => {
   const [imageUrl, setImageUrl] = useState("");
   const imageRef = useRef();
   const imageContainerRef = useRef();
   useEffect(() => {
     setImageUrl(`${window.SERVER_IP}/images/${data.imageName}`);
   });
-
   useEffect(() => {
-    if (imageData?.length >= 1) {
+    if (imageData) {
       const { coordinateX, coordinateY, width, height } = imageData;
 
       const containerWidth = imageContainerRef.current.offsetWidth || 0;
@@ -49,7 +53,11 @@ const ImageDataEntrySection = ({ data, imageData }) => {
   return (
     <div className="flex gap-5 justify-center items-center">
       <div className="text-white px-3 py-8 bg-blue-400 rounded-3xl mx-2 hover:bg-blue-600 text-lg transition-all cursor-pointer">
-        <button>
+        <button
+          onClick={() => {
+            prevHandler();
+          }}
+        >
           <GrPrevious />
         </button>
       </div>
@@ -115,7 +123,11 @@ const ImageDataEntrySection = ({ data, imageData }) => {
         </div>
       </div>
       <div className="text-white px-3 py-8 bg-blue-400 rounded-3xl mx-2 hover:bg-blue-600 text-lg transition-all cursor-pointer">
-        <button>
+        <button
+          onClick={() => {
+            nextHandler();
+          }}
+        >
           <MdOutlineArrowForwardIos />
         </button>
       </div>

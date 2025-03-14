@@ -129,7 +129,9 @@ const getCsvTableData = async (req, res) => {
       .map((col) => col.key);
 
     if (!columns.length) {
-      return res.status(404).json({success:false, error: "No relevant columns found" });
+      return res
+        .status(404)
+        .json({ success: false, error: "No relevant columns found" });
     }
     if (assignedData.tableName) {
       const indexToSearch = currentIndex;
