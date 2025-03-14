@@ -101,7 +101,7 @@ function App() {
                 <>
                   <Route path="/profile" element={<Profile />} />
 
-                  <Route path="/datamatching" element={<UserTaskAssined />} />
+                  <Route path="/datamatching" element={<DataMatching />} />
                   {/* <Route path="/datamatching/:id" element={<DataMatching />} /> */}
                   <Route path="/datamatching/:id" element={<DataMapping />} />
                   {/* <Route

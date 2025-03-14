@@ -18,7 +18,7 @@ const AdminMatchingTasks = ({
   const token = JSON.parse(localStorage.getItem("userData"));
   const completeHandler=async(taskId)=>{
         const response = await axios.get(
-          `http://${REACT_APP_IP}:4000/submitTask/${taskId}`,
+          `${window.SERVER_IP}/submitTask/${taskId}`,
           {
             headers: {
               token: token,

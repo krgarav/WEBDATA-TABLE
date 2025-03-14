@@ -46,49 +46,45 @@ const DataMatching = () => {
   const [focusedIndex, setFocusedIndex] = useState(null);
   const [os, setOs] = useState("Unknown OS");
 
+  // useEffect(() => {
+  //  (async() => {
+  //   const taskData = JSON.parse(localStorage.getItem("taskdata"))
+  //   try {
+  //     const response = await axios.post(
+  //       `${window.SERVER_IP}/get/csvdata`,
+  //       { taskData: taskData },
+  //       {
+  //         headers: {
+  //           token: token,
+  //         },
+  //       }
+  //     );
 
-  useEffect(() => {
-   (async() => {
-    const taskData = JSON.parse(localStorage.getItem("taskdata"))
-    try {
-      const response = await axios.post(
-        `${window.SERVER_IP}/get/csvdata`,
-        { taskData: taskData },
-        {
-          headers: {
-            token: token,
-          },
-        }
-      );
+  //     if (response.data.length === 1) {
+  //       toast.warning("No matching data was found.");
+  //       return;
+  //     }
 
-      if (response.data.length === 1) {
-        toast.warning("No matching data was found.");
-        return;
-      }
+  //     setCsvData(response.data);
+  //     let matchingIndex;
+  //     for (let i = 0; i < response.data.length; i++) {
+  //       if (response.data[i]["rowIndex"] == taskData.currentIndex) {
+  //         matchingIndex = i;
+  //         break;
+  //       }
+  //     }
 
-      setCsvData(response.data);
-      let matchingIndex;
-      for (let i = 0; i < response.data.length; i++) {
-        if (response.data[i]["rowIndex"] == taskData.currentIndex) {
-          matchingIndex = i;
-          break;
-        }
-      }
-
-      if (matchingIndex === undefined || matchingIndex === 0) {
-        matchingIndex = 1;
-      }
-      setCurrentIndex(matchingIndex);
-      onImageHandler("initial", matchingIndex, response.data, taskData);
-    } catch (error) {
-      setConfirmationModal(true);
-      toast.error(error?.response?.data?.error);
-    }
-   })();
-  } , [])
-
-console.log(csvData)
-
+  //     if (matchingIndex === undefined || matchingIndex === 0) {
+  //       matchingIndex = 1;
+  //     }
+  //     setCurrentIndex(matchingIndex);
+  //     onImageHandler("initial", matchingIndex, response.data, taskData);
+  //   } catch (error) {
+  //     setConfirmationModal(true);
+  //     toast.error(error?.response?.data?.error);
+  //   }
+  //  })();
+  // } , [])
 
   useEffect(() => {
     if (errorKey && inputRefs.current) {
@@ -122,6 +118,7 @@ console.log(csvData)
     const fetchCurrentUser = async () => {
       try {
         const verifiedUser = await onGetVerifiedUserHandler();
+        console.log(verifiedUser);
         setUserRole(verifiedUser.user.role);
         const tasks = await onGetTaskHandler(verifiedUser.user.id);
         const templateData = await onGetTemplateHandler();
@@ -813,7 +810,7 @@ console.log(csvData)
   const onCompareTaskStartHandler = (taskdata) => {
     if (taskdata.taskStatus) {
       toast.warning("Task already completed");
-      return
+      return;
     }
     localStorage.setItem("taskdata", JSON.stringify(taskdata));
     navigate("/datamatching/correct_compare_csv", { state: taskdata });
@@ -822,9 +819,7 @@ console.log(csvData)
   const onCompleteHandler = async () => {
     try {
       await axios.post(
-        `${window.SERVER_IP}/taskupdation/${parseInt(
-          currentTaskData?.id
-        )}`,
+        `${window.SERVER_IP}/taskupdation/${parseInt(currentTaskData?.id)}`,
         {
           taskStatus: true,
         },
@@ -873,87 +868,85 @@ console.log(csvData)
       {(userRole === "Operator" || userRole === "Moderator") && (
         <div>
           <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-[100vh] pt-16">
-              <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-600 dataEntry ">
-                {/* LEFT SECTION */}
-                <FormDataSection
-                  csvCurrentData={csvCurrentData}
-                  csvData={csvData}
-                  templateHeaders={templateHeaders}
-                  imageColName={imageColName}
-                  currentFocusIndex={currentFocusIndex}
-                  inputRefs={inputRefs}
-                  handleKeyDownJump={handleKeyDownJump}
-                  changeCurrentCsvDataHandler={changeCurrentCsvDataHandler}
-                  imageFocusHandler={imageFocusHandler}
-                  focusedIndex={focusedIndex}
-                  setFocusedIndex={setFocusedIndex}
-                />
-                {/* RIGHT SECTION */}
-                <div className="w-full lg:w-[80%] xl:w-10/12 matchingMain">
-                  {imageUrls?.length === 0 ? (
-                    <div className="flex justify-center items-center ">
-                      <div className="mt-10">
-                        <ImageNotFound />
+            <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-600 dataEntry ">
+              {/* LEFT SECTION */}
+              <FormDataSection
+                csvCurrentData={csvCurrentData}
+                csvData={csvData}
+                templateHeaders={templateHeaders}
+                imageColName={imageColName}
+                currentFocusIndex={currentFocusIndex}
+                inputRefs={inputRefs}
+                handleKeyDownJump={handleKeyDownJump}
+                changeCurrentCsvDataHandler={changeCurrentCsvDataHandler}
+                imageFocusHandler={imageFocusHandler}
+                focusedIndex={focusedIndex}
+                setFocusedIndex={setFocusedIndex}
+              />
+              {/* RIGHT SECTION */}
+              <div className="w-full lg:w-[80%] xl:w-10/12 matchingMain">
+                {imageUrls?.length === 0 ? (
+                  <div className="flex justify-center items-center ">
+                    <div className="mt-10">
+                      <ImageNotFound />
 
-                        <h1 className="mt-8 text-2xl font-bold tracking-tight text-gray-700 sm:text-4xl">
-                          Please Select Image...
-                        </h1>
+                      <h1 className="mt-8 text-2xl font-bold tracking-tight text-gray-700 sm:text-4xl">
+                        Please Select Image...
+                      </h1>
 
-                        <p className="mt-4 text-gray-600 text-center">
-                          We can't find that page!!
-                        </p>
+                      <p className="mt-4 text-gray-600 text-center">
+                        We can't find that page!!
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex-col">
+                    <div className="flex float-right gap-4 mt-2 mr-4 ">
+                      <div className="">
+                        {currentIndex === csvData.length - 1 && (
+                          <button
+                            onClick={() => setConfirmationModal(true)}
+                            className="px-4 py-2 bg-teal-600 mx-2 text-white rounded-3xl hover:bg-teal-700"
+                          >
+                            Task Completed
+                          </button>
+                        )}
                       </div>
                     </div>
-                  ) : (
-                    <div className="flex-col">
-                      <div className="flex float-right gap-4 mt-2 mr-4 ">
-                        <div className="">
-                          {currentIndex === csvData.length - 1 && (
-                            <button
-                              onClick={() => setConfirmationModal(true)}
-                              className="px-4 py-2 bg-teal-600 mx-2 text-white rounded-3xl hover:bg-teal-700"
-                            >
-                              Task Completed
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                      <ButtonSection
-                        currentIndex={currentIndex}
-                        csvData={csvData}
-                        zoomInHandler={zoomInHandler}
-                        onInialImageHandler={onInialImageHandler}
-                        zoomOutHandler={zoomOutHandler}
-                        currentImageIndex={currentImageIndex}
-                        imageUrls={imageUrls}
-                      />
+                    <ButtonSection
+                      currentIndex={currentIndex}
+                      csvData={csvData}
+                      zoomInHandler={zoomInHandler}
+                      onInialImageHandler={onInialImageHandler}
+                      zoomOutHandler={zoomOutHandler}
+                      currentImageIndex={currentImageIndex}
+                      imageUrls={imageUrls}
+                    />
 
-                      <ImageSection
-                        imageContainerRef={imageContainerRef}
-                        currentImageIndex={currentImageIndex}
-                        imageUrls={imageUrls}
-                        imageRef={imageRef}
-                        zoomLevel={zoomLevel}
-                        selectedCoordintes={selectedCoordintes}
-                        templateHeaders={templateHeaders}
-                      />
-                      <QuestionsDataSection
-                        csvCurrentData={csvCurrentData}
-                        csvData={csvData}
-                        templateHeaders={templateHeaders}
-                        imageColName={imageColName}
-                        currentFocusIndex={currentFocusIndex}
-                        inputRefs={inputRefs}
-                        handleKeyDownJump={handleKeyDownJump}
-                        changeCurrentCsvDataHandler={
-                          changeCurrentCsvDataHandler
-                        }
-                        imageFocusHandler={imageFocusHandler}
-                      />
-                    </div>
-                  )}
-                </div>
+                    <ImageSection
+                      imageContainerRef={imageContainerRef}
+                      currentImageIndex={currentImageIndex}
+                      imageUrls={imageUrls}
+                      imageRef={imageRef}
+                      zoomLevel={zoomLevel}
+                      selectedCoordintes={selectedCoordintes}
+                      templateHeaders={templateHeaders}
+                    />
+                    <QuestionsDataSection
+                      csvCurrentData={csvCurrentData}
+                      csvData={csvData}
+                      templateHeaders={templateHeaders}
+                      imageColName={imageColName}
+                      currentFocusIndex={currentFocusIndex}
+                      inputRefs={inputRefs}
+                      handleKeyDownJump={handleKeyDownJump}
+                      changeCurrentCsvDataHandler={changeCurrentCsvDataHandler}
+                      imageFocusHandler={imageFocusHandler}
+                    />
+                  </div>
+                )}
               </div>
+            </div>
           </div>
         </div>
       )}
