@@ -101,8 +101,13 @@ function App() {
                 <>
                   <Route path="/profile" element={<Profile />} />
 
-                  <Route path="/datamatching" element={<DataMatching />} />
-                  {/* <Route path="/datamatching/:id" element={<DataMatching />} /> */}
+                  <Route
+                    path="/datamatching"
+                    element={
+                      role !== "Admin" ? <UserTaskAssined /> : <DataMatching />
+                    }
+                  />
+                  {/* <Route path="/datamatching/" element={<DataMatching />} /> */}
                   <Route path="/datamatching/:id" element={<DataMapping />} />
                   {/* <Route
                     path="datamatching/correct_compare_csv"

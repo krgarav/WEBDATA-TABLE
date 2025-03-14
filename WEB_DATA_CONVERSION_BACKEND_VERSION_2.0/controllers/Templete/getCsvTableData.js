@@ -137,6 +137,8 @@ const getCsvTableData = async (req, res) => {
       const indexToSearch = currentIndex;
 
       try {
+        const template = await Template.findByPk(templeteId);
+        const maintable = template.csvTableName;
         const query = `SELECT * FROM \`${assignedData.tableName}\` WHERE id = :indexToSearch`;
         const [result] = await sequelize.query(query, {
           replacements: { indexToSearch },
@@ -146,7 +148,14 @@ const getCsvTableData = async (req, res) => {
         const [countResult] = await sequelize.query(countQuery, {
           type: sequelize.QueryTypes.SELECT,
         });
-        const imageName = result[imageColName];
+        const parentId = result.parentId;
+        const querytwo = `SELECT * FROM \`${maintable}\` WHERE id = :parentId`;
+
+        const [resultTwo] = await sequelize.query(querytwo, {
+          replacements: { parentId },
+          type: sequelize.QueryTypes.SELECT, // Ensures SELECT query type
+        });
+        const imageName = resultTwo[imageColName];
         const baseName = path.basename(imageName);
         const formData = {};
         const questionData = {};
@@ -157,7 +166,7 @@ const getCsvTableData = async (req, res) => {
 
         const maindir = path.join(fileName.zipFile, joinstr, baseName);
 
-        Object.entries(result).forEach(([key, value]) => {
+        Object.entries(resultTwo).forEach(([key, value]) => {
           if (FormCol.includes(key)) {
             formData[key] = value;
           }
@@ -176,6 +185,9 @@ const getCsvTableData = async (req, res) => {
         });
       } catch (error) {
         console.error("Error executing query:", error.message);
+        return res
+          .status(500)
+          .json({ success: false, error: "Internal Server Error" });
       }
     }
 
@@ -202,8 +214,7 @@ const getCsvTableData = async (req, res) => {
       },
       type: sequelize.QueryTypes.SELECT,
     });
-    const updatedFilteredData = filteredData.map(({ id, ...rest }) => ({
-      ...rest,
+    const updatedFilteredData = filteredData.map(({ id }) => ({
       parentId: id,
     }));
     const assignedTableName = await processAndInsertCSV(updatedFilteredData);

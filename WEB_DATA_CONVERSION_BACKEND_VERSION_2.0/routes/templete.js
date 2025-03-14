@@ -40,13 +40,14 @@ const getCsvHeaderController = require("../controllers/Templete/getCsvHeaders");
 const getCsvTableData = require("../controllers/Templete/getCsvTableData");
 const getMetaData = require("../controllers/Templete/getMetaData");
 const updateCurrentIndex = require("../controllers/Templete/updateCurrentIndex");
+const downloadMergedCsv = require("../controllers/Templete/downloadMergedCsv");
 const router = express.Router();
 
 router.get("/get/templetedata/:id", authMiddleware, getTempleteData); //templeteId
 router.get("/get/headerdata/:id", authMiddleware, getHeaderData); //fileId
 router.get("/get/alltasks", authMiddleware, getAllTask); //admin
 router.get("/get/task/:id", authMiddleware, getTask); //user
-router.get("/download/csv/:id", authMiddleware, downloadCsv); //file Id
+// router.get("/download/csv/:id", authMiddleware, downloadCsv); //file Id
 router.get("/user/details/:id", authMiddleware, userDetails); //userId
 router.get("/get/mappeddata/:id", authMiddleware, getMappedData); //templateId
 router.get("/formcheckeddata", authMiddleware, getFormCheckedData); //fileId
@@ -87,5 +88,6 @@ router.post("/get/csvdata", authMiddleware, getCsvTableData);
 router.get("/get/metadata", getMetaData);
 router.get("/update/assignedData", authMiddleware, getMetaData);
 router.post("/update/currentIndex", authMiddleware, updateCurrentIndex);
+router.get("/download/csv/:id", authMiddleware, downloadMergedCsv); 
 
 module.exports = router;

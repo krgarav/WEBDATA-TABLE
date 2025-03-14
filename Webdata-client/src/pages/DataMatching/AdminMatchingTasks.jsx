@@ -13,35 +13,34 @@ const AdminMatchingTasks = ({
   setTaskEditId,
   taskType,
   selectedDate,
-  setMatchingTask
+  setMatchingTask,
 }) => {
   const token = JSON.parse(localStorage.getItem("userData"));
-  const completeHandler=async(taskId)=>{
-        const response = await axios.get(
-          `${window.SERVER_IP}/submitTask/${taskId}`,
-          {
-            headers: {
-              token: token,
-            },
-          }
-        );
-        setMatchingTask((prev) => prev.map((task) => {
-          if(task.id == taskId) {
-             return {...task, taskStatus: true}
-          }
-          return task;
-        }));
-        
-      } 
+  const completeHandler = async (taskId) => {
+    const response = await axios.get(
+      `${window.SERVER_IP}/submitTask/${taskId}`,
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    setMatchingTask((prev) =>
+      prev.map((task) => {
+        if (task.id == taskId) {
+          return { ...task, taskStatus: true };
+        }
+        return task;
+      })
+    );
+  };
   const onFilteredTasksHandler = (tasks) => {
-    
     let filterdTaskData = tasks;
     if (taskType !== "ALL") {
       if (taskType === "pending") {
-        filterdTaskData = tasks?.filter(task => task?.taskStatus === false);
-      }
-      else if (taskType === "completed") {
-        filterdTaskData = tasks?.filter(task => task?.taskStatus === true);
+        filterdTaskData = tasks?.filter((task) => task?.taskStatus === false);
+      } else if (taskType === "completed") {
+        filterdTaskData = tasks?.filter((task) => task?.taskStatus === true);
       }
     }
 
@@ -55,11 +54,9 @@ const AdminMatchingTasks = ({
       });
     }
     return filterdTaskData;
-
-  }
+  };
 
   const filteredTasks = onFilteredTasksHandler(matchingTask);
-
 
   return (
     <div>
@@ -88,10 +85,11 @@ const AdminMatchingTasks = ({
           <div className="whitespace-nowrap w-[100px] py-2">
             <div className="text-md text-center">
               <span
-                className={`inline-flex items-center justify-center rounded-full ${!taskData.taskStatus
-                  ? "bg-amber-100 text-amber-700"
-                  : "bg-emerald-100 text-emerald-700"
-                  } px-2.5 py-0.5`}
+                className={`inline-flex items-center justify-center rounded-full ${
+                  !taskData.taskStatus
+                    ? "bg-amber-100 text-amber-700"
+                    : "bg-emerald-100 text-emerald-700"
+                } px-2.5 py-0.5`}
               >
                 {!taskData.taskStatus ? (
                   <svg
@@ -130,10 +128,11 @@ const AdminMatchingTasks = ({
           <div className="whitespace-nowrap text-center w-[100px] py-2">
             <button
               onClick={() => onCompleteHandler(taskData)}
-              className={`rounded-3xl px-4 py-1 font-semibold ${taskData.taskStatus
-                ? "bg-indigo-500 text-white border border-indigo-500"
-                : "bg-gray-400 text-gray-600 cursor-not-allowed"
-                }`}
+              className={`rounded-3xl px-4 py-1 font-semibold ${
+                taskData.taskStatus
+                  ? "bg-indigo-500 text-white border border-indigo-500"
+                  : "bg-gray-400 text-gray-600 cursor-not-allowed"
+              }`}
               disabled={!taskData.taskStatus}
             >
               <MdOutlineRestartAlt />
@@ -142,10 +141,11 @@ const AdminMatchingTasks = ({
           <div className="whitespace-nowrap text-center w-[100px] py-2">
             <button
               onClick={() => onDownloadHandler(taskData)}
-              className={`rounded-3xl px-4 py-1 font-semibold ${taskData.taskStatus
-                ? "bg-indigo-500 text-white border border-indigo-500"
-                : "bg-gray-400 text-gray-600 cursor-not-allowed"
-                }`}
+              className={`rounded-3xl px-4 py-1 font-semibold ${
+                taskData.taskStatus
+                  ? "bg-indigo-500 text-white border border-indigo-500"
+                  : "bg-gray-400 text-gray-600 cursor-not-allowed"
+              }`}
               disabled={!taskData.taskStatus}
             >
               <FaCloudDownloadAlt />
@@ -163,11 +163,11 @@ const AdminMatchingTasks = ({
             </button>
           </div>
           <div
-           onClick={()=>completeHandler(taskData.id)}
+            onClick={() => completeHandler(taskData.id)}
             className="whitespace-nowrap text-center w-[100px] py-2"
           >
             <button className="rounded border border-indigo-500 bg-indigo-500 px-4 py-1 font-semibold text-white">
-            <MdOutlineTaskAlt />
+              <MdOutlineTaskAlt />
             </button>
           </div>
         </div>

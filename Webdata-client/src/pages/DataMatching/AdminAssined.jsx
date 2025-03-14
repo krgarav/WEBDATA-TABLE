@@ -201,7 +201,7 @@ const AdminAssined = () => {
 
     try {
       const response = await fetch(
-        `${window.SERVER_IP}/download/csv/${currentTaskData.fileId}`,
+        `${window.SERVER_IP}/download/csv/${currentTaskData.id}`,
         {
           method: "GET",
           headers: {
