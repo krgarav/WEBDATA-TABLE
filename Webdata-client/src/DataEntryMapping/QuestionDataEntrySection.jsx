@@ -6,12 +6,23 @@ const QuestionDataEntrySection = ({ data, setImageData }) => {
   const [questionData, setQuestionData] = useState([]);
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
   const [columnName, setColumnName] = useState("");
-
+  const [editableData, setEditableData] = useState(null);
   useEffect(() => {
-    setQuestionData(
-      Array.isArray(data.questionData) ? data.questionData : [data.questionData]
-    );
+    setEditableData(data.questionData);
   }, [data]);
+  // useEffect(() => {
+  //   setQuestionData(
+  //     Array.isArray(data.questionData) ? data.questionData : [data.questionData]
+  //   );
+  // }, [data]);
+  // console.log(data.questionData);
+  const handleInputChange = (key, newValue) => {
+    setEditableData((prevData) => ({
+      ...prevData,
+      [key]: newValue,
+    }));
+  };
+  console.log(editableData);
   // useEffect(() => {
   //   setImageData();
   // }, [columnName]);
@@ -57,7 +68,7 @@ const QuestionDataEntrySection = ({ data, setImageData }) => {
           className="flex overflow-auto max-h-[360px] mt-3 ms-2 xl:ms-2 flex-wrap"
           style={{ scrollbarWidth: "thin" }}
         >
-          {Array.isArray(questionData) &&
+          {/* {Array.isArray(questionData) &&
           questionData.length > 0 &&
           questionData[0] ? (
             Object.entries(questionData[0]).map(([key, value], index) => {
@@ -94,6 +105,57 @@ const QuestionDataEntrySection = ({ data, setImageData }) => {
             <div className="text-white">No Data Found</div>
           ) : (
             <div className="text-white">Loading..</div>
+          )} */}
+          {/* {editableData && (
+            <div className="grid grid-cols-4 gap-4">
+              {Object.entries(editableData).map(([key, value]) => {
+                const red = value === " " || value === "*";
+
+                return (
+                  <div key={key} className="flex items-center">
+                    <label className="font-bold text-sm w-12">{key}</label>
+                    <input
+                      type="text"
+                      value={value}
+                      onChange={(e) => handleInputChange(key, e.target.value)}
+                      className={`h-7 w-7 text-center text-black rounded text-sm ${
+                        red ? "bg-red-500" : ""
+                      }`}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )} */}
+
+          {editableData? (
+            Object.entries(editableData).map(([key, value], index) => {
+              const red = value === " " || value === "*";
+
+              return (
+                <div key={index} className="flex">
+                  <div className="me-3 my-1 flex">
+                    <label className="font-bold text-sm w-9 my-1">{key}</label>
+                    <div className="flex rounded">
+                      <input
+                        type="text"
+                        value={value}
+                        className={`h-7 w-7 text-center text-black rounded text-sm ${
+                          red ? "bg-red-500" : ""
+                        }`}
+                        onChange={(e) => handleInputChange(key, e.target.value)}
+                        onClick={() => setColumnName(key)}
+                        onFocus={() => setColumnName(key)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : questionData.length === 0 ? (
+            <div className="text-white">No Data Found</div>
+          ) : (
+            <div className="text-white">Loading...</div>
           )}
         </div>
       </div>
