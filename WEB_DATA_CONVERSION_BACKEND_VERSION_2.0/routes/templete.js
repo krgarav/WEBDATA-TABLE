@@ -41,6 +41,7 @@ const getCsvTableData = require("../controllers/Templete/getCsvTableData");
 const getMetaData = require("../controllers/Templete/getMetaData");
 const updateCurrentIndex = require("../controllers/Templete/updateCurrentIndex");
 const downloadMergedCsv = require("../controllers/Templete/downloadMergedCsv");
+const updateMainCsvData = require("../controllers/Templete/updateMainCsvData");
 const router = express.Router();
 
 router.get("/get/templetedata/:id", authMiddleware, getTempleteData); //templeteId
@@ -89,5 +90,5 @@ router.get("/get/metadata", getMetaData);
 router.get("/update/assignedData", authMiddleware, getMetaData);
 router.post("/update/currentIndex", authMiddleware, updateCurrentIndex);
 router.get("/download/csv/:id", authMiddleware, downloadMergedCsv); 
-
+router.post("/update/csvdata" , authMiddleware,updateMainCsvData)
 module.exports = router;

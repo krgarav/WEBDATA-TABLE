@@ -181,7 +181,7 @@ const getCsvTableData = async (req, res) => {
           total_error: countResult.total,
           imageName: maindir,
           currentIndex: currentIndex,
-          id: result.id,
+          id: result.parentId,
         });
       } catch (error) {
         console.error("Error executing query:", error.message);

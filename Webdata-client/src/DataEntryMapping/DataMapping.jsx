@@ -5,7 +5,7 @@ import FormDataEntrySection from "./FormDataSection";
 import ButtonDataEntrySection from "./ButtonDataEntrySection";
 import ImageDataEntrySection from "./ImageDataEntrySection";
 import QuestionDataEntrySection from "./QuestionDataEntrySection";
-import { updateCurrentIndex } from "../services/common";
+import { updateCsvData, updateCurrentIndex } from "../services/common";
 
 const DataMapping = () => {
   const token = JSON.parse(localStorage.getItem("userData"));
@@ -61,6 +61,18 @@ const DataMapping = () => {
       console.log(error);
     }
   };
+
+  const saveHandler = async (updatedData) => {
+    // console.log(updatedData);
+    const obj = {
+      templateId: taskData.id,
+      parentId: data.id,
+      updatedData,
+    };
+    const res = await updateCsvData(obj);
+    nextHandler();
+    console.log(res);
+  };
   return (
     <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-[100vh] pt-16">
       <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-600 dataEntry ">
@@ -78,7 +90,11 @@ const DataMapping = () => {
             prevHandler={prevHandler}
           />
 
-          <QuestionDataEntrySection data={data} setImageData={setImageData} />
+          <QuestionDataEntrySection
+            data={data}
+            saveHandler={saveHandler}
+            setImageData={setImageData}
+          />
         </div>
       </div>
     </div>

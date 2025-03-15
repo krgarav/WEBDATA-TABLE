@@ -254,7 +254,7 @@ export const dataEntryMetaData = async (templateId, columnName) => {
   }
 };
 
-export const updateCurrentIndex = async (taskId,direction) => {
+export const updateCurrentIndex = async (taskId, direction) => {
   const token = JSON.parse(localStorage.getItem("userData"));
   // http://localhost:4000/getcsvheaders?templateId=1
   try {
@@ -262,8 +262,27 @@ export const updateCurrentIndex = async (taskId,direction) => {
       `http://${window.APP_IP}:4000/update/currentIndex`,
       {
         taskId: taskId,
-        direction:direction
+        direction: direction,
       },
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const updateCsvData = async (obj) => {
+  const token = JSON.parse(localStorage.getItem("userData"));
+  // http://localhost:4000/getcsvheaders?templateId=1
+  try {
+    const response = await axios.post(
+      `http://${window.APP_IP}:4000/update/csvdata`,
+      obj,
       {
         headers: {
           token: token,

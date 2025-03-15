@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { dataEntryMetaData } from "../services/common";
 import { toast } from "react-toastify";
 
-const QuestionDataEntrySection = ({ data, setImageData }) => {
+const QuestionDataEntrySection = ({ data, setImageData, saveHandler }) => {
   const [questionData, setQuestionData] = useState([]);
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
   const [columnName, setColumnName] = useState("");
@@ -58,12 +58,23 @@ const QuestionDataEntrySection = ({ data, setImageData }) => {
   return (
     <div className="w-full xl:w-2/3 xl:px-6 mx-auto text-white">
       <div className="my-4 w-full ">
-        <label
-          className="text-xl font-semibold ms-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          htmlFor="questions"
-        >
-          Questions:
-        </label>
+        <div className="flex items-center justify-between bg-transparent p-4 rounded-lg shadow-md">
+          <label
+            className="text-xl font-semibold text-white ms-2 leading-none"
+            htmlFor="questions"
+          >
+            Questions:
+          </label>
+          <button
+            onClick={() => {
+              saveHandler(editableData);
+            }}
+            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-200 ease-in-out"
+          >
+            Save
+          </button>
+        </div>
+
         <div
           className="flex overflow-auto max-h-[360px] mt-3 ms-2 xl:ms-2 flex-wrap"
           style={{ scrollbarWidth: "thin" }}
@@ -128,7 +139,7 @@ const QuestionDataEntrySection = ({ data, setImageData }) => {
             </div>
           )} */}
 
-          {editableData? (
+          {editableData ? (
             Object.entries(editableData).map(([key, value], index) => {
               const red = value === " " || value === "*";
 
