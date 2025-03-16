@@ -501,10 +501,10 @@ const compareCsv = async (req, res) => {
       },
     });
 
-    if (response.length > 0) {
-      // If records are found, throw an error
-      throw new Error("Records found in ErrorTable");
-    }
+    // if (response.length > 0) {
+    //   // If records are found, throw an error
+    //   throw new Error("Records found in ErrorTable");
+    // }
     insertData(groupedArray);
     // const resultTedArr = await insertGroupedArrayIntoTable(groupedArray);
     // console.log(f1,"------------------")

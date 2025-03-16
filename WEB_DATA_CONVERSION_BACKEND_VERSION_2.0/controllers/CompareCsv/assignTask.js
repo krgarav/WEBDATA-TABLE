@@ -22,7 +22,7 @@ const assignTask = async (req, res, next) => {
         templeteId,
         errorFilePath,
         imageDirectoryPath,
-        tableName
+        
       } = task;
 
       await Assigndata.create({
@@ -38,7 +38,6 @@ const assignTask = async (req, res, next) => {
         correctedCsvFilePath: correctedFilePath,
         errorFilePath: errorFilePath,
         imageDirectoryPath: imageDirectoryPath,
-        tableName:tableName
       });
 
     });
