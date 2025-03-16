@@ -199,12 +199,12 @@ export const submitMappedData = async (mappedData) => {
   }
 };
 
-export const getTotalCSVData = async (templateId) => {
+export const getTotalCSVData = async (templateId,fileId) => {
   const token = JSON.parse(localStorage.getItem("userData"));
   // http://localhost:4000/getcsvheaders?templateId=1
   try {
     const response = await axios.get(
-      `http://${window.APP_IP}:4000/gettotaldata?templateId=${templateId}`,
+      `http://${window.APP_IP}:4000/gettotaldata?templateId=${templateId}&fileId=${fileId}`,
       {
         headers: {
           token: token,

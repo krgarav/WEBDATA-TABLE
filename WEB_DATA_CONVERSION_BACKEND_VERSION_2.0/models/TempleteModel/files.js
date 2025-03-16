@@ -20,6 +20,9 @@ const Files = sequelize.define("filedata", {
     type: Sequelize.STRING,
     defaultValue: null,
   },
+  startIndex: {
+    type: Sequelize.INTEGER,
+  },
 });
 
 module.exports = Files;

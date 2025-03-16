@@ -57,7 +57,7 @@ const TemplateMapping = () => {
   useEffect(() => {
     const data = JSON.parse(localStorage.getItem("fileId"));
     async function fetchData() {
-      const response = await getTotalCSVData(data.templeteId);
+      const response = await getTotalCSVData(data.templeteId,data.fileId);
       setTotalData(response.totalRows);
     }
     fetchData();

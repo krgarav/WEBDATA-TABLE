@@ -27,15 +27,13 @@ const CsvHomepage = () => {
   useEffect(() => {
     dataCtx.addToCsvHeader([]);
   }, []);
-  
+
   useEffect(() => {
     document.body.style.userSelect = "none";
     return () => {
       document.body.style.userSelect = "auto";
     };
   }, []);
-  
-
 
   const compareHandler = () => {
     const {
@@ -59,12 +57,12 @@ const CsvHomepage = () => {
       alert("Please select template then select image zip file");
       return;
     }
-    
+
     if (firstInputCsvFiles.length === 0) {
       alert("Choose first CSV file");
       return;
     }
-    
+
     if (primaryKey === "") {
       alert("Please select primary key");
       return;
@@ -82,15 +80,16 @@ const CsvHomepage = () => {
         formData.append("firstInputCsvFile", firstInputCsvFiles);
         formData.append("zipImageFile", uploadZipImage);
         formData.append("fileId", fileId);
-        formData.append("firstInputFileName", firstInputFileName);
-        formData.append("secondInputFileName", secondInputFileName);
+        formData.append("secondInputFileName", firstInputFileName);
+        formData.append("firstInputFileName", secondInputFileName);
         formData.append("primaryKey", primaryKey);
         formData.append("skippingKey", skippingKey);
         formData.append("imageColName", imageColName);
         formData.append("formFeilds", formFeilds);
+        formData.append("templateId", selectedTemplate);
 
         const response = await axios.post(
-          `http://${REACT_APP_IP}:4000/compareData`,
+          `${window.SERVER_IP}/compareData`,
           formData,
           {
             headers: {
@@ -115,7 +114,7 @@ const CsvHomepage = () => {
           alert(`Error Occured : ${alertmsg}`);
           console.log(err.response.data.err);
         }
-       setLoading(false)
+        setLoading(false);
       }
     };
     sendRequest();

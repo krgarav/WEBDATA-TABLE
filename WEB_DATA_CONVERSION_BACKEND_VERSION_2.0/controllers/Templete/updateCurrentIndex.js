@@ -4,15 +4,14 @@ const updateCurrentIndex = async (req, res) => {
   try {
     const { taskId, direction } = req.body;
 
-    const assignData = await Assigndata.findOne({ id: taskId });
+    const assignData = await Assigndata.findByPk(taskId);
     if (!assignData) {
       return res.status(404).json({ error: "Task not found" });
     }
-
     const tableName = assignData.tableName;
 
     const [countResult] = await sequelize.query(
-      `SELECT COUNT(*) AS count FROM ${tableName}`
+      `SELECT COUNT(*) AS count FROM ${tableName} `
     );
     const count = countResult[0].count;
 

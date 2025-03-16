@@ -17,7 +17,8 @@ const MetaData = require("./models/TempleteModel/metadata");
 const Files = require("./models/TempleteModel/files");
 const UpdatedData = require("./models/TempleteModel/updatedData");
 const Settings = require("./routes/settings");
-
+const ErrorTable = require("./models/CompareModel/ErrrorTable");
+const ErrorAggregatedTable = require("./models/CompareModel/ErrorAggregatedTable");
 // require("./services/csvWorker");
 
 const upload = require("./routes/upload");
@@ -175,17 +176,25 @@ MappedData.belongsTo(Templete, {
 // MappedData.belongsTo(MetaData);
 // MetaData.hasMany(MappedData);
 MetaData.belongsTo(MappedData, {
-  foreignKey: 'templeteId',
-  as: 'templetedatum'  // 👈 Alias added here
+  foreignKey: "templeteId",
+  as: "templetedatum", // 👈 Alias added here
 });
 MappedData.hasMany(MetaData, {
-  foreignKey: 'templeteId',
-  as: 'templetedatum'  // 👈 Alias added here
+  foreignKey: "templeteId",
+  as: "templetedatum", // 👈 Alias added here
 });
 
 // MappedData.hasOne(MetaData, { foreignKey: 'attribute', sourceKey: 'value' });
 // MetaData.belongsTo(MappedData, { foreignKey: 'attribute', targetKey: 'value' });
+ErrorTable.hasMany(ErrorAggregatedTable, {
+  foreignKey: "errorTableId",
+  as: "aggregatedErrors", // Alias for clarity
+});
 
+ErrorAggregatedTable.belongsTo(ErrorTable, {
+  foreignKey: "errorTableId",
+  as: "error", // Alias for clarity
+});
 sequelize
   .sync({ alter: !true })
   .then(async () => {

@@ -2,6 +2,7 @@ const sequelize = require("../../utils/database"); // Import the Sequelize insta
 const { QueryTypes } = require("sequelize");
 const Template = require("../../models/TempleteModel/templete");
 const MappedData = require("../../models/TempleteModel/mappedData");
+const Files = require("../../models/TempleteModel/files");
 exports.checkDuplicateController = async (req, res) => {
   try {
     const { header, templateId } = req.body;
@@ -53,13 +54,11 @@ exports.checkMappedDataExistsController = async (req, res) => {
     });
     const records = mappedDataRecords.map((record) => record.dataValues);
     if (mappedDataRecords.length > 0) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Mapped data already exists",
-          records,
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Mapped data already exists",
+        records,
+      });
     }
 
     return res
@@ -74,7 +73,7 @@ exports.checkMappedDataExistsController = async (req, res) => {
 };
 exports.getTotalCsvDataController = async (req, res) => {
   try {
-    const { templateId } = req.query;
+    const { templateId, fileId } = req.query;
 
     if (!templateId) {
       return res
@@ -84,21 +83,25 @@ exports.getTotalCsvDataController = async (req, res) => {
 
     // Find template by ID
     const template = await Template.findByPk(templateId);
-
+    const assignData = await Files.findByPk(fileId);
     if (!template) {
       return res
         .status(404)
         .json({ success: false, message: "Template not found" });
     }
-
+    console.log(assignData);
     const tableName = template.csvTableName;
-
-    // Count total rows in the table
+    const startIndex = assignData.startIndex;
     const [result] = await sequelize.query(
-      `SELECT COUNT(*) as count FROM ${tableName}`
+      `
+      SELECT COUNT(*) AS count 
+      FROM ${tableName}
+      WHERE id > ${startIndex}
+    `,
+      { type: sequelize.QueryTypes.SELECT }
     );
 
-    return res.status(200).json({ success: true, totalRows: result[0].count });
+    return res.status(200).json({ success: true, totalRows: result.count });
   } catch (error) {
     console.error("Error fetching CSV data:", error);
     return res

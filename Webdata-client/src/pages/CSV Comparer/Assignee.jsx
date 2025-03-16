@@ -107,7 +107,7 @@ const Assignee = () => {
       !taskValue.max ||
       taskValue.max <= 0 ||
       taskValue.max <= taskValue.min ||
-      taskValue.max > state.data.length
+      taskValue.max > state.data
     ) {
       toast.warning("Please check your input values.");
       return;
@@ -136,6 +136,7 @@ const Assignee = () => {
       errorFilePath: location.state.errorFilePath,
       imageDirectoryPath: location.state.imageDirectoryName,
       moduleType: "CSV Compare",
+      tableName:location.state.tableName
     };
 
     setAssignedUsers([...assignedUsers, newAssignedTask]);
@@ -149,8 +150,8 @@ const Assignee = () => {
   };
   // console.log(dataCtx.fileId)
   const onTaskSubmitHandler = async () => {
-    console.log(location.state.data.length - taskValue.min + 1)
-    if(!(location.state.data.length - taskValue.min + 1  === 0)) {
+  
+    if(!(location.state.data - taskValue.min + 1  === 0)) {
       toast.warning("Please assign all rows")
       setShowModal(false)
       return
@@ -158,7 +159,7 @@ const Assignee = () => {
 
     try {
       await axios.post(
-        `http://${REACT_APP_IP}:4000/assign`,
+        `${window.SERVER_IP}/assign`,
         { assignedUsers: assignedUsers, templateName: templateName },
         {
           headers: {
@@ -189,10 +190,10 @@ const Assignee = () => {
                 <div className="flex gap-3">
                   <h1 className="rounded border border-indigo-500 bg-indigo-500 px-3 py-2 font-medium text-white">
                     Remaining Errors Rows -{" "}
-                    {state && location.state.data.length - taskValue.min + 1}
+                    {state && location.state.data - taskValue.min + 1}
                   </h1>
                   <h1 className="rounded border border-indigo-500 bg-indigo-500 px-3 py-2 font-medium text-white">
-                    Total Errors Rows - {state && location.state.data.length}
+                    Total Errors Rows - {state && location.state.data}
                   </h1>
                   
                 </div>

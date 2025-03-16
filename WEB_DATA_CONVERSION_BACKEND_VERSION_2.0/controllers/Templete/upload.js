@@ -394,6 +394,7 @@ const handleUpload = async (req, res) => {
           // template.mergedTableName = tableName;
 
           const createdFile = await Files.create({
+            startIndex : 1,
             totalFiles: mergedData.length,
             csvFileTable: tableName,
             csvFile: csvFileName,
@@ -418,13 +419,18 @@ const handleUpload = async (req, res) => {
           //     .json({ error: "CSV file not found after extraction." });
           // }
         } else {
+          const [result] = await sequelize.query(
+            `SELECT COUNT(*) AS count FROM \`${templateTable.csvTableName}\``, 
+            { type: sequelize.QueryTypes.SELECT }
+        );
           const csvJson = await csvToJson(csvFilePath);
           const columns = await insertDataIntoTable(
             templateTable.csvTableName,
             csvJson
           );
           const createdFile = await Files.create({
-            totalFiles: csvJson .length,
+            startIndex:result.count,
+            totalFiles: csvJson.length,
             csvFile: csvFileName,
             zipFile: `${timestamp}_${zipFileName}`,
             templeteId: id,

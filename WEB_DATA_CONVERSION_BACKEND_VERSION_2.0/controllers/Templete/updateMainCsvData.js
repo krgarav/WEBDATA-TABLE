@@ -7,7 +7,7 @@ const updateMainCsvData = async (req, res) => {
     const { templateId, parentId, updatedData } = req.body;
 
     // Fetch the template and get the table name
-    const template = await Template.findByPk    (templateId);
+    const template = await Template.findByPk(templateId);
     if (!template) {
       return res.status(404).json({ message: "Template not found" });
     }

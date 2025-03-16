@@ -21,7 +21,7 @@ import ImageSectionCSV from "./IamgeSectionCSV";
 import ButtonCsvSection from "./ButtonCsvSection";
 
 const UserCorrectionData = () => {
-  const [popUp, setPopUp] = useState(true);
+  const [popUp, setPopUp] = useState(false);
   const [templateHeaders, setTemplateHeaders] = useState(null);
   const [csvCurrentData, setCsvCurrentData] = useState([]);
   const [allTasks, setAllTasks] = useState([]);
@@ -102,71 +102,71 @@ const UserCorrectionData = () => {
   //     fetchData();
   //   }, []);
 
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const verifiedUser = await onGetVerifiedUserHandler();
+  // useEffect(() => {
+  //   const fetchCurrentUser = async () => {
+  //     try {
+  //       const verifiedUser = await onGetVerifiedUserHandler();
 
-        setUserRole(verifiedUser.user.role);
-        const tasks = await onGetTaskHandler(verifiedUser.user.id);
-        const templateData = await onGetTemplateHandler();
+  //       setUserRole(verifiedUser.user.role);
+  //       const tasks = await onGetTaskHandler(verifiedUser.user.id);
+  //       const templateData = await onGetTemplateHandler();
 
-        const uploadTask = tasks.filter((task) => {
-          return task.moduleType === "Data Entry";
-        });
-        const comTask = tasks.filter((task) => {
-          return task.moduleType === "CSV Compare";
-        });
+  //       const uploadTask = tasks.filter((task) => {
+  //         return task.moduleType === "Data Entry";
+  //       });
+  //       const comTask = tasks.filter((task) => {
+  //         return task.moduleType === "CSV Compare";
+  //       });
 
-        const updatedCompareTasks = comTask.map((task) => {
-          const matchedTemplate = templateData.find(
-            (template) => template.id === parseInt(task.templeteId)
-          );
-          if (matchedTemplate) {
-            return {
-              ...task,
-              templateName: matchedTemplate.name,
-            };
-          }
-          return task;
-        });
-        const updatedTasks = uploadTask.map((task) => {
-          const matchedTemplate = templateData.find(
-            (template) => template.id === parseInt(task.templeteId)
-          );
-          if (matchedTemplate) {
-            return {
-              ...task,
-              templateName: matchedTemplate.name,
-            };
-          }
-          return task;
-        });
-        setAllTasks(updatedTasks);
-        setCompareTask(updatedCompareTasks);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchCurrentUser();
-  }, [popUp]);
+  //       const updatedCompareTasks = comTask.map((task) => {
+  //         const matchedTemplate = templateData.find(
+  //           (template) => template.id === parseInt(task.templeteId)
+  //         );
+  //         if (matchedTemplate) {
+  //           return {
+  //             ...task,
+  //             templateName: matchedTemplate.name,
+  //           };
+  //         }
+  //         return task;
+  //       });
+  //       const updatedTasks = uploadTask.map((task) => {
+  //         const matchedTemplate = templateData.find(
+  //           (template) => template.id === parseInt(task.templeteId)
+  //         );
+  //         if (matchedTemplate) {
+  //           return {
+  //             ...task,
+  //             templateName: matchedTemplate.name,
+  //           };
+  //         }
+  //         return task;
+  //       });
+  //       setAllTasks(updatedTasks);
+  //       setCompareTask(updatedCompareTasks);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   fetchCurrentUser();
+  // }, [popUp]);
 
-  useEffect(() => {
-    const fetchTemplate = async () => {
-      try {
-        const response = await onGetTemplateHandler();
+  // useEffect(() => {
+  //   const fetchTemplate = async () => {
+  //     try {
+  //       const response = await onGetTemplateHandler();
 
-        const templateData = response.find(
-          (data) => data.id === parseInt(currentTaskData.templeteId)
-        );
+  //       const templateData = response.find(
+  //         (data) => data.id === parseInt(currentTaskData.templeteId)
+  //       );
 
-        setTemplateHeaders(templateData);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchTemplate();
-  }, [currentTaskData]);
+  //       setTemplateHeaders(templateData);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   fetchTemplate();
+  // }, [currentTaskData]);
 
   // useEffect(() => {
   //   const req = async () => {
@@ -203,7 +203,7 @@ const UserCorrectionData = () => {
     setLoading(true);
     const req = async () => {
       const response = await axios.post(
-        `http://${REACT_APP_IP}:4000/getCompareCsvData/${taskId}`,
+        `${window.SERVER_IP}/getCompareCsvData/${taskId}`,
         { currentIndex },
         {
           headers: {
@@ -386,7 +386,7 @@ const UserCorrectionData = () => {
         return;
       }
       const response = await axios.post(
-        `http://${REACT_APP_IP}:4000/getCompareCsvData/${taskId}`,
+        `${window.SERVER_IP}/getCompareCsvData/${taskId}`,
         { currentIndex },
         {
           headers: {
@@ -425,7 +425,7 @@ const UserCorrectionData = () => {
         return;
       }
       const response = await axios.post(
-        `http://${REACT_APP_IP}:4000/getCompareCsvData/${taskId}`,
+        `${window.SERVER_IP}/getCompareCsvData/${taskId}`,
         { currentIndex },
         {
           headers: {
@@ -519,11 +519,10 @@ const UserCorrectionData = () => {
         break;
       }
     }
-    console.log(matchedValue);
     const matchedCoordinate = templateHeaders?.templetedata?.find(
       (data) => data.attribute === matchedValue
     );
-    console.log(matchedCoordinate);
+   
     setCsvCurrentData((prevData) => {
       const previousValue = prevData[key];
       if (matchedCoordinate?.fieldType === "questionsField") {
@@ -532,7 +531,7 @@ const UserCorrectionData = () => {
           newValue = newValue.trim();
 
           if (validCharacters.includes(newValue) || newValue === "") {
-            console.log("newValue1");
+            
             setModifiedKeys((prevKeys) => ({
               ...prevKeys,
               [key]: [newValue, previousValue],
@@ -782,7 +781,7 @@ const UserCorrectionData = () => {
   };
   return (
     <>
-      {popUp && (
+      {/* {popUp && (
         <div className="bg-blue-400 h-[100vh] items-center justify-center flex ">
           <div
             role="alert"
@@ -855,194 +854,8 @@ const UserCorrectionData = () => {
             </div>
           </div>
         </div>
-      )}
-      {!popUp && (
-        <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-500 dataEntry pt-16 xl:pt-20 xl:h-screen">
-          {/* LEFT SECTION */}
-          <CSVFormDataSection
-            csvCurrentData={csvCurrentData}
-            csvData={csvData}
-            filterResults={filterResults}
-            templateHeaders={templateHeaders}
-            imageColName={imageColName}
-            currentFocusIndex={currentFocusIndex}
-            inputRefs={inputRefs}
-            handleKeyDownJump={handleKeyDownJump}
-            changeCurrentCsvDataHandler={changeCurrentCsvDataHandler}
-            imageFocusHandler={imageFocusHandler}
-          />
-
-          {/* RIGHT SECTION */}
-          <div className="w-full lg:w-[80%] xl:w-10/12 matchingMain">
-            {!imageUrls?.length === 0 ? (
-              <div className="flex justify-center items-center ">
-                <div className="mt-10">
-                  <ImageNotFound />
-
-                  <h1 className="mt-8 text-2xl font-bold tracking-tight text-gray-100 sm:text-4xl">
-                    Please Select Image...
-                  </h1>
-
-                  <p className="mt-4 text-gray-100 text-center">
-                    We can't find that page!!
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="flex-col">
-                <ButtonCsvSection
-                  currentIndex={currentIndex}
-                  csvData={csvData}
-                  // correctionData={correctionData}
-                  currentData={currentData}
-                  max={maximum}
-                  zoomInHandler={zoomInHandler}
-                  onInialImageHandler={onInialImageHandler}
-                  zoomOutHandler={zoomOutHandler}
-                  currentImageIndex={currentImageIndex}
-                  imageUrls={imageUrls}
-                />
-                <div>
-                  <div style={{ display: "flex", justifyContent: "center" }}>
-                    <button
-                      disabled={loading}
-                      className="px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
-                      onClick={() =>
-                        //   onImageHandler(
-                        //     "prev",
-                        //     currentIndex,
-                        //     filteredArray,
-                        //     currentTaskData
-                        //   )
-                        onPrevHandler("prev", currentIndex)
-                      }
-                      endIcon={<ArrowBackIosIcon />}
-                    >
-                      <ArrowBackIosIcon />
-                    </button>
-                    <div className="h-20vh">
-                      <ImageSectionCSV
-                        imageContainerRef={imageContainerRef}
-                        currentImageIndex={currentImageIndex}
-                        imageUrls={imageUrls}
-                        imageRef={imageRef}
-                        currentData={currentData}
-                        zoomLevel={zoomLevel}
-                        selectedCoordintes={selectedCoordintes}
-                        templateHeaders={templateHeaders}
-                      />
-                    </div>
-                    <button
-                      disabled={loading}
-                      className="px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
-                      onClick={() =>
-                        // onImageHandler(
-                        //   "next",
-                        //   currentIndex,
-                        //   filteredArray,
-                        //   currentTaskData
-                        // )
-                        onNextHandler("next", currentIndex)
-                      }
-                      endIcon={<ArrowForwardIosIcon />}
-                    >
-                      <ArrowForwardIosIcon />
-                    </button>
-                  </div>
-
-                  <section>
-                    <div className=" flex justify-end mt-5 mr-5">
-                      {maximum === currentIndex && (
-                        <div className="flex justify-center">
-                          <button
-                            onClick={() => onTaskCompleteHandler()}
-                            className="px-4 py-2 bg-teal-600 mx-2 text-white rounded-3xl shadow hover:bg-teal-700"
-                          >
-                            Submit task
-                          </button>
-                        </div>
-                      )}
-                      {/* <button
-                        onClick={() => navigate("/datamatching")}
-                        className=" px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
-                      >
-                        Back
-                      </button> */}
-                      {/* <Button
-                    onClick={onCsvUpdateHandler}
-                    variant="contained"
-                    color="info"
-                  >
-                    update
-                  </Button> */}
-
-                      {/* <button
-                        className="px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
-                        onClick={() =>
-                          //   onImageHandler(
-                          //     "prev",
-                          //     currentIndex,
-                          //     filteredArray,
-                          //     currentTaskData
-                          //   )
-                          onPrevHandler("prev", currentIndex)
-                        }
-                        endIcon={<ArrowBackIosIcon />}
-                      >
-                        Prev
-                      </button>
-                      <button
-                        className="px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
-                        onClick={() =>
-                          // onImageHandler(
-                          //   "next",
-                          //   currentIndex,
-                          //   filteredArray,
-                          //   currentTaskData
-                          // )
-                          onNextHandler("next", currentIndex)
-                        }
-                        endIcon={<ArrowForwardIosIcon />}
-                      >
-                        Next
-                      </button> */}
-                    </div>
-                    <CorrectionField
-                      csvCurrentData={csvCurrentData} //whole row data
-                      csvData={csvData}
-                      tableData={tableData}
-                      currentData={currentData}
-                      setCorrectionData={setCorrectionData}
-                      currentIndex={currentIndex} //error questions data
-                      setCurrentIndex={setCurrentIndex}
-                      maximum={maximum} //error questions data
-                      templateHeaders={templateHeaders} //template header already present
-                      imageColName={imageColName}
-                      currentFocusIndex={currentFocusIndex}
-                      inputRefs={inputRefs}
-                      handleKeyDownJump={handleKeyDownJump}
-                      onNextHandler={onNextHandler}
-                      changeCurrentCsvDataHandler={changeCurrentCsvDataHandler}
-                      imageFocusHandler={imageFocusHandler}
-                    />
-                  </section>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* CONFIRMATION MODAL */}
-          <ConfirmationModal
-            confirmationModal={confirmationModal}
-            onSubmitHandler={onCompleteHandler}
-            setConfirmationModal={setConfirmationModal}
-            heading={"Confirm Task Completion"}
-            message={
-              "Please confirm if you would like to mark this task as complete."
-            }
-          />
-        </div>
-      )}
+      )} */}
+      
     </>
   );
 };
