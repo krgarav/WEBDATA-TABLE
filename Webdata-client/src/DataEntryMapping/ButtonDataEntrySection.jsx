@@ -29,7 +29,7 @@ const ButtonDataEntrySection = ({ data }) => {
       </div>
       <h3 className="font-semibold py-3 text-white text-sm 2xl:text-lg">
         {" "}
-        Image Name : {imageName}
+        Image Name : <span className="font-light">{imageName}</span>
       </h3>
     </div>
   );
