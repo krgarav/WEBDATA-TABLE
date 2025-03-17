@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import FormDataEntrySection from "./FormDataSection";
 import ButtonDataEntrySection from "./ButtonDataEntrySection";
@@ -14,6 +14,13 @@ const DataMapping = () => {
   const [data, setData] = useState([]);
   const [imageData, setImageData] = useState([]);
   const [currentIndex, setCurrenIndex] = useState(null);
+  const [formData, setFormData] = useState([]);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const imageRef = useRef(null);
+
+  useEffect(() => {
+    setFormData(Array.isArray(data.formdata) ? data.formdata : [data.formdata]);
+  }, [data]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,31 +70,65 @@ const DataMapping = () => {
   };
 
   const saveHandler = async (updatedData) => {
+    const mergedData = {
+      ...(Array.isArray(formData) && formData.length > 0
+        ? formData[0]
+        : formData),
+      ...updatedData,
+    };
     // console.log(updatedData);
     const obj = {
       templateId: taskData.id,
       parentId: data.id,
-      updatedData,
+      // ...mergedData,
+      updatedData: mergedData,
     };
     const res = await updateCsvData(obj);
     nextHandler();
     console.log(res);
   };
+  const zoomInHandler = () => {
+    setZoomLevel((prevZoomLevel) => Math.min(prevZoomLevel * 1.1, 3));
+  };
+
+  const zoomOutHandler = () => {
+    setZoomLevel((prevZoomLevel) => Math.max(prevZoomLevel * 0.9, 0.5));
+  };
+
+  const onInialImageHandler = () => {
+    setZoomLevel(1);
+    setSelectedCoordinates(false);
+    if (imageRef.current) {
+      imageRef.current.style.transform = "none";
+      imageRef.current.style.transformOrigin = "initial";
+    }
+  };
   return (
     <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-[100vh] pt-16">
       <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-600 dataEntry ">
         {/* FormData Section */}
-        <FormDataEntrySection data={data} />
+        <FormDataEntrySection
+          data={data}
+          formData={formData}
+          setFormData={setFormData}
+        />
 
         <div className="flex-col w-full">
           {/* Button and Data */}
-          <ButtonDataEntrySection data={data} />
+          <ButtonDataEntrySection
+            data={data}
+            zoomInHandler={zoomInHandler}
+            zoomOutHandler={zoomOutHandler}
+            onInialImageHandler={onInialImageHandler}
+          />
 
           <ImageDataEntrySection
             data={data}
             imageData={imageData}
             nextHandler={nextHandler}
             prevHandler={prevHandler}
+            zoomLevel={zoomLevel}
+            imageRef={imageRef}
           />
 
           <QuestionDataEntrySection
