@@ -17,7 +17,7 @@ const ErrorAggregatedTable = sequelize.define("errorAggregated", {
     type: Sequelize.STRING,
     allowNull: false,
   },
-  File_1_data: {
+  File_2_data: {
     type: Sequelize.STRING,
     allowNull: false,
   },

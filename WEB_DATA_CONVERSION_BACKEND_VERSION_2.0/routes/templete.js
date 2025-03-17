@@ -89,6 +89,7 @@ router.post("/get/csvdata", authMiddleware, getCsvTableData);
 router.get("/get/metadata", getMetaData);
 router.get("/update/assignedData", authMiddleware, getMetaData);
 router.post("/update/currentIndex", authMiddleware, updateCurrentIndex);
-router.get("/download/csv/:id", authMiddleware, downloadMergedCsv); 
-router.post("/update/csvdata" , authMiddleware,updateMainCsvData)
+router.get("/download/csv/:id", authMiddleware, downloadMergedCsv);
+router.post("/update/csvdata", authMiddleware, updateMainCsvData);
+
 module.exports = router;
