@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
+  getRowCsvData,
   onGetTaskHandler,
   onGetTemplateHandler,
   onGetVerifiedUserHandler,
@@ -65,8 +66,7 @@ const UserCorrectionData = () => {
   const [header, setHeader] = useState(null);
   const [filterResults, setFilterResults] = useState(null);
   const [mappedData, setMappedData] = useState([]);
-  // const { imageURL, data } = tableData;
-  // console.log(location.state, "----------------");
+  const [formData, setFormData] = useState(null);
   const task = JSON.parse(localStorage.getItem("taskdata"));
   const [taskId, setTaskId] = useState(
     location.state !== null
@@ -199,6 +199,20 @@ const UserCorrectionData = () => {
   //     JSON.parse(localStorage.getItem("taskdata"))
   //   );
   // }, []);
+
+  useEffect(() => {
+    const req = async (taskId, rowId) => {
+      const response = await getRowCsvData(taskId, rowId);
+      if (response?.data) {
+        setFormData(response.data);
+        setImageUrls(response.imageUrl);
+      }
+      console.log(response.data);
+    };
+    if (currentData) {
+      req(taskId, currentData?.parentId);
+    }
+  }, [currentData]);
 
   useEffect(() => {
     setLoading(true);
@@ -777,18 +791,20 @@ const UserCorrectionData = () => {
       {!popUp && (
         <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-500 dataEntry pt-16 xl:pt-20 xl:h-screen">
           {/* LEFT SECTION */}
-          <CSVFormDataSection
-            csvCurrentData={csvCurrentData}
-            csvData={csvData}
-            filterResults={filterResults}
-            templateHeaders={templateHeaders}
-            imageColName={imageColName}
-            currentFocusIndex={currentFocusIndex}
-            inputRefs={inputRefs}
-            handleKeyDownJump={handleKeyDownJump}
-            changeCurrentCsvDataHandler={changeCurrentCsvDataHandler}
-            imageFocusHandler={imageFocusHandler}
-          />
+          {formData && (
+            <CSVFormDataSection
+              formCsvData={formData}
+              // csvData={csvData}
+              // filterResults={filterResults}
+              // templateHeaders={templateHeaders}
+              // imageColName={imageColName}
+              // currentFocusIndex={currentFocusIndex}
+              // inputRefs={inputRefs}
+              // handleKeyDownJump={handleKeyDownJump}
+              // changeCurrentCsvDataHandler={changeCurrentCsvDataHandler}
+              // imageFocusHandler={imageFocusHandler}
+            />
+          )}
 
           {/* RIGHT SECTION */}
           <div className="w-full lg:w-[80%] xl:w-10/12 matchingMain">

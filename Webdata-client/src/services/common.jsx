@@ -199,7 +199,7 @@ export const submitMappedData = async (mappedData) => {
   }
 };
 
-export const getTotalCSVData = async (templateId,fileId) => {
+export const getTotalCSVData = async (templateId, fileId) => {
   const token = JSON.parse(localStorage.getItem("userData"));
   // http://localhost:4000/getcsvheaders?templateId=1
   try {
@@ -283,6 +283,25 @@ export const updateCsvData = async (obj) => {
     const response = await axios.post(
       `http://${window.APP_IP}:4000/update/csvdata`,
       obj,
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getRowCsvData = async (taskId,rowId) => {
+  const token = JSON.parse(localStorage.getItem("userData"));
+  // http://localhost:4000/getcsvheaders?templateId=1
+  try {
+    const response = await axios.get(
+      `http://${window.APP_IP}:4000/getCsvRowData?taskId=${taskId}&rowId=${rowId}`,
+
       {
         headers: {
           token: token,
