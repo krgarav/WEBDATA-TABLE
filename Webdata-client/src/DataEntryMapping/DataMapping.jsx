@@ -14,6 +14,11 @@ const DataMapping = () => {
   const [data, setData] = useState([]);
   const [imageData, setImageData] = useState([]);
   const [currentIndex, setCurrenIndex] = useState(null);
+  const [formData, setFormData] = useState([]);
+
+  useEffect(() => {
+    setFormData(Array.isArray(data.formdata) ? data.formdata : [data.formdata]);
+  }, [data]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,11 +68,18 @@ const DataMapping = () => {
   };
 
   const saveHandler = async (updatedData) => {
+    const mergedData = {
+      ...(Array.isArray(formData) && formData.length > 0
+        ? formData[0]
+        : formData),
+      ...updatedData,
+    };
     // console.log(updatedData);
     const obj = {
       templateId: taskData.id,
       parentId: data.id,
-      updatedData,
+      // ...mergedData,
+      updatedData: mergedData,
     };
     const res = await updateCsvData(obj);
     nextHandler();
@@ -77,7 +89,11 @@ const DataMapping = () => {
     <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-[100vh] pt-16">
       <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-600 dataEntry ">
         {/* FormData Section */}
-        <FormDataEntrySection data={data} />
+        <FormDataEntrySection
+          data={data}
+          formData={formData}
+          setFormData={setFormData}
+        />
 
         <div className="flex-col w-full">
           {/* Button and Data */}

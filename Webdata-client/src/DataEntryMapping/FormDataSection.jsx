@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const FormDataEntrySection = ({ data }) => {
-  const [formData, setFormData] = useState([]);
-
-  useEffect(() => {
-    setFormData(Array.isArray(data.formdata) ? data.formdata : [data.formdata]);
-  }, [data]);
-
+const FormDataEntrySection = ({ formData, setFormData }) => {
   const handleInputChange = (key, value) => {
     setFormData((prevData) => {
       const updatedData = [...prevData];
@@ -16,10 +10,6 @@ const FormDataEntrySection = ({ data }) => {
       return updatedData;
     });
   };
-
-  useEffect(()=>{
-    console.log("Updated Form Data:", formData[0]);
-  },[formData])
 
   return (
     <div className="border-e lg:w-3/12 xl:w-[20%] order-lg-1">
