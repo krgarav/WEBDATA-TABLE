@@ -52,12 +52,13 @@ const ImageDataEntrySection = ({
 
   return (
     <div className="flex gap-5 justify-center items-center">
-      <div className="text-white px-3 py-8 bg-blue-400 rounded-3xl mx-2 hover:bg-blue-600 text-lg transition-all cursor-pointer">
-        <button
-          onClick={() => {
-            prevHandler();
-          }}
-        >
+      <div
+        onClick={() => {
+          prevHandler();
+        }}
+        className="text-white px-3 py-8 bg-blue-400 rounded-3xl mx-2 hover:bg-blue-600 text-lg transition-all cursor-pointer"
+      >
+        <button>
           <GrPrevious />
         </button>
       </div>
@@ -122,12 +123,13 @@ const ImageDataEntrySection = ({
           ></div>
         </div>
       </div>
-      <div className="text-white px-3 py-8 bg-blue-400 rounded-3xl mx-2 hover:bg-blue-600 text-lg transition-all cursor-pointer">
-        <button
-          onClick={() => {
-            nextHandler();
-          }}
-        >
+      <div
+        onClick={() => {
+          nextHandler();
+        }}
+        className="text-white px-3 py-8 bg-blue-400 rounded-3xl mx-2 hover:bg-blue-600 text-lg transition-all cursor-pointer"
+      >
+        <button>
           <MdOutlineArrowForwardIos />
         </button>
       </div>

@@ -7,6 +7,20 @@ const FormDataEntrySection = ({ data }) => {
     setFormData(Array.isArray(data.formdata) ? data.formdata : [data.formdata]);
   }, [data]);
 
+  const handleInputChange = (key, value) => {
+    setFormData((prevData) => {
+      const updatedData = [...prevData];
+      if (updatedData[0]) {
+        updatedData[0] = { ...updatedData[0], [key]: value };
+      }
+      return updatedData;
+    });
+  };
+
+  useEffect(()=>{
+    console.log("Updated Form Data:", formData[0]);
+  },[formData])
+
   return (
     <div className="border-e lg:w-3/12 xl:w-[20%] order-lg-1">
       <div className="overflow-hidden w-[100%]">
@@ -28,7 +42,7 @@ const FormDataEntrySection = ({ data }) => {
                 <input
                   type="text"
                   value={value || ""}
-                  readOnly
+                  onChange={(e) => handleInputChange(key, e.target.value)}
                   className="mt-1 border-none p-2 focus:border-transparent text-center rounded-lg focus:outline-none focus:ring-0 sm:text-sm w-48"
                 />
               </div>
