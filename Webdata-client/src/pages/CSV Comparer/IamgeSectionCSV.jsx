@@ -1,7 +1,9 @@
 import React from "react";
 import { REACT_APP_IP } from "../../services/common";
 
-const ImageSectionCSV = ({
+
+const  ImageSectionCSV = ({
+  imageUrls,
   imageContainerRef,
   currentImageIndex,
   imageRef,
@@ -26,7 +28,7 @@ const ImageSectionCSV = ({
       }}
     >
       <img
-        src={`http://${REACT_APP_IP}:4000/images/${currentData?.IMAGE_NAME}`}
+        src={`${window.SERVER_IP}/images/${imageUrls}`}
         alt="Selected"
         ref={imageRef}
         style={{

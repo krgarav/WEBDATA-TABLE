@@ -9,30 +9,22 @@ import {
 import { toast } from "react-toastify";
 import Loader from "../../UI/Loader";
 
-const CorrectionField = ({
-  correctionData,
-  setCorrectionData,
-  currentIndex,
-  imageFocusHandler,
-  onNextHandler,
-  maximum,
-  currentData,
-}) => {
+const CorrectionField = ({ subData, currentData }) => {
   // const [inputValues, setInputValues] = useState("");
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
   const taskId = JSON.parse(localStorage.getItem("taskdata")).id;
   const token = JSON.parse(localStorage.getItem("userData"));
   const [visitedCount, setVisitedCount] = useState(0);
   const [visitedRows, setVisitedRows] = useState({}); // Track visited rows
-  const [dataRow,setDataRow] = useState(currentData.DATA);
-  const [updatedData,setUpdatedData] = useState([])
+  const [dataRow, setDataRow] = useState(currentData);
+  const [updatedData, setUpdatedData] = useState([]);
   const inputRefs = useRef([]);
 
   const [isLoading, setIsLoading] = useState(false);
   const isUpdatingRef = useRef(false);
-  useEffect(()=>{
-    setDataRow(currentData.DATA)
-  },[currentData.DATA])
+  useEffect(() => {
+    setDataRow(currentData);
+  }, [currentData]);
   useEffect(() => {
     setVisitedCount(0);
     setVisitedRows({});
@@ -55,7 +47,7 @@ const CorrectionField = ({
 
   // useEffect(() => {
   //   const PRIMARY = currentData?.PRIMARY;
-  //   const PRIMARY_KEY = currentData?.DATA?.PRIMARY_KEY;
+  //   const Primary_Key = currentData?.DATA?.Primary_Key;
   //   // When filteredData or PRIMARY changes, update the input values
   //   const initialValues = currentData.DATA.reduce((acc, dataItem) => {
   //     const key = `${PRIMARY?.trim()}-${dataItem?.COLUMN_NAME?.trim()}`;
@@ -65,47 +57,46 @@ const CorrectionField = ({
   //   // setInputValue(initialValues);
   // }, [currentData]);
 
+  // useEffect(() => {
+  //   const processTemplateData = async () => {
+  //     try {
+  //       if (!taskData?.templeteId || dataRow.length === 0) return;
+
+  //       const templateId = taskData.templeteId;
+
+  //       // Fetch form field data for each COLUMN_NAME in parallel
+  //       const updatedData = await Promise.all(
+  //         dataRow.map(async (item) => {
+  //           try {
+  //             const isFormField = await fetchTemplateFormData(
+  //               templateId,
+  //               item.COLUMN_NAME
+  //             );
+  //             const type = isFormField?.templateData?.fieldType || "formField"; // Use default "formField" if API fails or returns undefined
+  //             return { ...item, type };
+  //           } catch (error) {
+  //             console.error(
+  //               `Error fetching data for ${item.COLUMN_NAME}:`,
+  //               error
+  //             );
+  //             return { ...item, type: "formField" }; // Fallback to "formField"
+  //           }
+  //         })
+  //       );
+
+  //       setUpdatedData(updatedData);
+  //     } catch (error) {
+  //       console.error("Error processing template data:", error);
+  //     }
+  //   };
+
+  //   processTemplateData();
+  // }, [dataRow]);
+
   useEffect(() => {
-    const processTemplateData = async () => {
-      try {
-        if (!taskData?.templeteId || dataRow.length === 0) return;
-
-        const templateId = taskData.templeteId;
-
-        // Fetch form field data for each COLUMN_NAME in parallel
-        const updatedData = await Promise.all(
-          dataRow.map(async (item) => {
-            try {
-              const isFormField = await fetchTemplateFormData(
-                templateId,
-                item.COLUMN_NAME
-              );
-              const type = isFormField?.templateData?.fieldType || "formField"; // Use default "formField" if API fails or returns undefined
-              return { ...item, type };
-            } catch (error) {
-              console.error(
-                `Error fetching data for ${item.COLUMN_NAME}:`,
-                error
-              );
-              return { ...item, type: "formField" }; // Fallback to "formField"
-            }
-          })
-        );
-
-        setUpdatedData(updatedData);
-      } catch (error) {
-        console.error("Error processing template data:", error);
-      }
-    };
-
-    processTemplateData();
-  }, [dataRow]);
-
-  useEffect(() => {
-    // setFilterData(correctionData?.previousData?.DATA);
     setVisitedCount(0);
     setVisitedRows({});
-  }, [correctionData?.previousData?.DATA]);
+  }, []);
   useEffect(() => {
     const handleAltSKey = (e) => {
       if (e.altKey && e.key.toLowerCase() === "s") {
@@ -162,14 +153,14 @@ const CorrectionField = ({
     isUpdatingRef.current = true;
     setIsLoading(true);
     const PRIMARY = currentData?.PRIMARY;
-    const PRIMARY_KEY = currentData?.PRIMARY_KEY;
+    const Primary_Key = currentData?.Primary_Key;
     try {
       const updates = Object.entries(inputValue).map(
         ([key, correctedValue]) => {
           const [primary, columnName] = key.split("-");
           return {
             PRIMARY: PRIMARY,
-            PRIMARY_KEY,
+            Primary_Key,
             CORRECTED: correctedValue,
             COLUMN_NAME: columnName,
           };
@@ -219,7 +210,7 @@ const CorrectionField = ({
       isUpdatingRef.current = false;
     }
   };
-  const errorData = updatedData?.map((dataItem, index) => {
+  const errorData = subData?.map((dataItem, index) => {
     const key = `${updatedData?.PRIMARY?.trim()}-${dataItem?.COLUMN_NAME?.trim()}`;
     // const updatedValue = dataItem.CORRECTED||"Null";
     // const questionAllowedValues = ["A", "B", "C", "D", "*", " "];
@@ -234,10 +225,10 @@ const CorrectionField = ({
         key={index}
         className={`flex ${visitedRows[index] ? "bg-green-200" : "bg-red-200"}`}
       >
-        <div className="py-2 px-4 border-b w-1/5">{currentData?.PRIMARY}</div>
-        <div className="py-2 px-4 border-b w-1/5">{dataItem?.COLUMN_NAME}</div>
-        <div className="py-2 px-4 border-b w-1/5">{dataItem?.FILE_1_DATA}</div>
-        <div className="py-2 px-4 border-b w-1/5">{dataItem?.FILE_2_DATA}</div>
+        <div className="py-2 px-4 border-b w-1/5">{dataRow?.Primary}</div>
+        <div className="py-2 px-4 border-b w-1/5">{dataItem?.Column_Name}</div>
+        <div className="py-2 px-4 border-b w-1/5">{dataItem?.File_1_data}</div>
+        <div className="py-2 px-4 border-b w-1/5">{dataItem?.File_2_data}</div>
         <div className="py-2 px-4 border-b w-1/5 flex space-x-2">
           <input
             type="text"
@@ -292,22 +283,22 @@ const CorrectionField = ({
     <div className="mx-4 bg-white xl:my-4 px-4 py-2 rounded-md">
       <div className="flex justify-between mb-6 mt-2">
         <h2 className="xl:text-xl mx-4 font-bold pt-1 text-blue-500 bg-blue-200 p-2 rounded-lg border border-blue-400">
-          {`${currentData?.PRIMARY_KEY} (Primary Key)`}
+          {`${currentData?.Primary_Key} (Primary Key)`}
         </h2>
         <h3 className="xl:text-lg font-bold bg-red-100 text-red-600 px-2 py-1 rounded-md shadow-md border border-red-300">
           Total Errors:{" "}
-          <span className="font-extrabold">{currentData.DATA?.length}</span>
+          <span className="font-extrabold">{subData?.length}</span>
         </h3>
 
-        {currentData.DATA?.length === visitedCount && (
+        {subData?.length === visitedCount && (
           <span className="text-green-700 bg-green-200 font-semibold px-2 py-1 rounded-md shadow-md border border-green-400">
             ✅ All Visited
           </span>
         )}
-        {currentData.DATA?.length !== visitedCount && (
+        {subData?.length !== visitedCount && (
           <span className="flex items-center text-yellow-800 bg-yellow-200 font-semibold px-3 py-1 rounded-md shadow-md border border-yellow-400">
-            ⚠️ Not All Visited &nbsp;|&nbsp; {visitedCount} of{" "}
-            {currentData.DATA?.length} completed
+            ⚠️ Not All Visited &nbsp;|&nbsp; {visitedCount} of {subData?.length}{" "}
+            completed
           </span>
         )}
 
@@ -334,7 +325,7 @@ const CorrectionField = ({
           <div>
             <div className="flex text-center">
               <div className="py-2 px-4 border-b font-semibold w-1/5">
-                {currentData?.PRIMARY_KEY}
+                {currentData?.Primary_Key}
               </div>
               <div className="py-2 px-4 border-b font-semibold w-1/5">
                 Field name

@@ -51,7 +51,9 @@ const getCsvData = async (req, res) => {
     //   DATA: row.DATA ? JSON.parse(`[${row.DATA}]`) : [],
     // }));
 
-    res.json({ file,columnData });
+    res
+      .status(200)
+      .json({ success: true, mainData: file, subData: columnData });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to fetch data." });

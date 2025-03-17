@@ -16,7 +16,7 @@ const updateMainCsvData = async (req, res) => {
 
     // Build the query dynamically based on updatedData
     const setValues = Object.entries(updatedData)
-      .map(([key, value]) => `${key} = :${key}`) // Named parameters for safety
+      .map(([key, value]) => `\`${key}\` = :${key}`) // Named parameters for safety
       .join(", ");
 
     const query = `

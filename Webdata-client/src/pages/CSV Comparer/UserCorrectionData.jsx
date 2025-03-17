@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
+  getRowCsvData,
   onGetTaskHandler,
   onGetTemplateHandler,
   onGetVerifiedUserHandler,
@@ -49,6 +50,7 @@ const UserCorrectionData = () => {
   const [currIndex, setCurrIndex] = useState(1);
   const [tableData, setTableData] = useState({});
   const [currentData, setCurrentData] = useState(null);
+  const [subData, setSubData] = useState(null);
   const [correctionData, setCorrectionData] = useState([]);
   const [minimum, setMinimum] = useState(0);
   const [maximum, setMaximum] = useState(0);
@@ -62,10 +64,9 @@ const UserCorrectionData = () => {
   const location = useLocation();
   const token = JSON.parse(localStorage.getItem("userData"));
   const [header, setHeader] = useState(null);
-  const [filterResults, setFilterResults]  = useState(null);
-  const [mappedData, setMappedData] = useState([]);;
-  // const { imageURL, data } = tableData;
-  // console.log(location.state, "----------------");
+  const [filterResults, setFilterResults] = useState(null);
+  const [mappedData, setMappedData] = useState([]);
+  const [formData, setFormData] = useState(null);
   const task = JSON.parse(localStorage.getItem("taskdata"));
   const [taskId, setTaskId] = useState(
     location.state !== null
@@ -200,6 +201,20 @@ const UserCorrectionData = () => {
   // }, []);
 
   useEffect(() => {
+    const req = async (taskId, rowId) => {
+      const response = await getRowCsvData(taskId, rowId);
+      if (response?.data) {
+        setFormData(response.data);
+        setImageUrls(response.imageUrl);
+      }
+      console.log(response.data);
+    };
+    if (currentData) {
+      req(taskId, currentData?.parentId);
+    }
+  }, [currentData]);
+
+  useEffect(() => {
     setLoading(true);
     const req = async () => {
       const response = await axios.post(
@@ -211,15 +226,8 @@ const UserCorrectionData = () => {
           },
         }
       );
-      setCurrentData(response?.data?.data?.previousData);
-      setHeaderData(response?.data?.data?.headers);
-      setHeader(response?.data?.data?.headers);
-      setMaximum(parseInt(response?.data?.data?.max));
-      setFilteredArray(response?.data?.data?.filteredData);
-      setFilterResults(response?.data?.data?.filteredResults);
-      setMinimum(parseInt(response?.data?.data?.min));
-      setLoading(false);
-      setMappedData(response?.data?.data?.mappedReponse);
+      setCurrentData(response?.data?.mainData);
+      setSubData(response?.data?.subData);
     };
     req();
   }, [currentIndex]);
@@ -522,7 +530,7 @@ const UserCorrectionData = () => {
     const matchedCoordinate = templateHeaders?.templetedata?.find(
       (data) => data.attribute === matchedValue
     );
-   
+
     setCsvCurrentData((prevData) => {
       const previousValue = prevData[key];
       if (matchedCoordinate?.fieldType === "questionsField") {
@@ -531,7 +539,6 @@ const UserCorrectionData = () => {
           newValue = newValue.trim();
 
           if (validCharacters.includes(newValue) || newValue === "") {
-            
             setModifiedKeys((prevKeys) => ({
               ...prevKeys,
               [key]: [newValue, previousValue],
@@ -781,81 +788,197 @@ const UserCorrectionData = () => {
   };
   return (
     <>
-      {/* {popUp && (
-        <div className="bg-blue-400 h-[100vh] items-center justify-center flex ">
-          <div
-            role="alert"
-            className="rounded-xl border border-gray-100 bg-white px-6 py-6 w-[40%]"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <strong className="block font-medium text-gray-900 text-2xl">
-                CSV Compare Task{" "}
-              </strong>
-              <button
-                className="text-gray-500 transition hover:text-gray-600"
-                onClick={() => modalClose()}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="2"
-                  stroke="currentColor"
-                  className="h-8 w-8"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-            <div className="mt-16 flex gap-2">
-              {loading ? (
-                <button
-                  className=" rounded-lg px-4 py-2 ms-auto transition bg-blue-400 text-white hover:bg-blue-600 flex justify-center items-center cursor-not-allowed"
-                  disabled={loading}
-                >
-                  <svg
-                    className="mr-2 h-5 w-5 animate-spin text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
+      {!popUp && (
+        <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-500 dataEntry pt-16 xl:pt-20 xl:h-screen">
+          {/* LEFT SECTION */}
+          {formData && (
+            <CSVFormDataSection
+              formCsvData={formData}
+              // csvData={csvData}
+              // filterResults={filterResults}
+              // templateHeaders={templateHeaders}
+              // imageColName={imageColName}
+              // currentFocusIndex={currentFocusIndex}
+              // inputRefs={inputRefs}
+              // handleKeyDownJump={handleKeyDownJump}
+              // changeCurrentCsvDataHandler={changeCurrentCsvDataHandler}
+              // imageFocusHandler={imageFocusHandler}
+            />
+          )}
+
+          {/* RIGHT SECTION */}
+          <div className="w-full lg:w-[80%] xl:w-10/12 matchingMain">
+            {!imageUrls?.length === 0 ? (
+              <div className="flex justify-center items-center ">
+                <div className="mt-10">
+                  <ImageNotFound />
+
+                  <h1 className="mt-8 text-2xl font-bold tracking-tight text-gray-100 sm:text-4xl">
+                    Please Select Image...
+                  </h1>
+
+                  <p className="mt-4 text-gray-100 text-center">
+                    We can't find that page!!
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex-col">
+                <ButtonCsvSection
+                  currentIndex={currentIndex}
+                  csvData={csvData}
+                  // correctionData={correctionData}
+                  currentData={currentData}
+                  max={maximum}
+                  zoomInHandler={zoomInHandler}
+                  onInialImageHandler={onInialImageHandler}
+                  zoomOutHandler={zoomOutHandler}
+                  currentImageIndex={currentImageIndex}
+                  imageUrls={imageUrls}
+                />
+                <div>
+                  <div style={{ display: "flex", justifyContent: "center" }}>
+                    <button
+                      disabled={loading}
+                      className="px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
+                      onClick={() =>
+                        //   onImageHandler(
+                        //     "prev",
+                        //     currentIndex,
+                        //     filteredArray,
+                        //     currentTaskData
+                        //   )
+                        onPrevHandler("prev", currentIndex)
+                      }
+                      endIcon={<ArrowBackIosIcon />}
+                    >
+                      <ArrowBackIosIcon />
+                    </button>
+                    <div className="h-20vh">
+                      <ImageSectionCSV
+                        imageContainerRef={imageContainerRef}
+                        currentImageIndex={currentImageIndex}
+                        imageUrls={imageUrls}
+                        imageRef={imageRef}
+                        currentData={currentData}
+                        zoomLevel={zoomLevel}
+                        selectedCoordintes={selectedCoordintes}
+                        templateHeaders={templateHeaders}
+                      />
+                    </div>
+                    <button
+                      disabled={loading}
+                      className="px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
+                      onClick={() =>
+                        // onImageHandler(
+                        //   "next",
+                        //   currentIndex,
+                        //   filteredArray,
+                        //   currentTaskData
+                        // )
+                        onNextHandler("next", currentIndex)
+                      }
+                      endIcon={<ArrowForwardIosIcon />}
+                    >
+                      <ArrowForwardIosIcon />
+                    </button>
+                  </div>
+
+                  <section>
+                    <div className=" flex justify-end mt-5 mr-5">
+                      {maximum === currentIndex && (
+                        <div className="flex justify-center">
+                          <button
+                            onClick={() => onTaskCompleteHandler()}
+                            className="px-4 py-2 bg-teal-600 mx-2 text-white rounded-3xl shadow hover:bg-teal-700"
+                          >
+                            Submit task
+                          </button>
+                        </div>
+                      )}
+                      <button
+                        onClick={() => navigate("/datamatching")}
+                        className=" px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
+                      >
+                        Back
+                      </button>
+                      <Button
+                        // onClick={onCsvUpdateHandler}
+                        variant="contained"
+                        color="info"
+                      >
+                        update
+                      </Button>
+
+                      <button
+                        className="px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
+                        onClick={() =>
+                          //   onImageHandler(
+                          //     "prev",
+                          //     currentIndex,
+                          //     filteredArray,
+                          //     currentTaskData
+                          //   )
+                          onPrevHandler("prev", currentIndex)
+                        }
+                        endIcon={<ArrowBackIosIcon />}
+                      >
+                        Prev
+                      </button>
+                      <button
+                        className="px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
+                        onClick={() =>
+                          // onImageHandler(
+                          //   "next",
+                          //   currentIndex,
+                          //   filteredArray,
+                          //   currentTaskData
+                          // )
+                          onNextHandler("next", currentIndex)
+                        }
+                        endIcon={<ArrowForwardIosIcon />}
+                      >
+                        Next
+                      </button>
+                    </div>
+                    <CorrectionField
+                      // csvCurrentData={csvCurrentData} //whole row data
+                      subData={subData} //error questions data
+                      currentData={currentData} //error questions data
+                      // csvData={csvData}
+                      // tableData={tableData}
+                      // currentData={currentData}
+                      // setCorrectionData={setCorrectionData}
+                      // currentIndex={currentIndex} //error questions data
+                      // setCurrentIndex={setCurrentIndex}
+                      // maximum={maximum} //error questions data
+                      // templateHeaders={templateHeaders} //template header already present
+                      // imageColName={imageColName}
+                      // currentFocusIndex={currentFocusIndex}
+                      // inputRefs={inputRefs}
+                      // handleKeyDownJump={handleKeyDownJump}
+                      // onNextHandler={onNextHandler}
+                      // changeCurrentCsvDataHandler={changeCurrentCsvDataHandler}
+                      // imageFocusHandler={imageFocusHandler}
                     />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                    />
-                  </svg>
-                  <span className="text-lg">
-                    Getting files ready for you...
-                  </span>
-                </button>
-              ) : (
-                <button
-                  className="block rounded-lg px-4 py-2 ms-auto transition bg-blue-500 text-white hover:bg-blue-600"
-                  onClick={() => {
-                    compareHandler();
-                  }}
-                >
-                  <span className="text-lg">Get Started</span>
-                </button>
-              )}
-            </div>
+                  </section>
+                </div>
+              </div>
+            )}
           </div>
+
+          {/* CONFIRMATION MODAL */}
+          <ConfirmationModal
+            confirmationModal={confirmationModal}
+            onSubmitHandler={onCompleteHandler}
+            setConfirmationModal={setConfirmationModal}
+            heading={"Confirm Task Completion"}
+            message={
+              "Please confirm if you would like to mark this task as complete."
+            }
+          />
         </div>
-      )} */}
-      
+      )}
     </>
   );
 };
