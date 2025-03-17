@@ -1,23 +1,24 @@
 import React from "react";
 import { REACT_APP_IP } from "../../services/common";
 
-const  ImageSectionCSV = ({
+const ImageSectionCSV = ({
   imageContainerRef,
   currentImageIndex,
   imageRef,
   zoomLevel,
   selectedCoordintes,
   templateHeaders,
-  currentData
+  currentData,
 }) => {
+  console.log(zoomLevel);
 
   return (
     <div
-      ref={imageContainerRef} 
+      ref={imageContainerRef}
       className="mx-auto bg-white"
       style={{
         position: "relative",
-        border: "2px solid gray", 
+        border: "2px solid gray",
         width: "48rem",
         height: "40vh",
         overflow: "auto",

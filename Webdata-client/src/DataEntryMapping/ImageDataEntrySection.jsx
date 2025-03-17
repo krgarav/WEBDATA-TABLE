@@ -7,9 +7,11 @@ const ImageDataEntrySection = ({
   imageData,
   prevHandler,
   nextHandler,
+  imageRef,
+  zoomLevel,
 }) => {
   const [imageUrl, setImageUrl] = useState("");
-  const imageRef = useRef();
+  // const imageRef = useRef();
   const imageContainerRef = useRef();
   useEffect(() => {
     setImageUrl(`${window.SERVER_IP}/images/${data.imageName}`);
@@ -82,7 +84,7 @@ const ImageDataEntrySection = ({
               alt="Selected"
               style={{
                 width: "48rem",
-                // transform: `scale(${zoomLevel})`,
+                transform: `scale(${zoomLevel})`,
                 transformOrigin: "center center",
                 borderRadius: "0.5rem",
                 boxShadow: "0 4px 8px rgba(0, 0, 0, 0.8)",
@@ -115,7 +117,7 @@ const ImageDataEntrySection = ({
               top: `${imageData?.coordinateY}px`,
               width: `${imageData?.width}px`,
               height: `${imageData?.height}px`,
-              //   transform: `scale(${zoomLevel})`,
+              transform: `scale(${zoomLevel})`,
               transformOrigin: "center center",
               borderRadius: "0.25rem",
               boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",

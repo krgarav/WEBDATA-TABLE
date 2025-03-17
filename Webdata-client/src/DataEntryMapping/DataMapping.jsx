@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import FormDataEntrySection from "./FormDataSection";
 import ButtonDataEntrySection from "./ButtonDataEntrySection";
@@ -15,6 +15,8 @@ const DataMapping = () => {
   const [imageData, setImageData] = useState([]);
   const [currentIndex, setCurrenIndex] = useState(null);
   const [formData, setFormData] = useState([]);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const imageRef = useRef(null);
 
   useEffect(() => {
     setFormData(Array.isArray(data.formdata) ? data.formdata : [data.formdata]);
@@ -85,6 +87,22 @@ const DataMapping = () => {
     nextHandler();
     console.log(res);
   };
+  const zoomInHandler = () => {
+    setZoomLevel((prevZoomLevel) => Math.min(prevZoomLevel * 1.1, 3));
+  };
+
+  const zoomOutHandler = () => {
+    setZoomLevel((prevZoomLevel) => Math.max(prevZoomLevel * 0.9, 0.5));
+  };
+
+  const onInialImageHandler = () => {
+    setZoomLevel(1);
+    setSelectedCoordinates(false);
+    if (imageRef.current) {
+      imageRef.current.style.transform = "none";
+      imageRef.current.style.transformOrigin = "initial";
+    }
+  };
   return (
     <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-[100vh] pt-16">
       <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-600 dataEntry ">
@@ -97,13 +115,20 @@ const DataMapping = () => {
 
         <div className="flex-col w-full">
           {/* Button and Data */}
-          <ButtonDataEntrySection data={data} />
+          <ButtonDataEntrySection
+            data={data}
+            zoomInHandler={zoomInHandler}
+            zoomOutHandler={zoomOutHandler}
+            onInialImageHandler={onInialImageHandler}
+          />
 
           <ImageDataEntrySection
             data={data}
             imageData={imageData}
             nextHandler={nextHandler}
             prevHandler={prevHandler}
+            zoomLevel={zoomLevel}
+            imageRef={imageRef}
           />
 
           <QuestionDataEntrySection
