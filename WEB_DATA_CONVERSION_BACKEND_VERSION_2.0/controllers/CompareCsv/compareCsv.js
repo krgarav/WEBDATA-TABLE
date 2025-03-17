@@ -167,32 +167,36 @@ async function insertGroupedArrayIntoTable(groupedArray) {
 }
 async function insertData(groupedArray) {
   try {
-    for (const item of groupedArray) {
-      // Insert data into ErrorTable
-      const errorEntry = await ErrorTable.create({
-        Primary: item.PRIMARY,
-        Primary_Key: item.PRIMARY_KEY,
-        Image_Name: item.IMAGE_NAME,
-        parentId: item.parentId,
-        fileId: item.fileId,
-      });
+    await Promise.all(
+      groupedArray.map(async (item, index) => {
+        const errorEntry = await ErrorTable.create({
+          Primary: item.PRIMARY,
+          Primary_Key: item.PRIMARY_KEY,
+          Image_Name: item.IMAGE_NAME,
+          parentId: item.parentId,
+          fileId: item.fileId,
+          indexTracker: index + 1,
+        });
 
-      // Insert data into ErrorAggregatedTable
-      const aggregatedData = item.DATA.map((dataItem) => ({
-        Column_Name: dataItem.COLUMN_NAME,
-        File_1_data: dataItem.FILE_1_DATA,
-        File_2_data: dataItem.FILE_2_DATA,
-        errorTableId: errorEntry.id, // Establish relation
-      }));
+        if (Array.isArray(item.DATA)) {
+          const aggregatedData = item.DATA.map((dataItem) => ({
+            Column_Name: dataItem.COLUMN_NAME,
+            File_1_data: dataItem.FILE_1_DATA,
+            File_2_data: dataItem.FILE_2_DATA,
+            errorTableId: errorEntry.id,
+          }));
 
-      await ErrorAggregatedTable.bulkCreate(aggregatedData);
-    }
+          await ErrorAggregatedTable.bulkCreate(aggregatedData);
+        }
+      })
+    );
 
     console.log("Data inserted successfully!");
   } catch (error) {
-    console.error("Error inserting data:", error);
+    console.error("Error inserting data:", error.message || error);
   }
 }
+
 // Function to group and sort by PRIMARY key
 function groupByPrimaryKey(arr, fileId) {
   const grouped = {};
