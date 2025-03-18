@@ -16,6 +16,21 @@ const QuestionDataEntrySection = ({ data, setImageData, saveHandler }) => {
   //   );
   // }, [data]);
   // console.log(data.questionData);
+
+  useEffect(() => {
+    const handleAltSKey = (e) => {
+      if (e.altKey && e.key.toLowerCase() === "s") {
+        e.preventDefault(); // Prevents browser default action
+        saveHandler(editableData); // Call save function directly
+      }
+    };
+
+    document.addEventListener("keydown", handleAltSKey);
+    return () => {
+      document.removeEventListener("keydown", handleAltSKey);
+    };
+  }, [editableData, saveHandler]); // Ensure latest state values
+
   const handleInputChange = (key, newValue) => {
     setEditableData((prevData) => ({
       ...prevData,
@@ -70,6 +85,7 @@ const QuestionDataEntrySection = ({ data, setImageData, saveHandler }) => {
               saveHandler(editableData);
             }}
             className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-200 ease-in-out"
+            id="update"
           >
             Save
           </button>

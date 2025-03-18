@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 
-const ButtonDataEntrySection = ({ data }) => {
+const ButtonDataEntrySection = ({
+  data,
+  zoomInHandler,
+  onInialImageHandler,
+  zoomOutHandler,
+}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [totalErrors, setTotalErrors] = useState(0);
   const [imageName, setImageName] = useState("");
@@ -17,19 +22,28 @@ const ButtonDataEntrySection = ({ data }) => {
         Data No : {currentIndex} out of {totalErrors}
       </h3>
       <div className="flex justify-center my-3 ">
-        <button className="px-6 py-2 bg-blue-400 text-white rounded-3xl mx-2 hover:bg-blue-600 transition-all text-sm 2xl:text-lg">
+        <button
+          className="px-6 py-2 bg-blue-400 text-white rounded-3xl mx-2 hover:bg-blue-600 transition-all text-sm 2xl:text-lg"
+          onClick={zoomInHandler}
+        >
           Zoom In
         </button>
-        <button className="px-6 py-2 bg-blue-400 text-white rounded-3xl mx-2 hover:bg-blue-600 transition-all text-sm 2xl:text-lg">
+        <button
+          className="px-6 py-2 bg-blue-400 text-white rounded-3xl mx-2 hover:bg-blue-600 transition-all text-sm 2xl:text-lg"
+          onClick={onInialImageHandler}
+        >
           Initial
         </button>
-        <button className="px-6 py-2 bg-blue-400 text-white rounded-3xl mx-2 hover:bg-blue-600 transition-all text-sm 2xl:text-lg">
+        <button
+          className="px-6 py-2 bg-blue-400 text-white rounded-3xl mx-2 hover:bg-blue-600 transition-all text-sm 2xl:text-lg"
+          onClick={zoomOutHandler}
+        >
           Zoom Out
         </button>
       </div>
       <h3 className="font-semibold py-3 text-white text-sm 2xl:text-lg">
         {" "}
-        Image Name : {imageName}
+        Image Name : <span className="font-light">{imageName}</span>
       </h3>
     </div>
   );
