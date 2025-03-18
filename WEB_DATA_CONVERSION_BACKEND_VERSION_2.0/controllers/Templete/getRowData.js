@@ -9,7 +9,7 @@ const getRowData = async (req, res) => {
   try {
     const { taskId, rowId } = req.query;
     const assignData = await Assigndata.findByPk(taskId);
-    const { templeteId, imageDirectoryPath, fileId } = assignData;
+    const { templeteId, imageDirectoryPath, fileId, currentIndex } = assignData;
     const template = await Template.findByPk(templeteId);
 
     const TableName = template.csvTableName;
@@ -28,7 +28,14 @@ const getRowData = async (req, res) => {
     const joinstr = dirs.join("/");
 
     const maindir = path.join(imageDirectoryPath, joinstr, baseName);
-    res.status(200).json({ success: true, data: row, imageUrl: maindir });
+    res
+      .status(200)
+      .json({
+        success: true,
+        data: row,
+        imageUrl: maindir,
+        currentIndex: currentIndex,
+      });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: "Failed to fetch data." });

@@ -209,12 +209,11 @@ const UserCorrectionData = () => {
         setFormData(response.data);
         setImageUrls(response.imageUrl);
       }
-      console.log(response.data);
     };
     if (currentData) {
       req(taskId, currentData?.parentId);
     }
-  }, [currentData]);
+  }, [currentData, currIndex]);
 
   useEffect(() => {
     setLoading(true);
@@ -231,9 +230,10 @@ const UserCorrectionData = () => {
       setCurrentData(response?.data?.mainData);
       setSubData(response?.data?.subData);
       setTotalData(response?.data?.errorCount);
+      setCurrIndex(response?.data?.currentIndex);
     };
     req();
-  }, [currentIndex]);
+  }, [currentIndex, currIndex]);
   // const onCsvUpdateHandler = async () => {
   //   if (!modifiedKeys) {
   //     onImageHandler("next", currentIndex, headerData, currentTaskData);
@@ -790,12 +790,10 @@ const UserCorrectionData = () => {
   };
   const prevHandler = async () => {
     const response = await updateCurrIndexData(taskId, "prev");
-    console.log(response);
-    setCurrIndex(response);
+    setCurrIndex(response?.updatedIndex);
   };
   const nextHandler = async () => {
     const response = await updateCurrIndexData(taskId, "next");
-    console.log(response);
     setCurrIndex(response?.updatedIndex);
   };
   return (
@@ -853,7 +851,6 @@ const UserCorrectionData = () => {
                 <div>
                   <div style={{ display: "flex", justifyContent: "center" }}>
                     <button
-                      disabled={loading}
                       className="px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
                       onClick={prevHandler}
                     >
@@ -897,44 +894,6 @@ const UserCorrectionData = () => {
                         className=" px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
                       >
                         Back
-                      </button>
-                      <Button
-                        // onClick={onCsvUpdateHandler}
-                        variant="contained"
-                        color="info"
-                      >
-                        update
-                      </Button>
-
-                      <button
-                        className="px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
-                        onClick={() =>
-                          //   onImageHandler(
-                          //     "prev",
-                          //     currentIndex,
-                          //     filteredArray,
-                          //     currentTaskData
-                          //   )
-                          onPrevHandler("prev", currentIndex)
-                        }
-                        endIcon={<ArrowBackIosIcon />}
-                      >
-                        Prev
-                      </button>
-                      <button
-                        className="px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
-                        onClick={() =>
-                          // onImageHandler(
-                          //   "next",
-                          //   currentIndex,
-                          //   filteredArray,
-                          //   currentTaskData
-                          // )
-                          onNextHandler("next", currentIndex)
-                        }
-                        endIcon={<ArrowForwardIosIcon />}
-                      >
-                        Next
                       </button>
                     </div>
                     <CorrectionField

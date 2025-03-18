@@ -10,7 +10,7 @@ const updateCurrentIndex = async (req, res) => {
     if (!assignData) {
       return res.status(404).json({ error: "Task not found" });
     }
-    let newIndex=0;
+    let newIndex=assignData.currentIndex;
     if (direction === "next") {
       newIndex = newIndex + 1;
     } else if (direction === "prev") {
