@@ -900,6 +900,8 @@ const UserCorrectionData = () => {
                       // csvCurrentData={csvCurrentData} //whole row data
                       subData={subData} //error questions data
                       currentData={currentData} //error questions data
+                      taskId={taskId}
+                      nextHandler={nextHandler}
                       // csvData={csvData}
                       // tableData={tableData}
                       // currentData={currentData}
