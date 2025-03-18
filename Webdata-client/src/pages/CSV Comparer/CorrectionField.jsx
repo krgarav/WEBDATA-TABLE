@@ -148,6 +148,7 @@ const CorrectionField = ({ subData, currentData }) => {
       [key]: e.target.value,
     }));
   };
+  console.log(inputValue);
   const onUpdateHandler = async () => {
     if (isUpdatingRef.current) return;
     isUpdatingRef.current = true;
@@ -166,16 +167,17 @@ const CorrectionField = ({ subData, currentData }) => {
           };
         }
       );
+      console.log(updates);
 
-      if (updates.length === 0) return;
+      // if (updates.length === 0) return;
 
-      const response = await axios.post(
-        `http://${REACT_APP_IP}:4000/csvUpdateData/${taskId}/batch`,
-        updates,
-        {
-          headers: { token: token },
-        }
-      );
+      // const response = await axios.post(
+      //   `http://${REACT_APP_IP}:4000/csvUpdateData/${taskId}/batch`,
+      //   updates,
+      //   {
+      //     headers: { token: token },
+      //   }
+      // );
 
       // setCorrectionData((prevState) => {
       //   const updatedData = prevState?.previousData?.DATA?.map((item) => {
@@ -198,7 +200,6 @@ const CorrectionField = ({ subData, currentData }) => {
       // }
 
       toast.success("Corrected Value is Updated");
-      onNextHandler("next", currentIndex);
     } catch (error) {
       console.error(
         "Error updating data:",
@@ -211,7 +212,7 @@ const CorrectionField = ({ subData, currentData }) => {
     }
   };
   const errorData = subData?.map((dataItem, index) => {
-    const key = `${updatedData?.PRIMARY?.trim()}-${dataItem?.COLUMN_NAME?.trim()}`;
+    const key = `${dataItem?.Column_Name?.trim()}`;
     // const updatedValue = dataItem.CORRECTED||"Null";
     // const questionAllowedValues = ["A", "B", "C", "D", "*", " "];
     // const formAllowed = //allvalues
@@ -241,20 +242,25 @@ const CorrectionField = ({ subData, currentData }) => {
             }
             // value={dataItem?.CORRECTED?dataItem?.CORRECTED:""}
             // defaultValue={dataItem?.CORRECTED}
+            placeholder={dataItem?.Column_Name}
             onChange={(e) => {
               const input = e.target.value.toUpperCase(); // Convert input to uppercase
 
               // Validate based on field type
-              if (
-                (dataItem.type === "formField" && numberRegex.test(input)) || // Allow only numbers for form fields
-                (dataItem.type !== "formField" &&
-                  (input === "" || questionAllowedValues.includes(input))) // Allow question field values
-              ) {
-                handleInputChange(
-                  { ...e, target: { ...e.target, value: input } },
-                  key
-                );
-              }
+              // if (
+              //   (dataItem.type === "formField" && numberRegex.test(input)) || // Allow only numbers for form fields
+              //   (dataItem.type !== "formField" &&
+              //     (input === "" || questionAllowedValues.includes(input))) // Allow question field values
+              // ) {
+              //   handleInputChange(
+              //     { ...e, target: { ...e.target, value: input } },
+              //     key
+              //   );
+              // }
+              handleInputChange(
+                { ...e, target: { ...e.target, value: input } },
+                key
+              );
             }}
             onFocus={(e) => {
               imageFocusHandler(dataItem.COLUMN_NAME); // First function

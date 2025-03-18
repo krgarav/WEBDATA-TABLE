@@ -30,6 +30,14 @@ const ErrorAggregatedTable = sequelize.define("errorAggregated", {
     onDelete: "CASCADE", // Ensures entries are deleted if the parent is deleted
     onUpdate: "CASCADE",
   },
+  Corrected: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  CorrectedBy: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
 });
 
 module.exports = ErrorAggregatedTable;
