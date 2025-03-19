@@ -42,6 +42,7 @@ const getMetaData = require("../controllers/Templete/getMetaData");
 const updateCurrentIndex = require("../controllers/Templete/updateCurrentIndex");
 const downloadMergedCsv = require("../controllers/Templete/downloadMergedCsv");
 const updateMainCsvData = require("../controllers/Templete/updateMainCsvData");
+const duplicateChecker = require("../controllers/Templete/duplicateChecker");
 const router = express.Router();
 
 router.get("/get/templetedata/:id", authMiddleware, getTempleteData); //templeteId
@@ -71,7 +72,7 @@ router.post("/data", authMiddleware, handleData);
 router.post("/updatecsvdata/:id", authMiddleware, updateCsvData); //fileId
 router.post("/assign/user", authMiddleware, assignUser);
 router.post("/taskupdation/:id", authMiddleware, taskUpdation); //assigndata Id
-router.post("/duplicate/data", authMiddleware, duplicateFinder);
+// router.post("/duplicate/data", authMiddleware, duplicateFinder);
 router.post("/delete/duplicate", authMiddleware, deleteDuplicateData);
 router.post("/update/duplicatedata", authMiddleware, editDuplicateData);
 router.post("/delete/template/:id", authMiddleware, deleteTemplate); //templateId
@@ -91,5 +92,6 @@ router.get("/update/assignedData", authMiddleware, getMetaData);
 router.post("/update/currentIndex", authMiddleware, updateCurrentIndex);
 router.get("/download/csv/:id", authMiddleware, downloadMergedCsv);
 router.post("/update/csvdata", authMiddleware, updateMainCsvData);
+router.post("/duplicate/data", authMiddleware, duplicateChecker);
 
 module.exports = router;

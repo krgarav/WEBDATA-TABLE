@@ -10,6 +10,7 @@ const DuplicateData = ({
   onEditModalHandler,
   onRemoveDuplicateHandler,
 }) => {
+  console.log(duplicatesData);
   return (
     <div className="inline-block align-bottom pb-6 lg:h-[85vh] bg-teal-100  rounded-xl lg:ms-4 text-left shadow-md overflow-hidden transform transition-all  sm:align-middle w-[90%] ">
       <div className="px-4 ">
@@ -50,17 +51,17 @@ const DuplicateData = ({
                     className="flex justify-around gap-1 py-3 text-center even:bg-gray-50 sm:grid-cols-4 "
                   >
                     <dt className="font-medium text-md justify-center whitespace-normal items-center flex w-1/3">
-                      {data?.sameData[0]?.row[columnName]}
+                      {data[columnName]}
                     </dt>
                     <dd className="font-medium items-center text-md w-1/3 flex justify-center ">
-                      {data.sameData.length}
+                      {data.count}
                     </dd>
 
                     <div className=" w-1/3 ">
                       <div className="relative">
                         <div className="inline-flex items-center overflow-hidden rounded-2xl border bg-white">
                           <button
-                            onClick={() => onShowModalHandler(data, index)}
+                            onClick={() => onShowModalHandler(data, index,columnName)}
                             className="border-e px-3 py-2 bg-blue-500 text-white text-sm/none  hover:bg-gray-50 hover:text-gray-700"
                           >
                             View

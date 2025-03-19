@@ -32,7 +32,7 @@ const ImageScanner = () => {
   const cancelButtonRef = useRef(null);
   const navigate = useNavigate();
 
-  const [duplicateCheckedData, setDuplicateCheckedData] = useState([])
+  const [duplicateCheckedData, setDuplicateCheckedData] = useState([]);
 
   // useEffect(() => {
   //   const fetchData = async () => {
@@ -210,28 +210,16 @@ const ImageScanner = () => {
 
       if (response.data?.message) {
         toast.success(response.data?.message);
+        // setCurrentRowData(response.data?.duplicates[0]);
+        // setImageUrl(url);
+        setColumnName(columnName);
+        setDuplicatesData(response.data?.duplicates);
+        setShowDuplicates(false);
         return;
       }
 
-      let groups = response.data.duplicates.reduce((acc, obj) => {
-        let key = obj.row[columnName];
-        if (!acc[key]) {
-          acc[key] = [];
-        }
-        acc[key].push(obj);
-        return acc;
-      }, {});
+      // const url = response.data?.duplicates[0].imagePaths[currentImageIndex];
 
-      let result = Object.values(groups).map((value) => {
-        return { sameData: value };
-      });
-
-      setDuplicatesData(result);
-      // setDuplicatesData(response.data.duplicates);
-      const url = response.data?.duplicates[0].imagePaths[currentImageIndex];
-      setCurrentRowData(response.data?.duplicates[0]);
-      setImageUrl(url);
-      setColumnName(columnName);
       setShowDuplicates(false);
       toast.success("Successfully fetched all duplicates data!");
     } catch (error) {
@@ -293,23 +281,32 @@ const ImageScanner = () => {
     setEditModal(true);
     setImageUrl(allCurrentData[index].imagePaths[currentImageIndex]);
   };
-  const onShowModalHandler = (data) => {
-    setAllCurrentData(data.sameData);
-    setShowDuplicateField(true);
+  const onShowModalHandler = async (data, _, columnName) => {
+    const fileId = await JSON.parse(localStorage.getItem("fileId"));
+    const obj = {
+      fileId: fileId.fileId,
+      columnName: columnName,
+      value: data[columnName],
+    };
+    
+    console.log(obj);
+
+    // setAllCurrentData(data.sameData);
+    // setShowDuplicateField(true);
   };
 
-  const onDuplicateCheckedHandler = async() => {
+  const onDuplicateCheckedHandler = async () => {
     try {
       const data = await JSON.parse(localStorage.getItem("fileId"));
       const response = await checkMappedDataExits(data?.templeteId);
-      setDuplicateCheckedData(response)
-      if(response?.success){
+      setDuplicateCheckedData(response);
+      if (response?.success) {
         navigate(`/csvuploader/templatemap/${id}`);
       } else {
         // toast.error("Cannot move to mapped page!!")
       }
     } catch (error) {
-      toast.error(error?.message)
+      toast.error(error?.message);
     }
   };
 

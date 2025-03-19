@@ -62,24 +62,7 @@ const EditDuplicateData = ({
             </div>
           </div>
         </div>
-        {/* <div className="flex flex-col space-y-4 lg:space-y-0 lg:space-x-12 lg:flex-row lg:pt-2 lg:pb-1  px-4 lg:px-7 w-[25%] lg:w-full">
-      <button
-        onClick={() => setEditModal(false)}
-        class="group inline-block rounded-3xl bg-blue-500 p-[2px] text-white hover:bg-indigo-600 focus:outline-none focus:ring active:text-opacity-75"
-      >
-        <span class="block rounded-sm  text-center lg:px-8 py-2 text-md font-medium group-hover:bg-transparent">
-          Back
-        </span>
-      </button>
-      <button
-        onClick={onUpdateCurrentDataHandler}
-        class="group inline-block rounded-3xl bg-blue-500 p-[2px] text-white hover:bg-indigo-600 focus:outline-none focus:ring active:text-opacity-75"
-      >
-        <span class="block rounded-sm  text-center lg:px-8 py-2 text-md font-medium group-hover:bg-transparent">
-          Save
-        </span>
-      </button>
-    </div> */}
+      
         <div className="flex  justify-around pb-3 lg:pb-5  px-4 lg:px-7 lg:w-full">
           <button
             onClick={() => setEditModal(false)}

@@ -378,7 +378,6 @@ const CsvUploader = () => {
             toast.error("Invalid or empty CSV file.");
             return;
           }
-console.log(result)
           // Extract headers from the first row
           const uploadedHeaders = Object.keys(result.data[0]);
 
