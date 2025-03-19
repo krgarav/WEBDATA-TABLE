@@ -1,5 +1,5 @@
 const path = require("path");
-const fs = require("fs").promises;
+const fs = require("fs");
 const Assigndata = require("../../models/TempleteModel/assigndata");
 const Files = require("../../models/TempleteModel/files");
 const Template = require("../../models/TempleteModel/templete");
@@ -7,7 +7,7 @@ const sequelize = require("../../utils/database");
 const { DataTypes, Op, QueryTypes } = require("sequelize");
 const csvToJson = require("../../services/csv_to_json");
 const jsonToCsv = require("../../services/json_to_csv");
-const { Parser } = require('json2csv');
+const { Parser } = require("json2csv");
 
 const DownloadCorrectedCsv = async (req, res) => {
   try {
@@ -36,9 +36,12 @@ const DownloadCorrectedCsv = async (req, res) => {
     const { startIndex } = fileData;
     const { csvTableName } = template;
 
-    const data = await sequelize.query(`SELECT * FROM ${csvTableName} WHERE id >= ${startIndex}`, {
-      type: QueryTypes.SELECT,
-    });
+    const data = await sequelize.query(
+      `SELECT * FROM ${csvTableName} WHERE id >= ${startIndex}`,
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
 
     if (!data || data.length === 0) {
       return res.status(404).json({ error: "No data available to download" });
@@ -47,13 +50,15 @@ const DownloadCorrectedCsv = async (req, res) => {
     const csvParser = new Parser();
     const csvData = csvParser.parse(data);
 
-    const filePath = path.join(__dirname, 'corrected_file.csv');
+    const filePath = path.join(__dirname, "corrected_file.csv");
     fs.writeFileSync(filePath, csvData);
 
-    res.download(filePath, 'corrected_file.csv', (err) => {
+    res.download(filePath, "corrected_file.csv", (err) => {
       if (err) {
         console.error("Error sending file:", err);
-        res.status(500).json({ error: "An error occurred while sending the file" });
+        res
+          .status(500)
+          .json({ error: "An error occurred while sending the file" });
       }
 
       // Clean up file after sending
@@ -61,7 +66,9 @@ const DownloadCorrectedCsv = async (req, res) => {
     });
   } catch (error) {
     console.error("Error processing CSV file:", error);
-    return res.status(500).json({ error: "An error occurred while processing your request" });
+    return res
+      .status(500)
+      .json({ error: "An error occurred while processing your request" });
   }
 };
 
