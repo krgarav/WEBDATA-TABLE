@@ -2,8 +2,12 @@ const path = require("path");
 const fs = require("fs").promises;
 const Assigndata = require("../../models/TempleteModel/assigndata");
 const Files = require("../../models/TempleteModel/files");
+const Template = require("../../models/TempleteModel/templete");
+const sequelize = require("../../utils/database");
+const { DataTypes, Op, QueryTypes } = require("sequelize");
 const csvToJson = require("../../services/csv_to_json");
 const jsonToCsv = require("../../services/json_to_csv");
+const { Parser } = require('json2csv');
 
 const DownloadCorrectedCsv = async (req, res) => {
   try {
@@ -13,83 +17,51 @@ const DownloadCorrectedCsv = async (req, res) => {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    const { errorFilePath, correctedCsvFilePath, fileId } = task;
+    const { fileId, templeteId } = task;
 
     if (!fileId) {
       return res.status(400).json({ error: "fileId not found" });
     }
-    if (!errorFilePath || !correctedCsvFilePath) {
-      return res.status(400).json({ error: "FilePath not provided" });
+
+    const template = await Template.findByPk(templeteId);
+    if (!template) {
+      return res.status(400).json({ error: "Template not found" });
     }
 
-    const fileData = await Files.findOne({ where: { id: fileId } });
+    const fileData = await Files.findByPk(fileId);
     if (!fileData) {
       return res.status(404).json({ error: "File not found" });
     }
 
-    const originalFilename = fileData.csvFile;
-    const originalFilePath = path.join(
-      __dirname,
-      "../../csvFile",
-      originalFilename
-    );
+    const { startIndex } = fileData;
+    const { csvTableName } = template;
 
-    try {
-      await fs.access(originalFilePath);
-    } catch (err) {
-      return res.status(404).json({ error: "File not found" });
-    }
-
-    const jsonData = await csvToJson(originalFilePath);
-    const errorData = await csvToJson(errorFilePath);
-    errorData.forEach((errorRow) => {
-      const primaryKey = errorRow["PRIMARY KEY"];
-      const primary = errorRow["PRIMARY"];
-      const columnName = errorRow["COLUMN_NAME"];
-      const correctedValue = errorRow["CORRECTED"];
-      const correctedBy = errorRow["CORRECTED BY"] || "Unknown"; // Default to "Unknown" if not present
-
-      let findVar = jsonData.find((item) => item[primaryKey] == primary.trim());
-
-      if (findVar) {
-        // Apply the correction
-        findVar[columnName] = correctedValue;
-
-        // Append the correction in "Corrected Data"
-        if (correctedValue) {
-          findVar["Corrected Data"] = findVar["Corrected Data"]
-            ? findVar["Corrected Data"] + `, ${columnName}: ${correctedValue}`
-            : `${columnName}: ${correctedValue}`;
-          // Append the corrector's name in "Corrected By"
-          findVar["Corrected By"] = correctedBy;
-        }
-      } else {  
-        console.log(
-          `No matching row found for primary key '${primary}, ${primaryKey}'`
-        );
-      }
+    const data = await sequelize.query(`SELECT * FROM ${csvTableName} WHERE id >= ${startIndex}`, {
+      type: QueryTypes.SELECT,
     });
 
-    const updatedCsv = await jsonToCsv(jsonData);
-    await fs.writeFile(correctedCsvFilePath, updatedCsv);
+    if (!data || data.length === 0) {
+      return res.status(404).json({ error: "No data available to download" });
+    }
 
-    // Set original filename in the response header
-    res.setHeader("X-Original-Filename", originalFilename);
+    const csvParser = new Parser();
+    const csvData = csvParser.parse(data);
 
-    // Send the file as an attachment
-    res.download(correctedCsvFilePath, "corrected_file.csv", (err) => {
+    const filePath = path.join(__dirname, 'corrected_file.csv');
+    fs.writeFileSync(filePath, csvData);
+
+    res.download(filePath, 'corrected_file.csv', (err) => {
       if (err) {
         console.error("Error sending file:", err);
-        res
-          .status(500)
-          .json({ error: "An error occurred while sending the file" });
+        res.status(500).json({ error: "An error occurred while sending the file" });
       }
+
+      // Clean up file after sending
+      fs.unlinkSync(filePath);
     });
   } catch (error) {
     console.error("Error processing CSV file:", error);
-    return res
-      .status(500)
-      .json({ error: "An error occurred while processing your request" });
+    return res.status(500).json({ error: "An error occurred while processing your request" });
   }
 };
 
