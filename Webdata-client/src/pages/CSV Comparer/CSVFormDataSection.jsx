@@ -52,6 +52,15 @@ const CSVFormDataSection = ({
 
           //               ${i === currentFocusIndex ? "bg-yellow-300" : ""}
           //               `}
+
+          className={`mt-1 border-none p-2 focus:border-transparent text-center rounded-lg focus:outline-none focus:ring-0 sm:text-sm w-48
+          ${
+            formCsvData[key] &&
+            typeof formCsvData[key] === "string" &&
+            formCsvData[key].includes(" ")
+              ? "bg-red-500 text-white"
+              : "bg-white"
+          }`}
           // ref={(el) => (inputRefs.current[i] = el)}
           value={formCsvData[key] || ""}
           // onKeyDown={(e) => handleKeyDownJump(e, i)}

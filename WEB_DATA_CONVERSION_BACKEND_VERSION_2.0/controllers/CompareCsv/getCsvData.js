@@ -38,9 +38,11 @@ const getCsvData = async (req, res) => {
     const { fileId, currentIndex } = assignData;
 
     const file = await ErrorTable.findOne({
-      where: { fileId: fileId, id: currentIndex },
+      where: { fileId: fileId, indexTracker: currentIndex },
     });
-
+    const errorCount = await ErrorTable.findAll({
+      where: { fileId: fileId },
+    });
     const columnData = await ErrorAggregatedTable.findAll({
       where: { errorTableId: file.id },
     });
@@ -51,9 +53,13 @@ const getCsvData = async (req, res) => {
     //   DATA: row.DATA ? JSON.parse(`[${row.DATA}]`) : [],
     // }));
 
-    res
-      .status(200)
-      .json({ success: true, mainData: file, subData: columnData });
+    res.status(200).json({
+      success: true,
+      mainData: file,
+      subData: columnData,
+      errorCount: errorCount.length,
+      currentIndex: currentIndex,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to fetch data." });

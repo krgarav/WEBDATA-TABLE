@@ -9,21 +9,21 @@ import {
 import { toast } from "react-toastify";
 import Loader from "../../UI/Loader";
 
-const CorrectionField = ({ subData, currentData }) => {
+const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
   // const [inputValues, setInputValues] = useState("");
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
-  const taskId = JSON.parse(localStorage.getItem("taskdata")).id;
   const token = JSON.parse(localStorage.getItem("userData"));
   const [visitedCount, setVisitedCount] = useState(0);
   const [visitedRows, setVisitedRows] = useState({}); // Track visited rows
   const [dataRow, setDataRow] = useState(currentData);
   const [updatedData, setUpdatedData] = useState([]);
+  const [inputValue, setInputValue] = useState({});
   const inputRefs = useRef([]);
-
   const [isLoading, setIsLoading] = useState(false);
   const isUpdatingRef = useRef(false);
   useEffect(() => {
     setDataRow(currentData);
+    setInputValue({});
   }, [currentData]);
   useEffect(() => {
     setVisitedCount(0);
@@ -42,8 +42,6 @@ const CorrectionField = ({ subData, currentData }) => {
       setVisitedCount((prev) => prev + 1);
     }
   };
-
-  const [inputValue, setInputValue] = useState({});
 
   // useEffect(() => {
   //   const PRIMARY = currentData?.PRIMARY;
@@ -148,34 +146,46 @@ const CorrectionField = ({ subData, currentData }) => {
       [key]: e.target.value,
     }));
   };
+  console.log(inputValue);
   const onUpdateHandler = async () => {
     if (isUpdatingRef.current) return;
     isUpdatingRef.current = true;
     setIsLoading(true);
     const PRIMARY = currentData?.PRIMARY;
     const Primary_Key = currentData?.Primary_Key;
-    try {
-      const updates = Object.entries(inputValue).map(
-        ([key, correctedValue]) => {
-          const [primary, columnName] = key.split("-");
-          return {
-            PRIMARY: PRIMARY,
-            Primary_Key,
-            CORRECTED: correctedValue,
-            COLUMN_NAME: columnName,
-          };
-        }
-      );
 
-      if (updates.length === 0) return;
+    try {
+      const mappedData = subData.map((dataItem) => {
+        return {
+          id: dataItem.id,
+          Column_Name: dataItem.Column_Name,
+          Corrected: inputValue[dataItem.Column_Name],
+        };
+      });
+      console.log(mappedData);
+      const filtered = mappedData.filter((item) => item.Corrected != null);
+
+      const obj = {
+        updated: filtered,
+        parentId: currentData?.parentId,
+        taskId: taskId,
+      };
+
+      // console.log(currentData);
+      // console.log(subData);
+
+      // if (updates.length === 0) return;
 
       const response = await axios.post(
-        `http://${REACT_APP_IP}:4000/csvUpdateData/${taskId}/batch`,
-        updates,
+        `${window.SERVER_IP}/csvUpdateData/${taskId}/batch`,
+        obj,
         {
           headers: { token: token },
         }
       );
+      if (response.data.success) {
+        nextHandler();
+      }
 
       // setCorrectionData((prevState) => {
       //   const updatedData = prevState?.previousData?.DATA?.map((item) => {
@@ -198,7 +208,6 @@ const CorrectionField = ({ subData, currentData }) => {
       // }
 
       toast.success("Corrected Value is Updated");
-      onNextHandler("next", currentIndex);
     } catch (error) {
       console.error(
         "Error updating data:",
@@ -211,7 +220,7 @@ const CorrectionField = ({ subData, currentData }) => {
     }
   };
   const errorData = subData?.map((dataItem, index) => {
-    const key = `${updatedData?.PRIMARY?.trim()}-${dataItem?.COLUMN_NAME?.trim()}`;
+    const key = `${dataItem?.Column_Name?.trim()}`;
     // const updatedValue = dataItem.CORRECTED||"Null";
     // const questionAllowedValues = ["A", "B", "C", "D", "*", " "];
     // const formAllowed = //allvalues
@@ -233,28 +242,33 @@ const CorrectionField = ({ subData, currentData }) => {
           <input
             type="text"
             className="w-full border rounded-xl py-1 px-2 shadow"
-            // value={inputValue[key] ?inputValue[key]:dataItem?.FILE_1_DATA}
+            // value={inputValue[key] ?inputValue[key]:dataItem?.Corrected}
             value={
               inputValue[key] !== undefined
                 ? inputValue[key]
-                : dataItem?.CORRECTED
+                : dataItem?.Corrected
             }
-            // value={dataItem?.CORRECTED?dataItem?.CORRECTED:""}
+            // value={dataItem?.Corrected ? dataItem?.Corrected : ""}
             // defaultValue={dataItem?.CORRECTED}
+            placeholder={dataItem?.Column_Name}
             onChange={(e) => {
               const input = e.target.value.toUpperCase(); // Convert input to uppercase
 
               // Validate based on field type
-              if (
-                (dataItem.type === "formField" && numberRegex.test(input)) || // Allow only numbers for form fields
-                (dataItem.type !== "formField" &&
-                  (input === "" || questionAllowedValues.includes(input))) // Allow question field values
-              ) {
-                handleInputChange(
-                  { ...e, target: { ...e.target, value: input } },
-                  key
-                );
-              }
+              // if (
+              //   (dataItem.type === "formField" && numberRegex.test(input)) || // Allow only numbers for form fields
+              //   (dataItem.type !== "formField" &&
+              //     (input === "" || questionAllowedValues.includes(input))) // Allow question field values
+              // ) {
+              //   handleInputChange(
+              //     { ...e, target: { ...e.target, value: input } },
+              //     key
+              //   );
+              // }
+              handleInputChange(
+                { ...e, target: { ...e.target, value: input } },
+                key
+              );
             }}
             onFocus={(e) => {
               // imageFocusHandler(dataItem.COLUMN_NAME); // First function

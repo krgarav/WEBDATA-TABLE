@@ -28,6 +28,10 @@ const ErrorTable = sequelize.define("errorTable", {
     type: Sequelize.INTEGER,
     allowNull: false,
   },
+  indexTracker: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+  },
 });
 
 module.exports = ErrorTable;

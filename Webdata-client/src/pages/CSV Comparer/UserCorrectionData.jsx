@@ -9,6 +9,7 @@ import {
   onGetTemplateHandler,
   onGetVerifiedUserHandler,
   REACT_APP_IP,
+  updateCurrIndexData,
 } from "../../services/common";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -75,6 +76,7 @@ const UserCorrectionData = () => {
   );
 
   const [loading, setLoading] = useState(false);
+  const [totalData, setTotalData] = useState(0);
 
   // console.log(currentTaskData)
   //   useEffect(() => {
@@ -207,12 +209,11 @@ const UserCorrectionData = () => {
         setFormData(response.data);
         setImageUrls(response.imageUrl);
       }
-      console.log(response.data);
     };
     if (currentData) {
       req(taskId, currentData?.parentId);
     }
-  }, [currentData]);
+  }, [currentData, currIndex]);
 
   useEffect(() => {
     setLoading(true);
@@ -228,9 +229,11 @@ const UserCorrectionData = () => {
       );
       setCurrentData(response?.data?.mainData);
       setSubData(response?.data?.subData);
+      setTotalData(response?.data?.errorCount);
+      setCurrIndex(response?.data?.currentIndex);
     };
     req();
-  }, [currentIndex]);
+  }, [currentIndex, currIndex]);
   // const onCsvUpdateHandler = async () => {
   //   if (!modifiedKeys) {
   //     onImageHandler("next", currentIndex, headerData, currentTaskData);
@@ -750,7 +753,7 @@ const UserCorrectionData = () => {
       );
 
       setConfirmationModal(false);
-      toast.success("task complted successfully.");
+      toast.success("task completed successfully.");
       navigate("/datamatching");
     } catch (error) {
       toast.error(error.message);
@@ -776,7 +779,6 @@ const UserCorrectionData = () => {
 
   const compareHandler = () => {
     // onImageHandler("initial", currentIndex - 1, filteredArray, currentTaskData);
-
     setPopUp(false);
   };
   const modalClose = () => {
@@ -786,6 +788,14 @@ const UserCorrectionData = () => {
   const onTaskCompleteHandler = () => {
     setConfirmationModal(true);
   };
+  const prevHandler = async () => {
+    const response = await updateCurrIndexData(taskId, "prev");
+    setCurrIndex(response?.updatedIndex);
+  };
+  const nextHandler = async () => {
+    const response = await updateCurrIndexData(taskId, "next");
+    setCurrIndex(response?.updatedIndex);
+  };
   return (
     <>
       {!popUp && (
@@ -794,6 +804,7 @@ const UserCorrectionData = () => {
           {formData && (
             <CSVFormDataSection
               formCsvData={formData}
+
               // csvData={csvData}
               // filterResults={filterResults}
               // templateHeaders={templateHeaders}
@@ -825,7 +836,7 @@ const UserCorrectionData = () => {
             ) : (
               <div className="flex-col">
                 <ButtonCsvSection
-                  currentIndex={currentIndex}
+                  currentIndex={currIndex}
                   csvData={csvData}
                   // correctionData={correctionData}
                   currentData={currentData}
@@ -835,22 +846,13 @@ const UserCorrectionData = () => {
                   zoomOutHandler={zoomOutHandler}
                   currentImageIndex={currentImageIndex}
                   imageUrls={imageUrls}
+                  totalData={totalData}
                 />
                 <div>
                   <div style={{ display: "flex", justifyContent: "center" }}>
                     <button
-                      disabled={loading}
                       className="px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
-                      onClick={() =>
-                        //   onImageHandler(
-                        //     "prev",
-                        //     currentIndex,
-                        //     filteredArray,
-                        //     currentTaskData
-                        //   )
-                        onPrevHandler("prev", currentIndex)
-                      }
-                      endIcon={<ArrowBackIosIcon />}
+                      onClick={prevHandler}
                     >
                       <ArrowBackIosIcon />
                     </button>
@@ -867,18 +869,9 @@ const UserCorrectionData = () => {
                       />
                     </div>
                     <button
-                      disabled={loading}
+                      // disabled={loading}
                       className="px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
-                      onClick={() =>
-                        // onImageHandler(
-                        //   "next",
-                        //   currentIndex,
-                        //   filteredArray,
-                        //   currentTaskData
-                        // )
-                        onNextHandler("next", currentIndex)
-                      }
-                      endIcon={<ArrowForwardIosIcon />}
+                      onClick={nextHandler}
                     >
                       <ArrowForwardIosIcon />
                     </button>
@@ -902,49 +895,13 @@ const UserCorrectionData = () => {
                       >
                         Back
                       </button>
-                      <Button
-                        // onClick={onCsvUpdateHandler}
-                        variant="contained"
-                        color="info"
-                      >
-                        update
-                      </Button>
-
-                      <button
-                        className="px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
-                        onClick={() =>
-                          //   onImageHandler(
-                          //     "prev",
-                          //     currentIndex,
-                          //     filteredArray,
-                          //     currentTaskData
-                          //   )
-                          onPrevHandler("prev", currentIndex)
-                        }
-                        endIcon={<ArrowBackIosIcon />}
-                      >
-                        Prev
-                      </button>
-                      <button
-                        className="px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
-                        onClick={() =>
-                          // onImageHandler(
-                          //   "next",
-                          //   currentIndex,
-                          //   filteredArray,
-                          //   currentTaskData
-                          // )
-                          onNextHandler("next", currentIndex)
-                        }
-                        endIcon={<ArrowForwardIosIcon />}
-                      >
-                        Next
-                      </button>
                     </div>
                     <CorrectionField
                       // csvCurrentData={csvCurrentData} //whole row data
                       subData={subData} //error questions data
                       currentData={currentData} //error questions data
+                      taskId={taskId}
+                      nextHandler={nextHandler}
                       // csvData={csvData}
                       // tableData={tableData}
                       // currentData={currentData}

@@ -23,6 +23,7 @@ const {
 } = require("../controllers/CompareCsv/formFieldDetails");
 const getCsvData = require("../controllers/CompareCsv/getCsvData");
 const getRowData = require("../controllers/Templete/getRowData");
+const updateCurrentIndex = require("../controllers/CompareCsv/updateCurrentIndex");
 
 const router = express.Router();
 
@@ -43,5 +44,6 @@ router.post("/getUploadedFiles/:templateId", getUploadedFilesByTemplateId);
 router.get("/getUploadedFileHeader", getCsvHeaders);
 router.post("/formfileddetails", formFieldDetails);
 router.get("/getCsvRowData", getRowData);
+router.post("/updateCurrentIndex", authMiddleware, updateCurrentIndex);
 
 module.exports = router;
