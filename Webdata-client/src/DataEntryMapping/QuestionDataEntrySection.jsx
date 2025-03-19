@@ -71,9 +71,9 @@ const QuestionDataEntrySection = ({ data, setImageData, saveHandler }) => {
   }, [columnName]);
 
   return (
-    <div className="w-full xl:w-2/3 xl:px-6 mx-auto text-white">
+    <div className="w-full 2xl:w-2/3 xl:px-6 mx-auto text-white">
       <div className="my-4 w-full ">
-        <div className="flex items-center justify-between bg-transparent p-4 rounded-lg shadow-md">
+        <div className="flex items-center justify-between bg-transparent rounded-lg">
           <label
             className="text-xl font-semibold text-white ms-2 leading-none"
             htmlFor="questions"
@@ -84,7 +84,7 @@ const QuestionDataEntrySection = ({ data, setImageData, saveHandler }) => {
             onClick={() => {
               saveHandler(editableData);
             }}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-200 ease-in-out"
+            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-200 ease-in-out mr-16"
             id="update"
           >
             Save
@@ -92,7 +92,7 @@ const QuestionDataEntrySection = ({ data, setImageData, saveHandler }) => {
         </div>
 
         <div
-          className="flex overflow-auto max-h-[360px] mt-3 ms-2 xl:ms-2 flex-wrap"
+          className="flex overflow-auto max-h-[360px] mt-3 ms-2 xl:ms-2 flex-wrap h-44 2xl:h-full"
           style={{ scrollbarWidth: "thin" }}
         >
           {/* {Array.isArray(questionData) &&
