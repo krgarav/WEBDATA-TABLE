@@ -58,7 +58,7 @@ const ImageDataEntrySection = ({
         onClick={() => {
           prevHandler();
         }}
-        className="text-white px-3 py-8 bg-blue-400 rounded-3xl mx-2 hover:bg-blue-600 text-lg transition-all cursor-pointer"
+        className="text-white px-3 py-8 bg-blue-400 rounded-3xl mx-2 hover:bg-blue-800 text-lg transition-all cursor-pointer"
       >
         <button>
           <GrPrevious />
@@ -129,7 +129,7 @@ const ImageDataEntrySection = ({
         onClick={() => {
           nextHandler();
         }}
-        className="text-white px-3 py-8 bg-blue-400 rounded-3xl mx-2 hover:bg-blue-600 text-lg transition-all cursor-pointer"
+        className="text-white px-3 py-8 bg-blue-400 rounded-3xl mx-2 hover:bg-blue-800 text-lg transition-all cursor-pointer"
       >
         <button>
           <MdOutlineArrowForwardIos />

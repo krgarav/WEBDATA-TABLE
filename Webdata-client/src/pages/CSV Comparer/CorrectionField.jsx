@@ -296,26 +296,26 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
   return (
     <div className="mx-4 bg-white xl:my-4 px-4 py-2 rounded-md">
       <div className="flex justify-between mb-6 mt-2">
-        <h2 className="xl:text-xl mx-4 font-bold pt-1 text-blue-500 bg-blue-200 p-2 rounded-lg border border-blue-400">
+        <h2 className="text-sm 2xl:text-xl mx-4 font-bold 2xl:pt-1 text-blue-500 bg-blue-200 p-2 rounded-lg border border-blue-400">
           {`${currentData?.Primary_Key} (Primary Key)`}
         </h2>
-        <h3 className="xl:text-lg font-bold bg-red-100 text-red-600 px-2 py-1 rounded-md shadow-md border border-red-300">
+        <h3 className="text-sm 2xl:text-lg font-bold bg-red-100 text-red-600 p-2 rounded-md shadow-md border border-red-300">
           Total Errors:{" "}
           <span className="font-extrabold">{subData?.length}</span>
         </h3>
 
         {subData?.length === visitedCount && (
-          <span className="text-green-700 bg-green-200 font-semibold px-2 py-1 rounded-md shadow-md border border-green-400">
+          <span className="text-sm 2xl:text-lg text-green-700 bg-green-200 font-semibold p-2 rounded-md shadow-md border border-green-400">
             ✅ All Visited
           </span>
         )}
         {subData?.length !== visitedCount && (
-          <span className="flex items-center text-yellow-800 bg-yellow-200 font-semibold px-3 py-1 rounded-md shadow-md border border-yellow-400">
+          <span className="flex items-center text-yellow-800 bg-yellow-200 font-semibold p-2 rounded-md shadow-md border border-yellow-400 text-sm 2xl:text-lg">
             ⚠️ Not Visited: {subData?.length - visitedCount}
           </span>
         )}
 
-        <h3 className="text-lg font-bold bg-blue-100 text-blue-600 px-2 py-1 rounded-md shadow-md border border-blue-300">
+        <h3 className="text-sm 2xl:text-lg font-bold bg-blue-100 text-blue-600 p-2 rounded-md shadow-md border border-blue-300">
           Visited: <span className="font-extrabold">{visitedCount}</span>
         </h3>
         <button
@@ -354,7 +354,7 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
               </div>
             </div>
           </div>
-          <div className="h-[180px] overflow-y-auto text-center">
+          <div className="h-28 2xl:h-44 overflow-y-auto text-center">
             {errorData}
           </div>
         </div>
