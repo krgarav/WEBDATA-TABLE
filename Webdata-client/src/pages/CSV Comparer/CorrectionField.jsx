@@ -271,7 +271,7 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
               );
             }}
             onFocus={(e) => {
-              imageFocusHandler(dataItem.COLUMN_NAME); // First function
+              // imageFocusHandler(dataItem.COLUMN_NAME); // First function
               handleVisit(index); // Second function
             }} // Mark row as visited
             ref={(el) => (inputRefs.current[index] = el)}
@@ -311,8 +311,7 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
         )}
         {subData?.length !== visitedCount && (
           <span className="flex items-center text-yellow-800 bg-yellow-200 font-semibold px-3 py-1 rounded-md shadow-md border border-yellow-400">
-            ⚠️ Not All Visited &nbsp;|&nbsp; {visitedCount} of {subData?.length}{" "}
-            completed
+            ⚠️ Not Visited: {subData?.length - visitedCount}
           </span>
         )}
 
