@@ -56,7 +56,7 @@ const DeactivateModal = ({ isOpen, onClose, taskId }) => {
       setCorrectLoading(true);
       // Fetch the corrected file from the server
       const response = await axios.get(
-        `http://${REACT_APP_IP}:4000/download/correctedCsv/${taskId}`,
+        `${window.SERVER_IP}/download/correctedCsv/${taskId}`,
         {
           responseType: "blob", // Important for downloading files
           headers: {
