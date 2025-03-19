@@ -82,15 +82,15 @@ const DuplicateDataModel = ({
                                   >
                                     <div className="flex">
                                       <div className="text-center py-4 whitespace-nowrap text-xs font-medium text-gray-900 w-1/4">
-                                        {data.row[columnName]}
+                                        {data[columnName]}
                                       </div>
                                       <div className=" py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/4 text-center">
-                                        {data.index}
+                                        {data.id}
                                       </div>
                                       <div className="text-center py-4 whitespace-nowrap text-sm text-gray-500 w-1/4">
                                         <button
                                           onClick={() =>
-                                            onEditModalHandler(data, index)
+                                            onEditModalHandler(data.id)
                                           }
                                           className="border-e px-4 bg-gray-100 py-2 text-sm/none text-blue-600 rounded-3xl hover:bg-blue-200"
                                         >

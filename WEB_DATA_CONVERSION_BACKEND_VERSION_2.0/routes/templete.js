@@ -43,6 +43,8 @@ const updateCurrentIndex = require("../controllers/Templete/updateCurrentIndex")
 const downloadMergedCsv = require("../controllers/Templete/downloadMergedCsv");
 const updateMainCsvData = require("../controllers/Templete/updateMainCsvData");
 const duplicateChecker = require("../controllers/Templete/duplicateChecker");
+const duplicateDataExtractor = require("../controllers/Templete/duplicateDataExtractor");
+const getCsvRowData = require("../controllers/Templete/getCsvRowData");
 const router = express.Router();
 
 router.get("/get/templetedata/:id", authMiddleware, getTempleteData); //templeteId
@@ -93,5 +95,6 @@ router.post("/update/currentIndex", authMiddleware, updateCurrentIndex);
 router.get("/download/csv/:id", authMiddleware, downloadMergedCsv);
 router.post("/update/csvdata", authMiddleware, updateMainCsvData);
 router.post("/duplicate/data", authMiddleware, duplicateChecker);
-
+router.post("/get/duplicate/data", authMiddleware, duplicateDataExtractor);
+router.get("/get/csvRowData", authMiddleware, getCsvRowData);
 module.exports = router;

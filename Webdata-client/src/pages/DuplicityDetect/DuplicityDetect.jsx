@@ -171,24 +171,11 @@ const ImageScanner = () => {
     };
   }, [currentImageIndex, currentRowData, onUpdateCurrentDataHandler]);
 
-  const changeCurrentCsvDataHandler = (key, newValue) => {
-    setCurrentRowData((prevData) => {
-      const previousValue = prevData.row[key];
-
-      // Set the modified keys with both new and previous values
-      setModifiedKeys((prevKeys) => ({
-        ...prevKeys,
-        [key]: [newValue, previousValue],
-      }));
-
-      return {
-        ...prevData,
-        row: {
-          ...prevData.row,
-          [key]: newValue,
-        },
-      };
-    });
+  const changeCurrentCsvDataHandler = (key, value) => {
+    setCurrentRowData((prevData) => ({
+      ...prevData,
+      [key]: value
+    }));
   };
 
   const onFindDuplicatesHandler = async (columnName) => {
@@ -276,10 +263,21 @@ const ImageScanner = () => {
     }
   };
 
-  const onEditModalHandler = (data, index) => {
-    setCurrentRowData(data);
+  const onEditModalHandler = async (id) => {
+    const response = await axios.get(
+      `${window.SERVER_IP}/get/csvRowData?rowId=${id}&fileId=${fileId}`,
+
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    console.log(response.data.rowData);
+    
+    setCurrentRowData(response.data.rowData);
     setEditModal(true);
-    setImageUrl(allCurrentData[index].imagePaths[currentImageIndex]);
+    // setImageUrl(response.data.imageUrl);
   };
   const onShowModalHandler = async (data, _, columnName) => {
     const fileId = await JSON.parse(localStorage.getItem("fileId"));
@@ -288,11 +286,21 @@ const ImageScanner = () => {
       columnName: columnName,
       value: data[columnName],
     };
-    
-    console.log(obj);
 
-    // setAllCurrentData(data.sameData);
-    // setShowDuplicateField(true);
+    const response = await axios.post(
+      `${window.SERVER_IP}/get/duplicate/data`,
+      obj,
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+
+    console.log(response.data.data);
+
+    setAllCurrentData(response.data.data);
+    setShowDuplicateField(true);
   };
 
   const onDuplicateCheckedHandler = async () => {
