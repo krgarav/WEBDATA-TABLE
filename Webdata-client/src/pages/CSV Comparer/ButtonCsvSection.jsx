@@ -15,7 +15,7 @@ const ButtonCsvSection = ({
 }) => {
   return (
     <div className="flex justify-evenly items-center ml-2">
-      <h3 className="xl:text-lg font-semibold py-3 text-white mr-4">
+      <h3 className="text-sm 2xl:text-lg font-semibold py-3 text-white mr-4">
         Data No : {currentIndex} out of {totalData}
       </h3>
       <div className="flex my-3">
@@ -39,8 +39,8 @@ const ButtonCsvSection = ({
           <ImZoomOut />
         </button>
       </div>
-      <h3 className=" xl:text-lg font-semibold py-3 text-white px-4">
-        Image Name - {imageUrls}
+      <h3 className=" text-sm 2xlxl:text-lg font-semibold py-3 text-white px-4">
+        Image Name - <span className="font-light">{imageUrls}</span>
       </h3>
     </div>
   );

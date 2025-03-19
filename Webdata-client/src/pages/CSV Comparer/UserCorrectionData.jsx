@@ -799,7 +799,7 @@ const UserCorrectionData = () => {
   return (
     <>
       {!popUp && (
-        <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-500 dataEntry pt-16 xl:pt-20 xl:h-screen">
+        <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-500 dataEntry pt-16 2xl:pt-20 xl:h-screen">
           {/* LEFT SECTION */}
           {formData && (
             <CSVFormDataSection
@@ -850,12 +850,14 @@ const UserCorrectionData = () => {
                 />
                 <div>
                   <div style={{ display: "flex", justifyContent: "center" }}>
+                    <div className="flex justify-center items-center">
                     <button
-                      className="px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
+                      className="pl-4 pr-2 py-8 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-800"
                       onClick={prevHandler}
                     >
                       <ArrowBackIosIcon />
                     </button>
+                    </div>
                     <div className="h-20vh">
                       <ImageSectionCSV
                         imageContainerRef={imageContainerRef}
@@ -868,13 +870,15 @@ const UserCorrectionData = () => {
                         templateHeaders={templateHeaders}
                       />
                     </div>
+                    <div className="flex justify-center items-center">
                     <button
                       // disabled={loading}
-                      className="px-6 py-2 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-700"
+                      className="pl-4 pr-2 py-8 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-800"
                       onClick={nextHandler}
                     >
                       <ArrowForwardIosIcon />
                     </button>
+                    </div>
                   </div>
 
                   <section>
