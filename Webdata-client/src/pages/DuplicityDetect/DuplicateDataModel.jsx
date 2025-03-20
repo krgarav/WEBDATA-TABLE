@@ -61,12 +61,12 @@ const DuplicateDataModel = ({
                               <div className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
                                 Row Index
                               </div>
-                              <div className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+                              <div className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/2">
                                 Edit
                               </div>
-                              <div className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+                              {/* <div className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
                                 Remove
-                              </div>
+                              </div> */}
                             </div>
                           </div>
                           <div className="overflow-y-auto h-[400px]">
@@ -87,7 +87,7 @@ const DuplicateDataModel = ({
                                       <div className=" py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/4 text-center">
                                         {data.id}
                                       </div>
-                                      <div className="text-center py-4 whitespace-nowrap text-sm text-gray-500 w-1/4">
+                                      <div className="text-center py-4 whitespace-nowrap text-sm text-gray-500 w-1/2">
                                         <button
                                           onClick={() =>
                                             onEditModalHandler(data.id)
@@ -97,7 +97,7 @@ const DuplicateDataModel = ({
                                           Edit
                                         </button>
                                       </div>
-                                      <div
+                                      {/* <div
                                         className="text-center py-4 whitespace-nowrap text-red-500 text-2xl  w-1/4"
                                         onClick={() =>
                                           onRemoveDuplicateHandler(
@@ -108,7 +108,7 @@ const DuplicateDataModel = ({
                                         }
                                       >
                                         <MdDelete className="mx-auto text-2xl hover:text-3xl" />
-                                      </div>
+                                      </div> */}
                                     </div>
                                   </div>
                                 </div>
