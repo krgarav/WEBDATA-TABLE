@@ -22,6 +22,7 @@ const assignTask = async (req, res, next) => {
         templeteId,
         errorFilePath,
         imageDirectoryPath,
+        
       } = task;
 
       await Assigndata.create({

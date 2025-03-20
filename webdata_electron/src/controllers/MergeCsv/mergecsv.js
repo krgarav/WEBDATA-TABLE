@@ -88,8 +88,8 @@ async function mergeCSVFiles(fileNames) {
   let firstFileHeaders = null;
 
   for (const [index, fileName] of fileNames.entries()) {
-    // const filePath = path.join(__dirname, "../../csvFile/", fileName);
-    const filePath = "csvFile/"+ fileName;
+    const filePath = path.join(__dirname, "../../csvFile/", fileName);
+
     if (!fs.existsSync(filePath)) {
       console.warn(`Warning: File not found - ${filePath}`);
       continue;

@@ -2,7 +2,7 @@ const mysql = require("mysql2/promise");
 const dotenv = require("dotenv");
 const { app } = require("electron");
 dotenv.config({ path: app.getAppPath() + "/.env" });
-const DB_name = "webdata";
+const DB_name = "webdataconversion";
 const createDatabaseIfNotExists = async () => {
   try {
     const connection = await mysql.createConnection({

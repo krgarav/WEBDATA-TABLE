@@ -16,7 +16,7 @@ const updateCsvTask = async ({ taskId, updates, user }) => {
     const fileData = await Files.findOne({ where: { id: fileId } });
     if (!fileData) throw new Error("File not found");
 
-    const originalFilePath =  "csvFile" + fileData.csvFile;
+    const originalFilePath = path.resolve(__dirname, "../../csvFile", fileData.csvFile);
 
     try {
       await fs.access(originalFilePath);

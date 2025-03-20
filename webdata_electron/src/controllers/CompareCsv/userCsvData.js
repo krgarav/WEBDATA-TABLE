@@ -56,8 +56,7 @@ exports.userData = async (req, res) => {
     const sendFile = errorJsonFile[currindex - 1];
     const imageName = sendFile.IMAGE_NAME;
     
-    // let imagePath = path.join(__dirname, "../", "../", "extractedFiles", imageDirectoryPath);
-    let imagePath = "extractedFiles/"+ imageDirectoryPath;
+    let imagePath = path.join(__dirname, "../", "../", "extractedFiles", imageDirectoryPath);
     const imageFolders = getAllDirectories(imagePath);
 
     imageFolders.forEach(folder => {

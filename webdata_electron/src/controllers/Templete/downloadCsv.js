@@ -3,9 +3,7 @@ const path = require("path");
 const fs = require("fs").promises; // Use the promises API for async/await
 const csvToJson = require("../../services/csv_to_json");
 const jsonToCsv = require("../../services/json_to_csv");
-const { app } = require("electron");
-const documentsPath = app.getPath("documents");
-const basePath = path.join(documentsPath, "Webdata");
+
 const downloadCsv = async (req, res) => {
   try {
     const fileId = req.params.id;
@@ -23,8 +21,8 @@ const downloadCsv = async (req, res) => {
 
     const originalFilename = fileData.csvFile;
     const originalFilePath = path.join(
-      basePath,
-      "csvFile",
+      __dirname,
+      "../../csvFile",
       originalFilename
     );
 
@@ -63,8 +61,8 @@ const downloadCsv = async (req, res) => {
     const timestamp = new Date().toISOString().replace(/[-:.]/g, "");
     const copiedFilename = `copy-${timestamp}.csv`;
     const copiedFilePath = path.join(
-      basePath,
-      "csvFile",
+      __dirname,
+      "../../csvFile",
       copiedFilename
     );
 

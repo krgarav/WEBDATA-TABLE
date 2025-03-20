@@ -33,7 +33,7 @@ const Sequelize = require("sequelize");
 //     process.exit(1); // Exit if DB creation fails
 //   }
 // };
-const sequelize = new Sequelize("webdataconversion_2", "root", "root", {
+const sequelize = new Sequelize("webdataconversion", "root", "root", {
   dialect: "mysql",
   host: "localhost",
   logging: false,

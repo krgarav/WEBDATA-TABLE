@@ -4,18 +4,40 @@ const Files = require("../../models/TempleteModel/files");
 const path = require("path");
 const fs = require("fs-extra");
 const unzipper = require("unzipper");
-const { app } = require("electron");
+const { DataTypes, Op, QueryTypes } = require("sequelize");
+const csv = require("csv-parser");
 const { createExtractorFromFile } = require("node-unrar-js");
+const sequelize = require("../../utils/database");
 const getAllDirectories = require("../../services/directoryFinder");
 const jsonToCsv = require("../../services/json_to_csv");
 const Templete = require("../../models/TempleteModel/templete");
-const documentsPath = app.getPath("documents");
-const basePath = path.join(documentsPath, "Webdata");
+const csvToJson = require("../../services/csvExtractor");
 
 // Multer memory storage for chunk uploads
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+// Function to insert data into a table
+async function insertDataIntoTable(tableName, data) {
+  if (data.length === 0) return;
+
+  const columnsForRead = Object.keys(data[0]);
+  const columns = Object.keys(data[0]).map((col) => `\`${col}\``);
+  const values = data
+    .map(
+      (row) =>
+        `(${columnsForRead.map((col) => `'${(row[col] || "").replace(/\\/g, "\\\\")}'`
+).join(",")})`
+    )
+    .join(",");
+
+  const query = `INSERT INTO ${tableName} (${columns.join(
+    ","
+  )}) VALUES ${values};`;
+
+  await sequelize.query(query, { type: QueryTypes.INSERT });
+  return columns;
+}
 /**
  * Function to process the uploaded CSV file
  * - Reads the CSV file from the specified path
@@ -146,6 +168,120 @@ async function extractZipFile(finalFilePath, destinationFolderPath) {
   });
 }
 
+async function createDynamicTable(headers) {
+  const tableName = `Table_${Date.now()}`; // Unique table name
+  const columns = {
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true }, // Explicitly set primary key
+  };
+
+  headers.forEach((header) => {
+    const normalizedHeader = header;
+
+    // Assign appropriate data types based on column content
+    if (
+      normalizedHeader.toLowerCase().includes("image") ||
+      normalizedHeader.toLowerCase().includes("details") ||
+      normalizedHeader.toLowerCase().includes("values") ||
+      normalizedHeader.toLowerCase().includes("updated_col")
+    ) {
+      columns[normalizedHeader] = { type: DataTypes.TEXT }; // Large text-based columns
+    } else if (normalizedHeader.toLowerCase().includes("barcode")) {
+      columns[normalizedHeader] = { type: DataTypes.STRING(100) }; // Reduce barcode size
+    } else if (normalizedHeader.match(/^q[0-9]+$/i)) {
+      columns[normalizedHeader] = { type: DataTypes.STRING(10) }; // Short answers (e.g., A, B, C, D, etc.)
+    } else {
+      columns[normalizedHeader] = { type: DataTypes.STRING(100) }; // Default reduced VARCHAR size
+    }
+  });
+
+  const DynamicModel = sequelize.define(tableName, columns, {
+    timestamps: false,
+  });
+
+  await DynamicModel.sync();
+  // Extract the actual table name from the model
+  const actualTableName = DynamicModel.getTableName();
+  return { tableName: actualTableName, DynamicModel };
+}
+
+// Function to read CSV files and insert into the dynamic table
+async function processAndInsertCSV(mergedRecords) {
+  if (!mergedRecords || mergedRecords.length === 0) {
+    throw new Error("No valid data found in the merged CSV data.");
+  }
+
+  // Collect all unique headers from the merged data
+  let allHeaders = new Set();
+  mergedRecords.forEach((record) => {
+    Object.keys(record).forEach((key) => allHeaders.add(key));
+  });
+
+  const headersArray = Array.from(allHeaders);
+  const { tableName, DynamicModel } = await createDynamicTable(headersArray);
+
+  // Ensure each record has all headers
+  const formattedRecords = mergedRecords.map((record) => {
+    let formattedRecord = {};
+    headersArray.forEach((header) => {
+      formattedRecord[header] = record[header] ?? null; // Fill missing columns with null
+    });
+    return formattedRecord;
+  });
+
+  await DynamicModel.bulkCreate(formattedRecords);
+
+  return { tableName, headersArray };
+}
+async function mergeCSVFiles(fileNames) {
+  let headersSet = new Set(); // Stores headers from the first file
+  let mergedRecords = [];
+  let firstFileHeaders = null;
+
+  for (const [index, fileName] of fileNames.entries()) {
+    const filePath = path.join(__dirname, "../../csvFile/", fileName);
+
+    if (!fs.existsSync(filePath)) {
+      console.warn(`Warning: File not found - ${filePath}`);
+      continue;
+    }
+
+    try {
+      await new Promise((resolve, reject) => {
+        let rowIndex = 0; // Row counter
+
+        fs.createReadStream(filePath)
+          .pipe(csv())
+          .on("headers", (headers) => {
+            if (index === 0) {
+              // Capture headers only from the first file
+              firstFileHeaders = headers;
+              headersSet = new Set(headers);
+            }
+          })
+          .on("data", (row) => {
+            rowIndex++; // Increment row count
+
+            let formattedRow = {};
+
+            // Only keep columns that exist in the first file
+            if (firstFileHeaders) {
+              firstFileHeaders.forEach((header) => {
+                formattedRow[header] = row[header] ?? null; // Fill missing values with null
+              });
+            }
+
+            mergedRecords.push(formattedRow);
+          })
+          .on("end", resolve)
+          .on("error", reject);
+      });
+    } catch (error) {
+      console.error(`Error processing file ${fileName}:`, error.message);
+    }
+  }
+
+  return mergedRecords;
+}
 /**
  * Main handler function for uploading files
  * - Validates user role
@@ -182,12 +318,9 @@ const handleUpload = async (req, res) => {
       return res.status(400).json({ error: "No chunk file uploaded." });
     }
 
-    // const uploadDir = path.join(__dirname, "..", "..", "zipFile");
-    // const chunkDir = path.join(uploadDir, "chunks");
-    // const csvFileDir = path.join(__dirname, "../../csvFile");
-    const uploadDir = path.join(basePath, "zipFile");
+    const uploadDir = path.join(__dirname, "..", "..", "zipFile");
     const chunkDir = path.join(uploadDir, "chunks");
-    const csvFileDir = path.join(basePath, "csvFile");
+    const csvFileDir = path.join(__dirname, "../../csvFile");
 
     try {
       // Ensure necessary directories exist
@@ -226,15 +359,12 @@ const handleUpload = async (req, res) => {
 
         // Step 7: Extract the final ZIP file
         const destinationFolderPath = path.join(
-          basePath,
-          "extractedFiles",
+          __dirname,
+          "../../extractedFiles",
           `${timestamp}_${zipFileName}`
         );
 
         await extractZipFile(finalFilePath, destinationFolderPath);
-
-        // console.log(finalFilePath, "finalFilePath");
-        // console.log(destinationFolderPath, "destinationFolderPath");
 
         // Step 8: Process the extracted files and CSV
         const allDirectories = getAllDirectories(destinationFolderPath);
@@ -251,32 +381,78 @@ const handleUpload = async (req, res) => {
         const pathDir = `${timestamp}_${zipFileName}/${allDirectories.join(
           "/"
         )}`;
+        const templateTable = await Templete.findByPk(id);
+        if (!templateTable.csvTableName) {
+          const mergedData = await mergeCSVFiles([csvFileName]);
+          // console.log(pathDir, "pathDir");
+          // Process merged CSV data and insert into SQL table
+          const { tableName, headersArray } = await processAndInsertCSV(
+            mergedData
+          );
 
-        // console.log(pathDir, "pathDir");
+          // **Update the Template with the new table name**
 
-        const createdFile = await Files.create({
-          csvFile: csvFileName,
-          zipFile: `${timestamp}_${zipFileName}`,
-          templeteId: id,
-        });
-        const template = await Templete.findByPk(id);
+          // template.mergedTableName = tableName;
 
-        template.imageColName = req.query.imageNames;
-        await template.save();
-        if (fs.existsSync(csvFilePath)) {
-          await processCSV(csvFilePath, res, req, createdFile, pathDir);
+          const createdFile = await Files.create({
+            startIndex : 1,
+            totalFiles: mergedData.length,
+            csvFileTable: tableName,
+            csvFile: csvFileName,
+            zipFile: `${timestamp}_${zipFileName}`,
+            templeteId: id,
+          });
+          const template = await Templete.findByPk(id);
+          template.csvTableName = tableName;
+          template.imageColName = req.query.imageNames;
+          await template.save();
+          res.status(200).json({
+            success: true,
+            message: `New Table Created.`,
+            templeteId: id,
+            fileId: createdFile.id,
+          });
+          // if (fs.existsSync(csvFilePath)) {
+          //   await processCSV(csvFilePath, res, req, createdFile, pathDir);
+          // } else {
+          //   res
+          //     .status(404)
+          //     .json({ error: "CSV file not found after extraction." });
+          // }
         } else {
-          res
-            .status(404)
-            .json({ error: "CSV file not found after extraction." });
+          const [result] = await sequelize.query(
+            `SELECT COUNT(*) AS count FROM \`${templateTable.csvTableName}\``, 
+            { type: sequelize.QueryTypes.SELECT }
+        );
+          const csvJson = await csvToJson(csvFilePath);
+          const columns = await insertDataIntoTable(
+            templateTable.csvTableName,
+            csvJson
+          );
+          const createdFile = await Files.create({
+            startIndex:result.count,
+            totalFiles: csvJson.length,
+            csvFile: csvFileName,
+            zipFile: `${timestamp}_${zipFileName}`,
+            templeteId: id,
+          });
+          res.status(200).json({
+            success: true,
+            message: `Inserted into existing table.`,
+            templeteId: id,
+            fileId: createdFile.id,
+          });
+          //insert the csv file into the table
         }
       } else {
         // Step 9: Respond with the status of the chunk upload
-        res.status(200).json({ message: `Chunk ${chunkIndex} uploaded.` });
+        res
+          .status(200)
+          .json({ success: true, message: `Chunk ${chunkIndex} uploaded.` });
       }
     } catch (error) {
       console.error("Error during chunk upload:", error);
-      res.status(500).json({ error: "Chunk upload failed.", message: error });
+      res.status(500).json({ success: false, error: "Chunk upload failed." });
     }
   });
 };

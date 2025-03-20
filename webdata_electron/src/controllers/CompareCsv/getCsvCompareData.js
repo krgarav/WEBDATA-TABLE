@@ -332,7 +332,7 @@ const getCsvCompareData = async (req, res) => {
     const filteredResult = csvCache[primaryValue] || null;
 
     // Construct Image Pathcd 
-    const imageFile = "extractedFiles/"+ imageDirectoryPath;
+    const imageFile = path.join(__dirname, "../../extractedFiles", imageDirectoryPath);
     const relativeImagePath = imageFile.split("extractedFiles\\")[1];
     resetCacheTimer();
     res.status(200).json({

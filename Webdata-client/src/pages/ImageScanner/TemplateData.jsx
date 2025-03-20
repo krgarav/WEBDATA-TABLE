@@ -135,8 +135,6 @@ const TemplateData = ({
         </div>
       </div>
     </div>
-
-
     </>
   );
 };

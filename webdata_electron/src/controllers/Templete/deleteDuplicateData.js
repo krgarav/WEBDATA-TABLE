@@ -20,8 +20,8 @@ const deleteDuplicateData = async (req, res, next) => {
     }
 
     const filename = fileData.csvFile;
-    // const filePath = path.join(__dirname, "../../csvFile", filename);
-    const filePath =  "csvFile/"+ filename;
+    const filePath = path.join(__dirname, "../../csvFile", filename);
+
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ error: "File not found" });
     }

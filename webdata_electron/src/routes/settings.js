@@ -13,4 +13,5 @@ router.post("/csvbackup", authMiddleware, onCsvBackupHandler);
 router.post("/mysqlbackup", authMiddleware, onMysqlBackupHandler);
 router.get("/get-device-ip", authMiddleware, getAllServerIPs);
 router.post("/setIp", changeServerIP);
+// router.get("/getCurrentIp",getcurrentIP)
 module.exports = router;

@@ -36,6 +36,9 @@ const Templete = sequelize.define("templetes", {
   mergedTableName: {
     type: Sequelize.STRING,
   },
+  csvTableName: {
+    type: Sequelize.STRING,
+  },
   imageColName: {
     type: Sequelize.STRING,
   },

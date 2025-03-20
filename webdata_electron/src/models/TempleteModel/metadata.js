@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 
 const sequelize = require("../../utils/database");
-
+const Template = require("./templete");
 const MetaData = sequelize.define("templetedata", {
   id: {
     type: Sequelize.INTEGER,
@@ -63,5 +63,20 @@ const MetaData = sequelize.define("templetedata", {
     },
   },
 });
+MetaData.belongsTo(Template, {
+  foreignKey: {
+    name: "templeteId",
+    allowNull: false,
+  },
+  onUpdate: "CASCADE",
+});
+Template.hasMany(MetaData, {
+  foreignKey: {
+    name: "templeteId",
+    allowNull: false,
+  },
+  onUpdate: "CASCADE",
+});
+
 
 module.exports = MetaData;

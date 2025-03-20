@@ -6,8 +6,7 @@ const Templete = require("../../models/TempleteModel/templete");
 const FormCheckedData = require("../../models/TempleteModel/formcheckeddata");
 const MetaData = require("../../models/TempleteModel/metadata");
 const { Op } = require("sequelize");
-const {app} = require("electron");
-const basePath = path.join(app.getPath("documents"), "Webdata");
+
 const escapeRegExp = (string) => {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 };
@@ -36,7 +35,7 @@ const getCsvData = async (req, res, next) => {
     }
 
     const filename = fileData.csvFile;
-    const filePath = path.join(basePath, "csvFile", filename);
+    const filePath = path.join(__dirname, "../../csvFile", filename);
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ error: "CSV file not found" });
@@ -60,14 +59,16 @@ const getCsvData = async (req, res, next) => {
     const maxIndex = parseInt(max);
 
     // Validate min and max indices
+
+
     if (
       isNaN(minIndex) ||
-      isNaN(maxIndex) ||
-      minIndex < 0 ||
-      minIndex >= jsonData.length ||
-      maxIndex < 0 ||
-      maxIndex >= jsonData.length ||
-      maxIndex < minIndex
+      isNaN(maxIndex) 
+      // minIndex < 0 ||
+      // minIndex >= jsonData.length ||
+      // maxIndex < 0 ||
+      // maxIndex >= jsonData.length ||
+      // maxIndex < minIndex
     ) {
       return res.status(400).json({ error: "Invalid min or max value" });
     }

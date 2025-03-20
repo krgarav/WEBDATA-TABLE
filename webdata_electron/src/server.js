@@ -160,7 +160,7 @@ MappedData.belongsTo(Templete, {
 // Database Sync and Admin User Creation (Handled in Electron Main)
 const startServer = async () => {
   try {
-    // await createDatabaseIfNotExists()
+    await createDatabaseIfNotExists()
     await sequelize.sync({ force: false });
 
     // Check if admin user exists, if not, create it

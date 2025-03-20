@@ -54,6 +54,9 @@ const Assigndata = sequelize.define("assigndata", {
   currentIndex: {
     type: Sequelize.INTEGER,
   },
+  tableName:{
+    type: Sequelize.STRING,
+  }
 });
 
 module.exports = Assigndata;
