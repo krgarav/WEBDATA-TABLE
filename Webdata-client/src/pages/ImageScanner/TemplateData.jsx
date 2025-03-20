@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { MdDelete } from "react-icons/md";
 import { CiEdit } from "react-icons/ci";
 import { toast } from "react-toastify";
+import EditMappedDataModel from "./EditMappedDataModel";
 
 const TemplateData = ({
   selectedCoordinates,
@@ -15,6 +16,7 @@ const TemplateData = ({
   setPermissionModal,
   templatePermissions,
 }) => {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Modal State
   const onCheckHandler = () => {
     if (!templatePermissions.patternDefinition) {
       setPermissionModal(true);
@@ -123,6 +125,7 @@ const TemplateData = ({
                 </button>
                 <button
                   // onClick={onCheckHandler}
+                  onClick={() => setIsEditModalOpen(true)}
                   className="ms-auto group rounded-md mt-6 flex items-center md:w-full sm:w-full bg-teal-600 hover:shadow-lg hover:shadow-blue-200 py-2 px-4 transition-colors hover:bg-teal-700 focus:outline-none focus:ring"
                 >
                   <span className="font-medium flex text-white transition-colors group-hover:text-white group-active:text-white mx-auto">
@@ -135,6 +138,12 @@ const TemplateData = ({
         </div>
       </div>
     </div>
+
+    <EditMappedDataModel
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+      />
+
     </>
   );
 };

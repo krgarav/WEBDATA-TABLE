@@ -155,7 +155,7 @@ const TemplateMapping = () => {
     } finally {
       setSubmitLoading(false);
     }
-  };
+  }; 
 
   return (
     <div className="min-h-[100vh] overflow-y-auto overflow-x-auto flex justify-center bg-gradient-to-r from-blue-400 to-blue-600 items-center templatemapping pt-20 pb-12">
