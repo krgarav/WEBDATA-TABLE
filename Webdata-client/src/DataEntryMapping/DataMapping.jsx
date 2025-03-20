@@ -19,6 +19,51 @@ const DataMapping = () => {
   const imageRef = useRef(null);
 
   useEffect(() => {
+    const enableFullscreen = () => {
+      const element = document.documentElement;
+      if (!document.fullscreenElement) {
+        element.requestFullscreen?.() ||
+          element.mozRequestFullScreen?.() ||
+          element.webkitRequestFullscreen?.() ||
+          element.msRequestFullscreen?.();
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        enableFullscreen();
+      }
+    };
+
+    // Run fullscreen logic when component mounts
+    enableFullscreen();
+
+    // Listen for visibility change to restore fullscreen if needed
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [currentIndex]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.ctrlKey && event.key === "ArrowLeft") {
+        prevHandler();
+      }
+      if (event.ctrlKey && event.key === "ArrowRight") {
+        nextHandler();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  useEffect(() => {
     setFormData(Array.isArray(data.formdata) ? data.formdata : [data.formdata]);
   }, [data]);
 
@@ -42,6 +87,7 @@ const DataMapping = () => {
     };
     fetchData();
   }, [currentIndex]);
+
   const prevHandler = async () => {
     try {
       const taskData = localStorage.getItem("taskdata");
@@ -54,7 +100,6 @@ const DataMapping = () => {
     } catch (error) {}
   };
   const nextHandler = async () => {
-    // console.log("called")
     try {
       const taskData = localStorage.getItem("taskdata");
       if (taskData) {
@@ -87,6 +132,7 @@ const DataMapping = () => {
     nextHandler();
     console.log(res);
   };
+
   const zoomInHandler = () => {
     setZoomLevel((prevZoomLevel) => Math.min(prevZoomLevel * 1.1, 3));
   };
@@ -103,6 +149,7 @@ const DataMapping = () => {
       imageRef.current.style.transformOrigin = "initial";
     }
   };
+
   return (
     <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-[100vh] pt-16">
       <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-600 dataEntry ">

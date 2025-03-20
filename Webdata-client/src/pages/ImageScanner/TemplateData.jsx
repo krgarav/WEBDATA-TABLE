@@ -37,6 +37,8 @@ const TemplateData = ({
   };
 
   return (
+    <>
+   
     <div className="px-4 py-6 ">
       <div className="">
         <div className="block w-full rounded-3xl bg-gray-100 px-6 py-2 text-sm font-medium  mb-5">
@@ -119,12 +121,23 @@ const TemplateData = ({
                     Save Template
                   </span>
                 </button>
+                <button
+                  // onClick={onCheckHandler}
+                  className="ms-auto group rounded-md mt-6 flex items-center md:w-full sm:w-full bg-teal-600 hover:shadow-lg hover:shadow-blue-200 py-2 px-4 transition-colors hover:bg-teal-700 focus:outline-none focus:ring"
+                >
+                  <span className="font-medium flex text-white transition-colors group-hover:text-white group-active:text-white mx-auto">
+                    Edit Mapped Data
+                  </span>
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+
+    </>
   );
 };
 

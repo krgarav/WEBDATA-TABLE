@@ -78,6 +78,37 @@ const UserCorrectionData = () => {
   const [loading, setLoading] = useState(false);
   const [totalData, setTotalData] = useState(0);
 
+
+
+useEffect(() => {
+  const enableFullscreen = () => {
+      const element = document.documentElement;
+      if (!document.fullscreenElement) {
+          element.requestFullscreen?.() || 
+          element.mozRequestFullScreen?.() || 
+          element.webkitRequestFullscreen?.() || 
+          element.msRequestFullscreen?.();
+      }
+  };
+
+  const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+          enableFullscreen();
+      }
+  };
+
+  // Run fullscreen logic when component mounts
+  enableFullscreen();
+
+  // Listen for visibility change to restore fullscreen if needed
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+
+  return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+  };
+}, [currentData]);
+
+
   // console.log(currentTaskData)
   //   useEffect(() => {
   //     const fetchData = async () => {

@@ -107,7 +107,6 @@ const UserTaskAssined = () => {
       toast.warning("Task already completed");
       return
     }
-
     localStorage.setItem("taskdata", JSON.stringify(taskdata));
     navigate("/datamatching/correct_compare_csv", { state: taskdata });
   };
