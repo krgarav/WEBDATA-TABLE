@@ -26,7 +26,8 @@ async function insertDataIntoTable(tableName, data) {
   const values = data
     .map(
       (row) =>
-        `(${columnsForRead.map((col) => `'${row[col] || ""}'`).join(",")})`
+        `(${columnsForRead.map((col) => `'${(row[col] || "").replace(/\\/g, "\\\\")}'`
+).join(",")})`
     )
     .join(",");
 

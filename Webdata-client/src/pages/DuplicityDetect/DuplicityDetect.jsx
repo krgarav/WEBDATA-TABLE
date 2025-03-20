@@ -63,19 +63,13 @@ const ImageScanner = () => {
   // }, [fileId, token]);
 
   const onUpdateCurrentDataHandler = async () => {
-    if (!modifiedKeys) {
-      toast.success("Row updated successfully.");
-      return;
-    }
-
     try {
       await axios.post(
         `${window.SERVER_IP}/update/duplicatedata`,
         {
-          index: currentRowData?.index,
+          id: currentRowData?.id,
           fileID: fileId,
-          rowData: currentRowData.row,
-          updatedColumn: modifiedKeys,
+          rowData: currentRowData,
         },
         {
           headers: {
@@ -83,53 +77,6 @@ const ImageScanner = () => {
           },
         }
       );
-      const indexToUpdate = duplicatesData.findIndex((group) =>
-        group.sameData.some((item) => item.index === currentRowData.index)
-      );
-      if (indexToUpdate !== -1) {
-        const updatedDuplicateData = duplicatesData.map((group, index) => {
-          if (index === indexToUpdate) {
-            return {
-              sameData: group.sameData.map((item) =>
-                item.index === currentRowData.index
-                  ? { ...item, row: currentRowData.row }
-                  : item
-              ),
-            };
-          }
-          return group;
-        });
-
-        const updatedAllCurrentData = allCurrentData.map((item) =>
-          item.index === currentRowData.index
-            ? { ...item, row: currentRowData.row }
-            : item
-        );
-
-        const filteredUpdatedDuplicateData = updatedDuplicateData
-          .map((group) => ({
-            sameData: group.sameData.filter(
-              (item) => item.row[columnName] !== currentRowData.row[columnName]
-            ),
-          }))
-          .filter((group) => group.sameData.length > 0);
-
-        const filteredAllCurrentData = updatedAllCurrentData.filter(
-          (item) => item.row[columnName] !== currentRowData.row[columnName]
-        );
-        console.log(filteredAllCurrentData);
-        if (filteredUpdatedDuplicateData.length !== 0) {
-          setDuplicatesData(filteredUpdatedDuplicateData);
-        } else {
-          setDuplicatesData(updatedDuplicateData);
-        }
-        if (filteredAllCurrentData.length !== 0) {
-          setAllCurrentData(filteredAllCurrentData);
-        } else {
-          setAllCurrentData(updatedAllCurrentData);
-        }
-        setModifiedKeys(null);
-      }
       toast.success("The row has been updated successfully.");
       setEditModal(false);
     } catch (error) {
@@ -174,7 +121,7 @@ const ImageScanner = () => {
   const changeCurrentCsvDataHandler = (key, value) => {
     setCurrentRowData((prevData) => ({
       ...prevData,
-      [key]: value
+      [key]: value,
     }));
   };
 
@@ -274,10 +221,10 @@ const ImageScanner = () => {
       }
     );
     console.log(response.data.rowData);
-    
+
     setCurrentRowData(response.data.rowData);
     setEditModal(true);
-    // setImageUrl(response.data.imageUrl);
+    setImageUrl(response.data.imageUrl);
   };
   const onShowModalHandler = async (data, _, columnName) => {
     const fileId = await JSON.parse(localStorage.getItem("fileId"));
