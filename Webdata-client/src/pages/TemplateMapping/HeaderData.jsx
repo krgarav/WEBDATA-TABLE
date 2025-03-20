@@ -7,6 +7,7 @@ function HeaderData({
   selectedAssociations,
   handleCsvHeaderChange,
 }) {
+  console.log(selectedAssociations)
   return (
     <div className="relative">
       <div>
@@ -68,9 +69,9 @@ function HeaderData({
                     >
                       <option>UserFieldName</option>
                       {templateHeaders &&
-                        templateHeaders.templetedata.map((template, idx) => (
-                          <option key={idx} value={template.attribute}>
-                            {template.attribute}
+                        templateHeaders.map((template, idx) => (
+                          <option key={idx} value={template}>
+                            {template}
                           </option>
                         ))}
                     </select>

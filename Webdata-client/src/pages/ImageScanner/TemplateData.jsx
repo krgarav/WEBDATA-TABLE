@@ -37,7 +37,7 @@ const TemplateData = ({
       setOptionModel(true);
     }
   };
-
+// console.log(selectedCoordinates)
   return (
     <>
    
@@ -142,6 +142,7 @@ const TemplateData = ({
     <EditMappedDataModel
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
+        selectedCoordinates={selectedCoordinates}
       />
 
     </>
