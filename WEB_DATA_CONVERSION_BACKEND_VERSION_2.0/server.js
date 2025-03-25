@@ -66,6 +66,8 @@ const imageDirectoryPath = path.join(
 // Serve static files from the 'extractedFiles' directory
 app.use("/images", express.static(imageDirectoryPath));
 app.use("/images", express.static(path.join(__dirname, "extractedFiles")));
+// app.use("GetImage/?imagePath=", express.static(path.join(__dirname, "testFile")));
+
 app.use(express.static(builtPath));
 
 app.use("/users", userRoutes);
@@ -74,7 +76,19 @@ app.use(compareCsv);
 app.use(templeteRoutes);
 app.use(mergeCsv);
 app.use("/settings", Settings);
+app.get("/GetImage", (req, res) => {
+  const imagePath = req.query.imagePath; // Get image path from query
+  if (!imagePath) {
+    return res.status(400).send("Image path is required.");
+  }
 
+  const filePath = path.join(__dirname, "testFile", imagePath); // Serve from 'testFile' directory
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      res.status(404).send("Image not found.");
+    }
+  });
+});
 // Handle all other routes and serve 'index.html'
 app.get("*", (req, res) => {
   res.sendFile(path.join(builtPath, "index.html"));

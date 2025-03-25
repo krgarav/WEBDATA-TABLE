@@ -65,7 +65,7 @@ const TemplateData = ({
                       key={data.fId}
                       className="odd:bg-gray-50 h-[40px] flex justify-around"
                     >
-                      <div className="whitespace-nowrap px-4 py-2 text-center font-semibold text-md text-gray-900 text-ellipsis overflow-x-hidden w-1/3">
+                      <div className="whitespace-nowrap px-4 py-2 text-center font-semibold text-md text-gray-900 text-ellipsis overflow-x-hidden w-1/2">
                         {data.attribute}
                       </div>
                       <div className="whitespace-nowrap px-4 py-2 text-center font-semibold text-md text-gray-900 w-1/3">

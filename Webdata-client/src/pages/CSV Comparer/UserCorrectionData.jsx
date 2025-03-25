@@ -78,36 +78,33 @@ const UserCorrectionData = () => {
   const [loading, setLoading] = useState(false);
   const [totalData, setTotalData] = useState(0);
 
-
-
-useEffect(() => {
-  const enableFullscreen = () => {
+  useEffect(() => {
+    const enableFullscreen = () => {
       const element = document.documentElement;
       if (!document.fullscreenElement) {
-          element.requestFullscreen?.() || 
-          element.mozRequestFullScreen?.() || 
-          element.webkitRequestFullscreen?.() || 
+        element.requestFullscreen?.() ||
+          element.mozRequestFullScreen?.() ||
+          element.webkitRequestFullscreen?.() ||
           element.msRequestFullscreen?.();
       }
-  };
+    };
 
-  const handleVisibilityChange = () => {
+    const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
-          enableFullscreen();
+        enableFullscreen();
       }
-  };
+    };
 
-  // Run fullscreen logic when component mounts
-  enableFullscreen();
+    // Run fullscreen logic when component mounts
+    enableFullscreen();
 
-  // Listen for visibility change to restore fullscreen if needed
-  document.addEventListener("visibilitychange", handleVisibilityChange);
+    // Listen for visibility change to restore fullscreen if needed
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
-  return () => {
+    return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-  };
-}, [currentData]);
-
+    };
+  }, [currentData]);
 
   // console.log(currentTaskData)
   //   useEffect(() => {
@@ -359,137 +356,7 @@ useEffect(() => {
   //   }
   // }, [csvData, currentTaskData, setCsvCurrentData, onCsvUpdateHandler]);
 
-  const handleKeyDownJump = (e, index) => {
-    if (e.key === "Tab") {
-      e.preventDefault();
-
-      let nextIndex = index;
-      let loopedOnce = false;
-      const direction = e.shiftKey ? -1 : 1;
-
-      while (!loopedOnce || nextIndex !== index) {
-        // Calculate the next index based on direction
-        nextIndex =
-          (nextIndex + direction + inputRefs.current.length) %
-          inputRefs.current.length;
-
-        const [nextKey, nextValue] = Object.entries(csvCurrentData)[nextIndex];
-
-        // Check if nextValue meets the condition
-        if (
-          nextValue === "" ||
-          (nextValue &&
-            typeof nextValue === "string" &&
-            (nextValue.includes("*") || nextValue.includes(" ")))
-        ) {
-          // Update focus index
-          setCurrentFocusIndex(nextIndex);
-          // Ensure the input reference exists and is focusable
-          if (inputRefs.current[nextIndex]) {
-            inputRefs.current[nextIndex].focus();
-          }
-          break;
-        }
-
-        // Check if we have looped back to the original index
-        if (nextIndex === index) {
-          loopedOnce = true;
-        }
-      }
-    } else if (e.key === "Shift") {
-      e.preventDefault();
-
-      let nextIndex = index + 1;
-      if (nextIndex >= inputRefs.current.length) {
-        nextIndex = 0;
-      }
-
-      // Update focus index
-      setCurrentFocusIndex(nextIndex);
-      // Ensure the input reference exists and is focusable
-      if (inputRefs.current[nextIndex]) {
-        inputRefs.current[nextIndex].focus();
-      }
-    }
-  };
-
-  const onNextHandler = async (direction, currentIndex) => {
-    try {
-      setLoading(true);
-      currentIndex = direction === "next" ? currentIndex + 1 : currentIndex - 1;
-      if (currentIndex >= minimum && currentIndex <= maximum) {
-        setCurrentIndex(currentIndex);
-      } else {
-        toast.warning(
-          direction === "next"
-            ? "All images have been processed."
-            : "You are already at the first image."
-        );
-        return;
-      }
-      const response = await axios.post(
-        `${window.SERVER_IP}/getCompareCsvData/${taskId}`,
-        { currentIndex },
-        {
-          headers: {
-            token: token,
-          },
-        }
-      );
-
-      setHeaderData(response?.data?.data?.headers);
-      setHeader(response?.data?.data?.headers);
-      setMaximum(parseInt(response?.data?.data?.max));
-      setFilteredArray(response?.data?.data?.filteredData);
-      setCorrectionData(response?.data?.data);
-      setMinimum(parseInt(response?.data?.data?.min));
-    } catch (error) {
-      console.log(error);
-      toast.error("Image not found!.");
-      setImageNotFound(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const onPrevHandler = async (direction, currentIndex) => {
-    try {
-      setLoading(true);
-      currentIndex = direction === "next" ? currentIndex + 1 : currentIndex - 1;
-      if (currentIndex >= minimum && currentIndex <= maximum) {
-        setCurrentIndex(currentIndex);
-      } else {
-        toast.warning(
-          direction === "next"
-            ? "All images have been processed."
-            : "You are already at the first image."
-        );
-        return;
-      }
-      const response = await axios.post(
-        `${window.SERVER_IP}/getCompareCsvData/${taskId}`,
-        { currentIndex },
-        {
-          headers: {
-            token: token,
-          },
-        }
-      );
-
-      setHeaderData(response?.data?.data?.headers);
-      setHeader(response?.data?.data?.headers);
-      setMaximum(parseInt(response?.data?.data?.max));
-      setFilteredArray(response?.data?.data?.filteredData);
-      setCorrectionData(response?.data?.data);
-      setMinimum(parseInt(response?.data?.data?.min));
-    } catch (error) {
-      console.log(error);
-      toast.error("Image not found!.");
-      setImageNotFound(false);
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   // const onImageHandler = async (
   //   direction,
@@ -821,10 +688,18 @@ useEffect(() => {
   };
   const prevHandler = async () => {
     const response = await updateCurrIndexData(taskId, "prev");
+    if (!response) {
+      toast.error("Cannot go back. Already at the first index.");
+      return;
+    }
     setCurrIndex(response?.updatedIndex);
   };
   const nextHandler = async () => {
     const response = await updateCurrIndexData(taskId, "next");
+    if (!response) {
+      toast.error("Cannot proceed forward. Already at the last index.");
+      return;
+    }
     setCurrIndex(response?.updatedIndex);
   };
   return (
@@ -882,12 +757,12 @@ useEffect(() => {
                 <div>
                   <div style={{ display: "flex", justifyContent: "center" }}>
                     <div className="flex justify-center items-center">
-                    <button
-                      className="pl-4 pr-2 py-8 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-800"
-                      onClick={prevHandler}
-                    >
-                      <ArrowBackIosIcon />
-                    </button>
+                      <button
+                        className="pl-4 pr-2 py-8 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-800"
+                        onClick={prevHandler}
+                      >
+                        <ArrowBackIosIcon />
+                      </button>
                     </div>
                     <div className="h-20vh">
                       <ImageSectionCSV
@@ -902,13 +777,13 @@ useEffect(() => {
                       />
                     </div>
                     <div className="flex justify-center items-center">
-                    <button
-                      // disabled={loading}
-                      className="pl-4 pr-2 py-8 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-800"
-                      onClick={nextHandler}
-                    >
-                      <ArrowForwardIosIcon />
-                    </button>
+                      <button
+                        // disabled={loading}
+                        className="pl-4 pr-2 py-8 bg-blue-600 text-white rounded-3xl mx-2 hover:bg-blue-800"
+                        onClick={nextHandler}
+                      >
+                        <ArrowForwardIosIcon />
+                      </button>
                     </div>
                   </div>
 

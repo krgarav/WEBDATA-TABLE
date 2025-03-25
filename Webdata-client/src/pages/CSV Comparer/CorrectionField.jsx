@@ -95,6 +95,7 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
     setVisitedCount(0);
     setVisitedRows({});
   }, []);
+
   useEffect(() => {
     const handleAltSKey = (e) => {
       if (e.altKey && e.key.toLowerCase() === "s") {
@@ -109,6 +110,7 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
   useEffect(() => {
     handleVisit(0);
   }, []);
+
   useEffect(() => {
     return () => setIsLoading(false);
   }, []);
@@ -123,7 +125,7 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
 
         if (e.shiftKey) {
           // Shift + Tab (Move Backward)
-          const prevIndex =
+          const prevIndex = 
             (currentIndex - 1 + focusableInputs.length) %
             focusableInputs.length;
           focusableInputs[prevIndex]?.focus();
@@ -138,21 +140,19 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
     document.addEventListener("keydown", handleTabKey);
     return () => document.removeEventListener("keydown", handleTabKey);
   }, []);
-  useEffect(() => {}, []);
-  // console.log(inputValue);
+
   const handleInputChange = (e, key) => {
     setInputValue((prevValues) => ({
       ...prevValues,
       [key]: e.target.value,
     }));
   };
-  console.log(inputValue);
+ 
+
   const onUpdateHandler = async () => {
     if (isUpdatingRef.current) return;
     isUpdatingRef.current = true;
     setIsLoading(true);
-    const PRIMARY = currentData?.PRIMARY;
-    const Primary_Key = currentData?.Primary_Key;
 
     try {
       const mappedData = subData.map((dataItem) => {
@@ -162,7 +162,6 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
           Corrected: inputValue[dataItem.Column_Name],
         };
       });
-      console.log(mappedData);
       const filtered = mappedData.filter((item) => item.Corrected != null);
 
       const obj = {
@@ -170,11 +169,6 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
         parentId: currentData?.parentId,
         taskId: taskId,
       };
-
-      // console.log(currentData);
-      // console.log(subData);
-
-      // if (updates.length === 0) return;
 
       const response = await axios.post(
         `${window.SERVER_IP}/csvUpdateData/${taskId}/batch`,
@@ -184,30 +178,9 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
         }
       );
       if (response.data.success) {
+        toast.success("Corrected Value Updated Successfully");
         nextHandler();
       }
-
-      // setCorrectionData((prevState) => {
-      //   const updatedData = prevState?.previousData?.DATA?.map((item) => {
-      //     const update = updates.find(
-      //       (u) =>
-      //         u?.PRIMARY?.trim() === item?.PRIMARY?.trim() &&
-      //         u?.COLUMN_NAME?.trim() === item?.COLUMN_NAME?.trim()
-      //     );
-      //     return update ? { ...item, CORRECTED: update?.CORRECTED } : item;
-      //   });
-
-      //   return {
-      //     ...prevState,
-      //     previousData: { ...prevState?.previousData, DATA: updatedData },
-      //   };
-      // });
-
-      // if (currentIndex !== maximum) {
-      //   setInputValue({});
-      // }
-
-      toast.success("Corrected Value is Updated");
     } catch (error) {
       console.error(
         "Error updating data:",
@@ -219,6 +192,7 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
       isUpdatingRef.current = false;
     }
   };
+
   const errorData = subData?.map((dataItem, index) => {
     const key = `${dataItem?.Column_Name?.trim()}`;
     // const updatedValue = dataItem.CORRECTED||"Null";
@@ -293,6 +267,7 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
       </div>
     );
   });
+  
   return (
     <div className="mx-4 bg-white xl:my-4 px-4 py-2 rounded-md">
       <div className="flex justify-between mb-6 mt-2">
