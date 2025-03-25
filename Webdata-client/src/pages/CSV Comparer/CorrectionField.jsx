@@ -16,11 +16,11 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
   const [visitedCount, setVisitedCount] = useState(0);
   const [visitedRows, setVisitedRows] = useState({}); // Track visited rows
   const [dataRow, setDataRow] = useState(currentData);
-  const [updatedData, setUpdatedData] = useState([]);
   const [inputValue, setInputValue] = useState({});
   const inputRefs = useRef([]);
   const [isLoading, setIsLoading] = useState(false);
   const isUpdatingRef = useRef(false);
+
   useEffect(() => {
     setDataRow(currentData);
     setInputValue({});
@@ -29,13 +29,7 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
     setVisitedCount(0);
     setVisitedRows({});
   }, [currentData]);
-  // const firstInputRef = useRef(null);
 
-  // useEffect(() => {
-  //   if (firstInputRef.current) {
-  //     firstInputRef.current.focus(); // Automatically focus on first input
-  //   }
-  // }, []);
   const handleVisit = (index) => {
     if (!visitedRows[index]) {
       setVisitedRows((prev) => ({ ...prev, [index]: true }));
@@ -125,7 +119,7 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
 
         if (e.shiftKey) {
           // Shift + Tab (Move Backward)
-          const prevIndex = 
+          const prevIndex =
             (currentIndex - 1 + focusableInputs.length) %
             focusableInputs.length;
           focusableInputs[prevIndex]?.focus();
@@ -147,7 +141,6 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
       [key]: e.target.value,
     }));
   };
- 
 
   const onUpdateHandler = async () => {
     if (isUpdatingRef.current) return;
@@ -267,7 +260,7 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
       </div>
     );
   });
-  
+
   return (
     <div className="mx-4 bg-white xl:my-4 px-4 py-2 rounded-md">
       <div className="flex justify-between mb-6 mt-2">
