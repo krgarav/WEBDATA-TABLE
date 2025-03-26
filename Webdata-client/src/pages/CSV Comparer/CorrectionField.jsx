@@ -9,8 +9,7 @@ import {
 import { toast } from "react-toastify";
 import Loader from "../../UI/Loader";
 
-const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
-  // const [inputValues, setInputValues] = useState("");
+const CorrectionField = ({ subData, currentData, taskId, nextHandler,currIndex }) => {
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
   const token = JSON.parse(localStorage.getItem("userData"));
   const [visitedCount, setVisitedCount] = useState(0);
@@ -20,11 +19,12 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
   const inputRefs = useRef([]);
   const [isLoading, setIsLoading] = useState(false);
   const isUpdatingRef = useRef(false);
-
+console.log(taskData)
   useEffect(() => {
     setDataRow(currentData);
     setInputValue({});
   }, [currentData]);
+
   useEffect(() => {
     setVisitedCount(0);
     setVisitedRows({});
@@ -245,17 +245,17 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler }) => {
             maxLength={dataItem.type !== "formField" && 1}
           />
 
-          {/* <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center">
             <MdDataSaverOn
               className="text-2xl text-teal-600"
-              onClick={() =>
-                onUpdateHandler(
-                  PRIMARY?.trim(),
-                  dataItem?.COLUMN_NAME?.trim()
-                )
-              }
+              // onClick={() =>
+              //   onUpdateHandler(
+              //     PRIMARY?.trim(),
+              //     dataItem?.COLUMN_NAME?.trim()
+              //   )
+              // }
             />
-          </div> */}
+          </div>
         </div>
       </div>
     );

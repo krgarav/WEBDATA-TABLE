@@ -38,28 +38,18 @@ const UserCorrectionData = () => {
   const [imageNotFound, setImageNotFound] = useState(true);
   const [currentFocusIndex, setCurrentFocusIndex] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
-
-  const [compareTask, setCompareTask] = useState([]);
-
   const [userRole, setUserRole] = useState();
   const imageContainerRef = useRef(null);
   const imageRef = useRef(null);
-
-  const navigate = useNavigate();
-  const inputRefs = useRef([]);
   const [imageUrls, setImageUrls] = useState([]);
   const [currIndex, setCurrIndex] = useState(1);
-  const [tableData, setTableData] = useState({});
   const [currentData, setCurrentData] = useState(null);
   const [subData, setSubData] = useState(null);
-  const [correctionData, setCorrectionData] = useState([]);
-  const [minimum, setMinimum] = useState(0);
   const [maximum, setMaximum] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(
     JSON.parse(localStorage.getItem("taskdata")).currentIndex
   );
   const [headerData, setHeaderData] = useState([]);
-  const [filteredArray, setFilteredArray] = useState([]);
   const [csvData, setCsvData] = useState([]);
   const [confirmationModal, setConfirmationModal] = useState();
   const location = useLocation();
@@ -68,15 +58,15 @@ const UserCorrectionData = () => {
   const [filterResults, setFilterResults] = useState(null);
   const [mappedData, setMappedData] = useState([]);
   const [formData, setFormData] = useState(null);
-  const task = JSON.parse(localStorage.getItem("taskdata"));
   const [taskId, setTaskId] = useState(
     location.state !== null
       ? location.state.id
       : JSON.parse(localStorage.getItem("taskdata")).id
   );
-
   const [loading, setLoading] = useState(false);
   const [totalData, setTotalData] = useState(0);
+  const task = JSON.parse(localStorage.getItem("taskdata"));
+  const navigate = useNavigate();
 
   useEffect(() => {
     const enableFullscreen = () => {
@@ -355,8 +345,6 @@ const UserCorrectionData = () => {
   //     };
   //   }
   // }, [csvData, currentTaskData, setCsvCurrentData, onCsvUpdateHandler]);
-
-  
 
   // const onImageHandler = async (
   //   direction,
@@ -789,7 +777,7 @@ const UserCorrectionData = () => {
 
                   <section>
                     <div className=" flex justify-end mt-5 mr-5">
-                      {maximum === currentIndex && (
+                      {Number(task.max) === currIndex && (
                         <div className="flex justify-center">
                           <button
                             onClick={() => onTaskCompleteHandler()}
@@ -812,6 +800,7 @@ const UserCorrectionData = () => {
                       currentData={currentData} //error questions data
                       taskId={taskId}
                       nextHandler={nextHandler}
+                      currIndex={currIndex}
                       // csvData={csvData}
                       // tableData={tableData}
                       // currentData={currentData}
