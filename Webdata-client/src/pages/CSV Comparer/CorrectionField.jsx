@@ -9,7 +9,13 @@ import {
 import { toast } from "react-toastify";
 import Loader from "../../UI/Loader";
 
-const CorrectionField = ({ subData, currentData, taskId, nextHandler,currIndex }) => {
+const CorrectionField = ({
+  subData,
+  currentData,
+  taskId,
+  nextHandler,
+  currIndex,
+}) => {
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
   const token = JSON.parse(localStorage.getItem("userData"));
   const [visitedCount, setVisitedCount] = useState(0);
@@ -18,13 +24,14 @@ const CorrectionField = ({ subData, currentData, taskId, nextHandler,currIndex }
   const [inputValue, setInputValue] = useState({});
   const inputRefs = useRef([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [updatedeData,setUpdatedData] = useState([])
   const isUpdatingRef = useRef(false);
-console.log(taskData)
+
   useEffect(() => {
     setDataRow(currentData);
     setInputValue({});
   }, [currentData]);
-
+  console.log(inputValue);
   useEffect(() => {
     setVisitedCount(0);
     setVisitedRows({});
@@ -49,41 +56,43 @@ console.log(taskData)
   //   // setInputValue(initialValues);
   // }, [currentData]);
 
-  // useEffect(() => {
-  //   const processTemplateData = async () => {
-  //     try {
-  //       if (!taskData?.templeteId || dataRow.length === 0) return;
+  useEffect(() => {
+    console.log(dataRow);
+    const processTemplateData = async () => {
+      try {
+        if (!taskData?.templeteId || subData.length === 0) return;
 
-  //       const templateId = taskData.templeteId;
+        const templateId = taskData.templeteId;
 
-  //       // Fetch form field data for each COLUMN_NAME in parallel
-  //       const updatedData = await Promise.all(
-  //         dataRow.map(async (item) => {
-  //           try {
-  //             const isFormField = await fetchTemplateFormData(
-  //               templateId,
-  //               item.COLUMN_NAME
-  //             );
-  //             const type = isFormField?.templateData?.fieldType || "formField"; // Use default "formField" if API fails or returns undefined
-  //             return { ...item, type };
-  //           } catch (error) {
-  //             console.error(
-  //               `Error fetching data for ${item.COLUMN_NAME}:`,
-  //               error
-  //             );
-  //             return { ...item, type: "formField" }; // Fallback to "formField"
-  //           }
-  //         })
-  //       );
+        // Fetch form field data for each COLUMN_NAME in parallel
+        const updatedData = await Promise.all(
+          subData.map(async (item) => {
+            try {
+              console.log(item);
+              const isFormField = await fetchTemplateFormData(
+                templateId,
+                item.Column_Name
+              );
+              const type = isFormField?.templateData?.fieldType || "formField"; // Use default "formField" if API fails or returns undefined
+              return { ...item, type };
+            } catch (error) {
+              console.error(
+                `Error fetching data for ${item.Column_Name}:`,
+                error
+              );
+              return { ...item, type: "formField" }; // Fallback to "formField"
+            }
+          })
+        );
+    
+        setUpdatedData(updatedData);
+      } catch (error) {
+        console.error("Error processing template data:", error);
+      }
+    };
 
-  //       setUpdatedData(updatedData);
-  //     } catch (error) {
-  //       console.error("Error processing template data:", error);
-  //     }
-  //   };
-
-  //   processTemplateData();
-  // }, [dataRow]);
+    processTemplateData();
+  }, [dataRow, currentData]);
 
   useEffect(() => {
     setVisitedCount(0);
@@ -185,17 +194,15 @@ console.log(taskData)
       isUpdatingRef.current = false;
     }
   };
-
-  const errorData = subData?.map((dataItem, index) => {
+console.log(updatedeData)
+  const errorData = updatedeData?.map((dataItem, index) => {
     const key = `${dataItem?.Column_Name?.trim()}`;
     // const updatedValue = dataItem.CORRECTED||"Null";
-    // const questionAllowedValues = ["A", "B", "C", "D", "*", " "];
-    // const formAllowed = //allvalues
-    // Allowed values for different field types
     const questionAllowedValues = ["A", "B", "C", "D", "*", " "];
+    // const formAllowed = //allvalues
     const numberRegex = /^[0-9]*$/; // Allows only numbers (0-9)
-    // const allowedValues = dataItem.type=== "formField"?questionAllowedValues  : "questionsField";
-
+    const allowedValues = dataItem.type=== "formField"?questionAllowedValues  : "questionsField";
+    
     return (
       <div
         key={index}
@@ -214,28 +221,28 @@ console.log(taskData)
               inputValue[key] !== undefined
                 ? inputValue[key]
                 : dataItem?.Corrected
+                ? dataItem?.Corrected
+                : ""
             }
-            // value={dataItem?.Corrected ? dataItem?.Corrected : ""}
-            // defaultValue={dataItem?.CORRECTED}
             placeholder={dataItem?.Column_Name}
             onChange={(e) => {
               const input = e.target.value.toUpperCase(); // Convert input to uppercase
 
               // Validate based on field type
-              // if (
-              //   (dataItem.type === "formField" && numberRegex.test(input)) || // Allow only numbers for form fields
-              //   (dataItem.type !== "formField" &&
-              //     (input === "" || questionAllowedValues.includes(input))) // Allow question field values
-              // ) {
-              //   handleInputChange(
-              //     { ...e, target: { ...e.target, value: input } },
-              //     key
-              //   );
-              // }
-              handleInputChange(
-                { ...e, target: { ...e.target, value: input } },
-                key
-              );
+              if (
+                (dataItem.type === "formField" && numberRegex.test(input)) || // Allow only numbers for form fields
+                (dataItem.type !== "formField" &&
+                  (input === "" || questionAllowedValues.includes(input))) // Allow question field values
+              ) {
+                handleInputChange(
+                  { ...e, target: { ...e.target, value: input } },
+                  key
+                );
+              }
+              // handleInputChange(
+              //   { ...e, target: { ...e.target, value: input } },
+              //   key
+              // );
             }}
             onFocus={(e) => {
               // imageFocusHandler(dataItem.COLUMN_NAME); // First function

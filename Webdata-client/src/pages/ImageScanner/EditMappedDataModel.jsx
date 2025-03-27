@@ -14,7 +14,7 @@ const EditMappedDataModel = ({ isOpen, onClose, selectedCoordinates }) => {
   if (!isOpen) return null; // Don't render if modal is not open
 
   const [csvHeaders, setCsvHeaders] = useState([]);
-  const [templateHeaders, setTemplateHeaders] = useState();
+  const [templateHeaders, setTemplateHeaders] = useState([]);
   const [selectedAssociations, setSelectedAssociations] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);

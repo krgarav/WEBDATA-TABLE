@@ -159,13 +159,15 @@ const getCsvTableData = async (req, res) => {
         const baseName = path.basename(imageName);
         const formData = {};
         const questionData = {};
+
+
         const dirs = getAllDirectories(
           path.join(__dirname, "../", "../", "extractedFiles", fileName.zipFile)
         );
         const joinstr = dirs.join("/");
 
         const maindir = path.join(fileName.zipFile, joinstr, baseName);
-
+// const maindir="dfdf"
         Object.entries(resultTwo).forEach(([key, value]) => {
           if (FormCol.includes(key)) {
             formData[key] = value;

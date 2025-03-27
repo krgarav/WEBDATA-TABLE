@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 function HeaderData({
   csvHeaders,
@@ -7,7 +7,7 @@ function HeaderData({
   selectedAssociations,
   handleCsvHeaderChange,
 }) {
-  console.log(selectedAssociations)
+  console.log(templateHeaders);
   return (
     <div className="relative">
       <div>
@@ -77,8 +77,7 @@ function HeaderData({
                     </select>
                   </div>
                 );
-              })
-          }
+              })}
         </div>
       </div>
     </div>

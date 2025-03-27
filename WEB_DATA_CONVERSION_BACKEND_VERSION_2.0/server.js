@@ -210,7 +210,7 @@ ErrorAggregatedTable.belongsTo(ErrorTable, {
   as: "error", // Alias for clarity
 });
 sequelize
-  .sync({ alter: !true })
+  .sync({ force: !true })
   .then(async () => {
     // Check if the admin user table exists, if not, create it
     const adminUser = await User.findOne({ where: { role: "admin" } });

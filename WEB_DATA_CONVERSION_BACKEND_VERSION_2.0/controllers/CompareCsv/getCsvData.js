@@ -34,31 +34,41 @@ function groupByPrimaryKey(arr) {
 const getCsvData = async (req, res) => {
   try {
     const { taskId } = req.params;
-    const assignData = await Assigndata.findByPk(taskId);
+
+    // Fetch 'fileId' and 'currentIndex' in a single query
+    const assignData = await Assigndata.findByPk(taskId, {
+      attributes: ["fileId", "currentIndex"], // Only fetch necessary columns
+    });
+
+    if (!assignData) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
     const { fileId, currentIndex } = assignData;
 
-    const file = await ErrorTable.findOne({
-      where: { fileId: fileId, indexTracker: currentIndex },
-    });
-    const errorCount = await ErrorTable.findAll({
-      where: { fileId: fileId },
-    });
+    // Fetch 'file' and 'errorCount' in a single query using COUNT()
+    const [file, errorCount] = await Promise.all([
+      ErrorTable.findOne({
+        where: { fileId, indexTracker: currentIndex },
+      }),
+      ErrorTable.count({ where: { fileId } }), // Use COUNT instead of findAll
+    ]);
+
+    if (!file) {
+      return res.status(404).json({ error: "File not found" });
+    }
+
+    // Fetch columnData efficiently
     const columnData = await ErrorAggregatedTable.findAll({
       where: { errorTableId: file.id },
     });
-
-    // // Convert grouped JSON data back into an array
-    // const formattedResult = result.map((row) => ({
-    //   ...row,
-    //   DATA: row.DATA ? JSON.parse(`[${row.DATA}]`) : [],
-    // }));
 
     res.status(200).json({
       success: true,
       mainData: file,
       subData: columnData,
-      errorCount: errorCount.length,
-      currentIndex: currentIndex,
+      errorCount, // Already counted
+      currentIndex,
     });
   } catch (error) {
     console.error(error);

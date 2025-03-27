@@ -2,23 +2,15 @@ const fs = require("fs");
 const path = require("path");
 
 function getAllDirectories(directoryPath) {
-  
-  let directories = [];
-
-  // Read the contents of the directory
-  fs.readdirSync(directoryPath).forEach((file) => {
-    // Get the full path of the file
-    const fullPath = path.join(directoryPath, file);
-    // console.log(fullPath);
-    // Check if it's a directory
-    if (fs.statSync(fullPath).isDirectory()) {
-      directories.push(file);
-      // Recursively list contents of directories
-      directories = directories.concat(getAllDirectories(fullPath));
-    }
-  });
-
-  return directories;
+  try {
+    return fs
+      .readdirSync(directoryPath, { withFileTypes: true }) // Efficiently get file metadata
+      .filter((dirent) => dirent.isDirectory()) // Filter only directories
+      .map((dirent) => dirent.name); // Return directory names only
+  } catch (error) {
+    console.error("Error reading directory:", error.message);
+    return []; // Return empty array on error
+  }
 }
 
 module.exports = getAllDirectories;

@@ -12,7 +12,7 @@ import HeaderMappedReview from "./HeaderMappedReview";
 
 const TemplateMapping = () => {
   const [csvHeaders, setCsvHeaders] = useState([]);
-  const [templateHeaders, setTemplateHeaders] = useState();
+  const [templateHeaders, setTemplateHeaders] = useState([]);
   const [selectedAssociations, setSelectedAssociations] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -31,8 +31,13 @@ const TemplateMapping = () => {
         for (let i = 1; i <= templateData.pageCount; i++) {
           templateData.templetedata.push({ attribute: `Image${i}` });
         }
+
+        const selctedCoordinates = templateData.templetedata.map((item) => {
+          return item.attribute;
+        });
+        console.log(selctedCoordinates);
         // templateData.templetedata.push({ attribute: "Image" });
-        setTemplateHeaders(templateData);
+        setTemplateHeaders(selctedCoordinates);
       } catch (error) {
         console.log(error);
       }
@@ -143,19 +148,19 @@ const TemplateMapping = () => {
     };
 
     try {
-      const response = await submitMappedData(mappedData)
-      if(response.success){
+      const response = await submitMappedData(mappedData);
+      if (response.success) {
         toast.success("Mapping successfully done.");
         navigate(`/csvuploader/fieldDecision/${id}`);
       } else {
-        toast.error("Something went wrong")
+        toast.error("Something went wrong");
       }
     } catch (error) {
       toast.error(error.message);
     } finally {
       setSubmitLoading(false);
     }
-  }; 
+  };
 
   return (
     <div className="min-h-[100vh] overflow-y-auto overflow-x-auto flex justify-center bg-gradient-to-r from-blue-400 to-blue-600 items-center templatemapping pt-20 pb-12">
