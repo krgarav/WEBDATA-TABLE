@@ -28,7 +28,7 @@ const Assigndata = require("./models/TempleteModel/assigndata");
 const RowIndexData = require("./models/TempleteModel/rowIndexData");
 const ImageDataPath = require("./models/TempleteModel/templeteImages");
 const MappedData = require("./models/TempleteModel/mappedData");
-const builtPath = path.join(__dirname, "../../webdata/Webdata-client/dist");
+const builtPath = path.join(__dirname, "../../WEBDATA-TABLE/Webdata-client/dist");
 const buildBat = path.join(__dirname, "../../webdata/Webdata-client/start.bat");
 // const projectPath = path.resolve(__dirname, "../../Webdata-client");
 // Check if build exists, if not, run `npm run build`
