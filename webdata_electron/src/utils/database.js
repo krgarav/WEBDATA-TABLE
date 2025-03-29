@@ -33,12 +33,18 @@ const Sequelize = require("sequelize");
 //     process.exit(1); // Exit if DB creation fails
 //   }
 // };
-const sequelize = new Sequelize("webdataconversion", "root", "root", {
-  dialect: "mysql",
-  host: "localhost",
-  logging: false,
-  timezone: "+05:30",
+
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  storage: 'database.sqlite', // SQLite database file
+  logging: false, // Disable logging (optional)
 });
+// const sequelize = new Sequelize("webdataconversion", "root", "root", {
+//   dialect: "mysql",
+//   host: "localhost",
+//   logging: false,
+//   timezone: "+05:30",
+// });
 
 // const sequelize = new Sequelize(process.env.SQL_DATABASE_NAME, process.env.SQL_USER, process.env.SQL_PASS, {
 //   dialect: "mysql",
