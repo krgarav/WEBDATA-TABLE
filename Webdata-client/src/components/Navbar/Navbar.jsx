@@ -65,6 +65,7 @@ export default function Navbar() {
     const getUser = async () => {
       try {
         const response = await onGetVerifiedUserHandler();
+        console.log(response)
         setUserData(response.user);
       } catch (error) {
         console.log(error);

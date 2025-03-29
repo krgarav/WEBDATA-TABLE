@@ -24,14 +24,13 @@ const CorrectionField = ({
   const [inputValue, setInputValue] = useState({});
   const inputRefs = useRef([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [updatedeData,setUpdatedData] = useState([])
+  const [updatedeData, setUpdatedData] = useState([]);
   const isUpdatingRef = useRef(false);
 
   useEffect(() => {
     setDataRow(currentData);
     setInputValue({});
   }, [currentData]);
-  console.log(inputValue);
   useEffect(() => {
     setVisitedCount(0);
     setVisitedRows({});
@@ -57,7 +56,6 @@ const CorrectionField = ({
   // }, [currentData]);
 
   useEffect(() => {
-    console.log(dataRow);
     const processTemplateData = async () => {
       try {
         if (!taskData?.templeteId || subData.length === 0) return;
@@ -84,7 +82,7 @@ const CorrectionField = ({
             }
           })
         );
-    
+
         setUpdatedData(updatedData);
       } catch (error) {
         console.error("Error processing template data:", error);
@@ -194,15 +192,15 @@ const CorrectionField = ({
       isUpdatingRef.current = false;
     }
   };
-console.log(updatedeData)
   const errorData = updatedeData?.map((dataItem, index) => {
     const key = `${dataItem?.Column_Name?.trim()}`;
     // const updatedValue = dataItem.CORRECTED||"Null";
     const questionAllowedValues = ["A", "B", "C", "D", "*", " "];
     // const formAllowed = //allvalues
     const numberRegex = /^[0-9]*$/; // Allows only numbers (0-9)
-    const allowedValues = dataItem.type=== "formField"?questionAllowedValues  : "questionsField";
-    
+    const allowedValues =
+      dataItem.type === "formField" ? questionAllowedValues : "questionsField";
+
     return (
       <div
         key={index}
@@ -251,18 +249,6 @@ console.log(updatedeData)
             ref={(el) => (inputRefs.current[index] = el)}
             maxLength={dataItem.type !== "formField" && 1}
           />
-
-          <div className="flex justify-center items-center">
-            <MdDataSaverOn
-              className="text-2xl text-teal-600"
-              // onClick={() =>
-              //   onUpdateHandler(
-              //     PRIMARY?.trim(),
-              //     dataItem?.COLUMN_NAME?.trim()
-              //   )
-              // }
-            />
-          </div>
         </div>
       </div>
     );
