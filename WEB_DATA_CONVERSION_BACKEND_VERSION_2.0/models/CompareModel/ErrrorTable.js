@@ -32,6 +32,12 @@ const ErrorTable = sequelize.define("errorTable", {
     type: Sequelize.INTEGER,
     allowNull: false,
   },
+  Corrected: {
+    type: Sequelize.STRING,
+  },
+  CorrectedBy: {
+    type: Sequelize.STRING,
+  },
 });
 
 module.exports = ErrorTable;

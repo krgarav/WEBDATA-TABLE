@@ -22,14 +22,6 @@ const ErrorAggregatedTable = sequelize.define("errorAggregated", {
     allowNull: false,
   },
 
-  Corrected: {
-    type: Sequelize.STRING,
-    
-  },
-  CorrectedBy: {
-    type: Sequelize.STRING,
-
-  },
   errorTableId: {
     type: Sequelize.INTEGER,
     references: {

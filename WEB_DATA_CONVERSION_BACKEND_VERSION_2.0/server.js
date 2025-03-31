@@ -29,7 +29,10 @@ const RowIndexData = require("./models/TempleteModel/rowIndexData");
 const ImageDataPath = require("./models/TempleteModel/templeteImages");
 const MappedData = require("./models/TempleteModel/mappedData");
 const createDatabaseIfNotExists = require("./utils/createDb");
-const builtPath = path.join(__dirname, "../../WEBDATA-TABLE/Webdata-client/dist");
+const builtPath = path.join(
+  __dirname,
+  "../../WEBDATA-TABLE/Webdata-client/dist"
+);
 const buildBat = path.join(__dirname, "../../webdata/Webdata-client/start.bat");
 // const projectPath = path.resolve(__dirname, "../../Webdata-client");
 // Check if build exists, if not, run `npm run build`
@@ -211,12 +214,11 @@ ErrorAggregatedTable.belongsTo(ErrorTable, {
   as: "error", // Alias for clarity
 });
 
-
 async function startServer() {
   try {
     await createDatabaseIfNotExists(); // Ensure the database exists
 
-    await sequelize.sync({ force: false }); // Sync database schema
+    await sequelize.sync({ alter: !true }); // Sync database schema
 
     // Check if admin user exists
     const adminUser = await User.findOne({ where: { role: "Admin" } });
@@ -250,8 +252,6 @@ async function startServer() {
 
 // Call the async function
 startServer();
-
-
 
 // await createDatabaseIfNotExists()
 // sequelize

@@ -20,6 +20,7 @@ const AdminAssined = () => {
   const [taskEditId, setTaskEditId] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [taskType, setTaskType] = useState("ALL");
+  const [loading,setLoading] = useState(false)
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -200,6 +201,7 @@ const AdminAssined = () => {
     }
 
     try {
+      setLoading(true)
       const response = await fetch(
         `${window.SERVER_IP}/download/csv/${currentTaskData.id}`,
         {
@@ -240,6 +242,8 @@ const AdminAssined = () => {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error downloading the file:", error);
+    }finally{
+      setLoading(false)
     }
   };
 
@@ -450,6 +454,11 @@ const AdminAssined = () => {
           />
         </section>
       </div>
+      {loading && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
     </div>
   );
 };
