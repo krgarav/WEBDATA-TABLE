@@ -16,6 +16,7 @@ const DataMapping = () => {
   const [currentIndex, setCurrenIndex] = useState(null);
   const [formData, setFormData] = useState([]);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [editedData, setEditedData] = useState([]);
   const imageRef = useRef(null);
 
   useEffect(() => {
@@ -123,9 +124,11 @@ const DataMapping = () => {
     };
     // console.log(updatedData);
     const obj = {
-      templateId: taskData.id,
+      taskId: taskData.id,
+      templateId: taskData.templeteId,
       parentId: data.id,
-      // ...mergedData,
+      id: data,
+      editedData: editedData,
       updatedData: mergedData,
     };
     const res = await updateCsvData(obj);
@@ -182,6 +185,7 @@ const DataMapping = () => {
             data={data}
             saveHandler={saveHandler}
             setImageData={setImageData}
+            setEditedData={setEditedData}
           />
         </div>
       </div>

@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import { dataEntryMetaData } from "../services/common";
 import { toast } from "react-toastify";
 
-const QuestionDataEntrySection = ({ data, setImageData, saveHandler }) => {
+const QuestionDataEntrySection = ({ data, setImageData, saveHandler,setEditedData }) => {
   const [questionData, setQuestionData] = useState([]);
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
   const [columnName, setColumnName] = useState("");
   const [editableData, setEditableData] = useState(null);
   useEffect(() => {
     setEditableData(data.questionData);
+    setEditedData([])
+
   }, [data]);
   // useEffect(() => {
   //   setQuestionData(
@@ -36,6 +38,9 @@ const QuestionDataEntrySection = ({ data, setImageData, saveHandler }) => {
       ...prevData,
       [key]: newValue,
     }));
+    setEditedData((prev) => {
+      return [...prev, { [key]: newValue }];
+    });
   };
   console.log(editableData);
   // useEffect(() => {

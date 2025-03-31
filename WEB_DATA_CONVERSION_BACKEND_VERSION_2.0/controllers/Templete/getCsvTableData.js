@@ -57,6 +57,9 @@ async function processAndInsertCSV(mergedRecords) {
   });
 
   const headersArray = Array.from(allHeaders);
+  headersArray.push("Corrected");
+  headersArray.push("Corrected_By");
+  
   const { tableName, DynamicModel } = await createDynamicTable(headersArray);
 
   // Ensure each record has all headers
@@ -167,7 +170,7 @@ const getCsvTableData = async (req, res) => {
         const joinstr = dirs.join("/");
 
         const maindir = path.join(fileName.zipFile, joinstr, baseName);
-// const maindir="dfdf"
+
         Object.entries(resultTwo).forEach(([key, value]) => {
           if (FormCol.includes(key)) {
             formData[key] = value;

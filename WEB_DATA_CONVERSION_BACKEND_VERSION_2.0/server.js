@@ -28,6 +28,7 @@ const Assigndata = require("./models/TempleteModel/assigndata");
 const RowIndexData = require("./models/TempleteModel/rowIndexData");
 const ImageDataPath = require("./models/TempleteModel/templeteImages");
 const MappedData = require("./models/TempleteModel/mappedData");
+const createDatabaseIfNotExists = require("./utils/createDb");
 const builtPath = path.join(__dirname, "../../WEBDATA-TABLE/Webdata-client/dist");
 const buildBat = path.join(__dirname, "../../webdata/Webdata-client/start.bat");
 // const projectPath = path.resolve(__dirname, "../../Webdata-client");
@@ -209,13 +210,18 @@ ErrorAggregatedTable.belongsTo(ErrorTable, {
   foreignKey: "errorTableId",
   as: "error", // Alias for clarity
 });
-sequelize
-  .sync({ force: !true })
-  .then(async () => {
-    // Check if the admin user table exists, if not, create it
-    const adminUser = await User.findOne({ where: { role: "admin" } });
-    const hashedPassword = await bcrypt.hash("123456", 12);
+
+
+async function startServer() {
+  try {
+    await createDatabaseIfNotExists(); // Ensure the database exists
+
+    await sequelize.sync({ force: false }); // Sync database schema
+
+    // Check if admin user exists
+    const adminUser = await User.findOne({ where: { role: "Admin" } });
     if (!adminUser) {
+      const hashedPassword = await bcrypt.hash("123456", 12);
       await User.create({
         userName: "admin",
         mobile: "1234567891",
@@ -230,12 +236,51 @@ sequelize
           resultGenerator: true,
         },
       });
+      console.log("Admin user created.");
     }
+
     // Start the server
     app.listen(process.env.PORT, () => {
       console.log(`Server is running on port ${process.env.PORT}`);
     });
-  })
-  .catch((err) => {
-    console.error("Unable to connect to the database:", err);
-  });
+  } catch (err) {
+    console.error("Error starting server:", err);
+  }
+}
+
+// Call the async function
+startServer();
+
+
+
+// await createDatabaseIfNotExists()
+// sequelize
+//   .sync({ force: !true })
+//   .then(async () => {
+//     // Check if the admin user table exists, if not, create it
+//     const adminUser = await User.findOne({ where: { role: "admin" } });
+//     const hashedPassword = await bcrypt.hash("123456", 12);
+//     if (!adminUser) {
+//       await User.create({
+//         userName: "admin",
+//         mobile: "1234567891",
+//         password: hashedPassword,
+//         role: "Admin",
+//         email: "admin@gmail.com",
+//         permissions: {
+//           dataEntry: true,
+//           comparecsv: true,
+//           csvuploader: true,
+//           createTemplate: true,
+//           resultGenerator: true,
+//         },
+//       });
+//     }
+//     // Start the server
+//     app.listen(process.env.PORT, () => {
+//       console.log(`Server is running on port ${process.env.PORT}`);
+//     });
+//   })
+//   .catch((err) => {
+//     console.error("Unable to connect to the database:", err);
+//   });
