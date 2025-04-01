@@ -107,11 +107,16 @@ const DataMapping = () => {
         const parsedData = JSON.parse(taskData);
         const taskId = parsedData.id;
         const res = await updateCurrentIndex(taskId, "next");
+        if (!res) {
+          toast.error("Last page reached");
+          return;
+        }
         console.log(res);
         setCurrenIndex(res);
       }
     } catch (error) {
       console.log(error);
+      toast.error(error);
     }
   };
 

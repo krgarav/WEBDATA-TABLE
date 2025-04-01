@@ -24,10 +24,10 @@ const assignUser = async (req, res, next) => {
         max: max,
         min: min,
         taskName: taskName,
-        currentIndex: min,
+        currentIndex: 1,
         moduleType: "Data Entry",
         correctedCsvFilePath: correctedFilePath,
-        errorFilePath: errorFilePath, 
+        errorFilePath: errorFilePath,
         imageDirectoryPath: imageDirectoryPath,
       });
     });

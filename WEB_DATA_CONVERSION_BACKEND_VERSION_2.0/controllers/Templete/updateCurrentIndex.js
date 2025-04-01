@@ -2,7 +2,7 @@ const Assigndata = require("../../models/TempleteModel/assigndata");
 const sequelize = require("../../utils/database");
 const updateCurrentIndex = async (req, res) => {
   try {
-    console.log("called")
+    console.log("called");
     const { taskId, direction } = req.body;
 
     const assignData = await Assigndata.findByPk(taskId);
@@ -11,14 +11,18 @@ const updateCurrentIndex = async (req, res) => {
     }
 
     const { min, max, tableName } = assignData;
-
-    const [countResult] = await sequelize.query(
-      `SELECT COUNT(*) AS count FROM ${tableName} `
-    );
-    const count = countResult[0].count;
+    const query = `SELECT COUNT(*) AS count FROM \`${tableName}\` WHERE parentId >= ${min} AND parentId <= ${max} ORDER BY parentId ASC LIMIT 1`;
+    const [countId] = await sequelize.query(query, {
+      type: sequelize.QueryTypes.SELECT,
+    });
+  const count = countId.count;
+    // const [countResult] = await sequelize.query(
+    //   `SELECT COUNT(*) AS count FROM ${tableName} `
+    // );
+    // const count = countResult[0].count;
 
     let updated = false;
-   
+
     if (direction === "next" && assignData.currentIndex < count) {
       assignData.currentIndex += 1;
       updated = true;

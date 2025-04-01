@@ -42,7 +42,6 @@ const QuestionDataEntrySection = ({ data, setImageData, saveHandler,setEditedDat
       return [...prev, { [key]: newValue }];
     });
   };
-  console.log(editableData);
   // useEffect(() => {
   //   setImageData();
   // }, [columnName]);

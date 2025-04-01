@@ -3,7 +3,7 @@ const Assigndata = require("../../models/TempleteModel/assigndata");
 const getTask = async (req, res, next) => {
   const id = req.params.id;
   try {
-    const response = await Assigndata.findAll();
+    const response = await Assigndata.findAll({ where: { userId: id } });
     res.status(200).json(response);
   } catch (error) {
     console.error(error);

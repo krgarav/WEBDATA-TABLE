@@ -59,7 +59,7 @@ async function processAndInsertCSV(mergedRecords) {
   const headersArray = Array.from(allHeaders);
   headersArray.push("Corrected");
   headersArray.push("Corrected_By");
-  
+
   const { tableName, DynamicModel } = await createDynamicTable(headersArray);
 
   // Ensure each record has all headers
@@ -95,7 +95,9 @@ const getCsvTableData = async (req, res) => {
 
     const { patternDefinition, blankDefination, csvTableName, imageColName } =
       template;
-
+    // if(!currentIndex){
+    //     const query = `SELECT * FROM ${csvTableName} WHERE '`;
+    // }
     const columns = await MappedData.findAll({
       where: {
         templeteId: templeteId,
@@ -137,7 +139,18 @@ const getCsvTableData = async (req, res) => {
         .json({ success: false, error: "No relevant columns found" });
     }
     if (assignedData.tableName) {
-      const indexToSearch = currentIndex;
+      let indexToSearch=currentIndex;
+
+      if (currentIndex == min) {
+        // const query = `SELECT id FROM \`${assignedData.tableName}\` WHERE parentId >= ${min} ORDER BY parentId ASC LIMIT 1`;
+        // const [countId] = await sequelize.query(query, {
+        //   type: sequelize.QueryTypes.SELECT,
+        // });
+
+        // indexToSearch = countId.id;
+        // assignedData.currentIndex = indexToSearch;
+        // await assignedData.save();
+      }
 
       try {
         const template = await Template.findByPk(templeteId);
@@ -162,7 +175,6 @@ const getCsvTableData = async (req, res) => {
         const baseName = path.basename(imageName);
         const formData = {};
         const questionData = {};
-
 
         const dirs = getAllDirectories(
           path.join(__dirname, "../", "../", "extractedFiles", fileName.zipFile)
