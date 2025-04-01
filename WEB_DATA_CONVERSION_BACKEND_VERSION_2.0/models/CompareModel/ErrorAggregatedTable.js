@@ -21,7 +21,9 @@ const ErrorAggregatedTable = sequelize.define("errorAggregated", {
     type: Sequelize.STRING,
     allowNull: false,
   },
-
+  Corrected: {
+    type: Sequelize.STRING,
+  },
   errorTableId: {
     type: Sequelize.INTEGER,
     references: {
@@ -31,7 +33,6 @@ const ErrorAggregatedTable = sequelize.define("errorAggregated", {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
   },
- 
 });
 
 module.exports = ErrorAggregatedTable;

@@ -67,60 +67,146 @@ const sequelize = require("../../utils/database");
 //   }
 // };
 
+// const downloadMergedCsv = async (req, res) => {
+//   try {
+//     const taskId = req.params.id;
+//     const assigndata = await Assigndata.findByPk(taskId);
+
+//     if (!assigndata) {
+//       return res.status(404).json({ error: "Assignment data not found" });
+//     }
+
+//     const assignedcsvtable = assigndata.tableName;
+//     const templateId = assigndata.templeteId;
+//     const template = await Templete.findByPk(templateId);
+
+//     if (!template) {
+//       return res.status(404).json({ error: "Template not found" });
+//     }
+//     const allAssignedData = await Assigndata.findAll({
+//       where: { templeteId: templateId },
+//     });
+//     const mergedAssignedData=[]
+//     for (let i = 0; i < allAssignedData.length; i++) {
+//      const assigndata = await sequelize.query(`SELECT * FROM ${allAssignedData[i].tableName}`, {
+//         type: sequelize.QueryTypes.SELECT,
+//       });
+//       mergedAssignedData.push(assigndata)
+//     }
+
+//     const maintableName = template.csvTableName;
+
+//     // Get table columns dynamically
+//     const [columns] = await sequelize.query(
+//       `SHOW COLUMNS FROM ${maintableName}`
+//     );
+//     const columnNames = columns
+//       .map((col) => `\`${col.Field}\``) // Add backticks for safety
+//       .filter((col) => col !== "`id`") // Exclude 'id' column if needed
+//       .join(", ");
+
+//     // Fetch main table data
+//     const query = `SELECT id, ${columnNames} FROM ${maintableName}`;
+//     const mainData = await sequelize.query(query, {
+//       type: sequelize.QueryTypes.SELECT,
+//     });
+//     // Merge the data based on parentId
+//     const mergedData = mainData.map((row) => {
+//       const matchedRow = mergedAssignedData.find(
+//         (assigned) => assigned.parentId == row.id
+//       );
+//       if (matchedRow) {
+//         return {
+//           ...row,
+//           Corrected: matchedRow.Corrected,
+//           Corrected_By: matchedRow.Corrected_By,
+//         };
+//       }
+//       return row;
+//     });
+
+//     if (!mergedData.length) {
+//       return res
+//         .status(404)
+//         .json({ error: "No data available in the main table" });
+//     }
+
+//     // Convert JSON data to CSV
+//     const json2csvParser = new Parser();
+//     const csvData = json2csvParser.parse(mergedData);
+
+//     // Set response headers for CSV download
+//     res.setHeader(
+//       "Content-Disposition",
+//       `attachment; filename=${maintableName}.csv`
+//     );
+//     res.setHeader("Content-Type", "text/csv");
+
+//     res.send(csvData);
+//   } catch (error) {
+//     console.error("Error downloading CSV:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// };
 const downloadMergedCsv = async (req, res) => {
   try {
     const taskId = req.params.id;
     const assigndata = await Assigndata.findByPk(taskId);
-
     if (!assigndata) {
       return res.status(404).json({ error: "Assignment data not found" });
     }
 
-    const assignedcsvtable = assigndata.tableName;
-    const templateId = assigndata.templeteId;
-    const template = await Templete.findByPk(templateId);
-
+    const template = await Templete.findByPk(assigndata.templeteId);
     if (!template) {
       return res.status(404).json({ error: "Template not found" });
     }
+
+    const allAssignedData = await Assigndata.findAll({
+      where: { templeteId: assigndata.templeteId },
+    });
+
+    // Fetch all assigned data tables in parallel
+    const assignedDataResults = await Promise.all(
+      allAssignedData.map((assign) =>
+        sequelize.query(`SELECT * FROM \`${assign.tableName}\``, {
+          type: sequelize.QueryTypes.SELECT,
+        })
+      )
+    );
+
+    const mergedAssignedData = assignedDataResults.flat();
 
     const maintableName = template.csvTableName;
 
     // Get table columns dynamically
     const [columns] = await sequelize.query(
-      `SHOW COLUMNS FROM ${maintableName}`
+      `SHOW COLUMNS FROM \`${maintableName}\``
     );
     const columnNames = columns
-      .map((col) => `\`${col.Field}\``) // Add backticks for safety
-      .filter((col) => col !== "`id`") // Exclude 'id' column if needed
+      .map((col) => `\`${col.Field}\``)
+      .filter((col) => col !== "`id`")
       .join(", ");
 
     // Fetch main table data
-    const query = `SELECT id, ${columnNames} FROM ${maintableName}`;
-    const mainData = await sequelize.query(query, {
-      type: sequelize.QueryTypes.SELECT,
-    });
-
-    // Fetch assigned table data
-    const assignedData = await sequelize.query(
-      `SELECT * FROM ${assignedcsvtable}`,
+    const mainData = await sequelize.query(
+      `SELECT id, ${columnNames} FROM \`${maintableName}\``,
       {
         type: sequelize.QueryTypes.SELECT,
       }
     );
+
     // Merge the data based on parentId
     const mergedData = mainData.map((row) => {
-      const matchedRow = assignedData.find(
-        (assigned) => assigned.parentId == row.id
+      const matchedRow = mergedAssignedData.find(
+        (assigned) => Number(assigned.parentId) === Number(row.id)
       );
-      if (matchedRow) {
-        return {
-          ...row,
-          Corrected: matchedRow.Corrected,
-          Corrected_By: matchedRow.Corrected_By,
-        };
-      }
-      return row;
+      return matchedRow
+        ? {
+            ...row,
+            Corrected: matchedRow.Corrected,
+            Corrected_By: matchedRow.Corrected_By,
+          }
+        : row;
     });
 
     if (!mergedData.length) {
@@ -139,7 +225,6 @@ const downloadMergedCsv = async (req, res) => {
       `attachment; filename=${maintableName}.csv`
     );
     res.setHeader("Content-Type", "text/csv");
-
     res.send(csvData);
   } catch (error) {
     console.error("Error downloading CSV:", error);

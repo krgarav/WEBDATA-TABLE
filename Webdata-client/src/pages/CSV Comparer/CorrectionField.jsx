@@ -168,6 +168,7 @@ const CorrectionField = ({
         updated: filtered,
         parentId: currentData?.parentId,
         taskId: taskId,
+        errorDataId : currentData.id 
       };
 
       const response = await axios.post(
@@ -192,6 +193,7 @@ const CorrectionField = ({
       isUpdatingRef.current = false;
     }
   };
+
   const errorData = updatedeData?.map((dataItem, index) => {
     const key = `${dataItem?.Column_Name?.trim()}`;
     // const updatedValue = dataItem.CORRECTED||"Null";

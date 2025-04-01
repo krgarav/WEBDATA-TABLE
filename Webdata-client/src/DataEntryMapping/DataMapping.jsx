@@ -96,6 +96,10 @@ const DataMapping = () => {
         const parsedData = JSON.parse(taskData);
         const taskId = parsedData.id;
         const res = await updateCurrentIndex(taskId, "prev");
+        if (!res) {
+          toast.error("No Previous Page!!");
+          return;
+        }
         setCurrenIndex(res);
       }
     } catch (error) {}

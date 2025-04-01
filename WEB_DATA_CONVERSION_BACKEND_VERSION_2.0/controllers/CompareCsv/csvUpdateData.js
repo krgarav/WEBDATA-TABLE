@@ -50,7 +50,7 @@ const csvUpdateData = async (req, res) => {
   try {
     const { email } = req.user;
     const { taskId } = req.params;
-    const { updated, parentId } = req.body;
+    const { updated, parentId, errorDataId } = req.body;
 
     if (!updated || !Array.isArray(updated)) {
       return res.status(400).json({ message: "Invalid update data provided" });
@@ -65,6 +65,12 @@ const csvUpdateData = async (req, res) => {
 
     const { csvTableName } = template;
 
+    const errorTable = await ErrorTable.findOne({
+      where: { id: errorDataId },
+    });
+    errorTable.CorrectedBy = req.user.email;
+    errorTable.Corrected = JSON.stringify(updated);
+    await errorTable.save();
     for (const update of updated) {
       const { id, Corrected, Column_Name } = update;
 
@@ -82,7 +88,7 @@ const csvUpdateData = async (req, res) => {
 
       if (errorAggregatedRow) {
         errorAggregatedRow.Corrected = Corrected;
-        errorAggregatedRow["Corrected By"] = email;
+        // errorAggregatedRow["Corrected By"] = email;
         await errorAggregatedRow.save({ transaction });
       }
 
