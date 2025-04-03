@@ -2,15 +2,19 @@ import React, { useEffect, useState } from "react";
 import { dataEntryMetaData } from "../services/common";
 import { toast } from "react-toastify";
 
-const QuestionDataEntrySection = ({ data, setImageData, saveHandler,setEditedData }) => {
+const QuestionDataEntrySection = ({
+  data,
+  setImageData,
+  saveHandler,
+  setEditedData,
+}) => {
   const [questionData, setQuestionData] = useState([]);
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
   const [columnName, setColumnName] = useState("");
   const [editableData, setEditableData] = useState(null);
   useEffect(() => {
     setEditableData(data.questionData);
-    setEditedData([])
-
+    setEditedData([]);
   }, [data]);
   // useEffect(() => {
   //   setQuestionData(
@@ -39,7 +43,20 @@ const QuestionDataEntrySection = ({ data, setImageData, saveHandler,setEditedDat
       [key]: newValue,
     }));
     setEditedData((prev) => {
-      return [...prev, { [key]: newValue }];
+      const updatedData = [...prev];
+      const existingIndex = updatedData.findIndex(
+        (item) => Object.keys(item)[0] === key
+      );
+
+      if (existingIndex !== -1) {
+        // If key exists, update its value
+        updatedData[existingIndex] = { [key]: newValue };
+      } else {
+        // If key does not exist, add a new entry
+        updatedData.push({ [key]: newValue });
+      }
+
+      return updatedData;
     });
   };
   // useEffect(() => {

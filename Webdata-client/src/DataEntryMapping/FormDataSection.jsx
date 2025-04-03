@@ -1,7 +1,21 @@
 import React, { useEffect, useState } from "react";
 
-const FormDataEntrySection = ({ formData, setFormData }) => {
+const FormDataEntrySection = ({ formData, setFormData,setEditedData }) => {
   const handleInputChange = (key, value) => {
+    setEditedData((prev) => {
+      const updatedData = [...prev];
+      const existingIndex = updatedData.findIndex((item) => Object.keys(item)[0] === key);
+  
+      if (existingIndex !== -1) {
+        // If key exists, update its value
+        updatedData[existingIndex] = { [key]: value };
+      } else {
+        // If key does not exist, add a new entry
+        updatedData.push({ [key]: value });
+      }
+  
+      return updatedData;
+    });
     setFormData((prevData) => {
       const updatedData = [...prevData];
       if (updatedData[0]) {
@@ -10,7 +24,7 @@ const FormDataEntrySection = ({ formData, setFormData }) => {
       return updatedData;
     });
   };
-
+console.log(formData)
   return (
     <div className="border-e min-w-60 order-lg-1">
       <div className="">

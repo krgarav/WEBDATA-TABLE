@@ -161,7 +161,7 @@ const DataMapping = () => {
       imageRef.current.style.transformOrigin = "initial";
     }
   };
-
+console.log(editedData)
   return (
     <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-[100vh] pt-16">
       <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-600 dataEntry ">
@@ -170,6 +170,7 @@ const DataMapping = () => {
           data={data}
           formData={formData}
           setFormData={setFormData}
+          setEditedData={setEditedData}
         />
 
         <div className="flex-col w-full">

@@ -75,6 +75,7 @@ async function processAndInsertCSV(mergedRecords) {
 
   return { tableName, headersArray };
 }
+
 const getCsvTableData = async (req, res) => {
   try {
     const { id } = req.body.taskData;

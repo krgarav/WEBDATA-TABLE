@@ -20,5 +20,4 @@ router.get('/getuseractivitydetails/:email', authMiddleware, getUserActivityDeta
 router.post("/login", logIn);
 router.post("/logout", logout);
 
-
 module.exports = router;
