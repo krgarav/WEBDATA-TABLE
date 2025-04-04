@@ -68,8 +68,23 @@ const csvUpdateData = async (req, res) => {
     const errorTable = await ErrorTable.findOne({
       where: { id: errorDataId },
     });
+    const newData = updated.map((item) => {
+      const { Column_Name, Corrected } = item;
+      return { [Column_Name]: Corrected };
+    });
     errorTable.CorrectedBy = req.user.email;
-    errorTable.Corrected = JSON.stringify(updated);
+    const copyObj = errorTable.Corrected || "{}"; // Ensure it's never null
+    const copyObjParsed = JSON.parse(copyObj);
+
+    // Merge existing data with new updates correctly
+    const mergedUpdates = {
+      ...copyObjParsed,
+      ...Object.assign({}, ...newData),
+    };
+
+    // Convert merged object to JSON string
+    errorTable.Corrected = JSON.stringify(mergedUpdates);
+
     await errorTable.save();
     for (const update of updated) {
       const { id, Corrected, Column_Name } = update;

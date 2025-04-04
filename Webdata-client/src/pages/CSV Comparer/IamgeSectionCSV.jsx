@@ -12,7 +12,7 @@ const  ImageSectionCSV = ({
   templateHeaders,
   currentData,
 }) => {
-  console.log(zoomLevel);
+  console.log(templateHeaders);
 
   return (
     <div

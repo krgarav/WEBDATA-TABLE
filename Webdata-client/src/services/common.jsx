@@ -334,3 +334,21 @@ export const updateCurrIndexData = async (taskId, direction) => {
     console.log(error);
   }
 };
+
+export const getMetaData = async (columnName, templateId) => {
+  const token = JSON.parse(localStorage.getItem("userData"));
+  try {
+    const response = await axios.get(
+      `http://${window.APP_IP}:4000/get/metadata?columnName=${columnName}&templateId=${templateId}`,
+
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

@@ -4,6 +4,8 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
+  dataEntryMetaData,
+  getMetaData,
   getRowCsvData,
   onGetTaskHandler,
   onGetTemplateHandler,
@@ -95,7 +97,22 @@ const UserCorrectionData = () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [currentData]);
+ useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.ctrlKey && event.key === "ArrowLeft") {
+        prevHandler();
+      }
+      if (event.ctrlKey && event.key === "ArrowRight") {
+        nextHandler();
+      }
+    };
 
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
   // console.log(currentTaskData)
   //   useEffect(() => {
   //     const fetchData = async () => {
@@ -172,22 +189,22 @@ const UserCorrectionData = () => {
   //   fetchCurrentUser();
   // }, [popUp]);
 
-  // useEffect(() => {
-  //   const fetchTemplate = async () => {
-  //     try {
-  //       const response = await onGetTemplateHandler();
+  useEffect(() => {
+    const fetchTemplate = async () => {
+      try {
+        const response = await onGetTemplateHandler();
 
-  //       const templateData = response.find(
-  //         (data) => data.id === parseInt(currentTaskData.templeteId)
-  //       );
+        const templateData = response.find(
+          (data) => data.id === parseInt(currentTaskData.templeteId)
+        );
 
-  //       setTemplateHeaders(templateData);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  //   fetchTemplate();
-  // }, [currentTaskData]);
+        setTemplateHeaders(templateData);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchTemplate();
+  }, [currentTaskData]);
 
   // useEffect(() => {
   //   const req = async () => {
@@ -542,48 +559,17 @@ const UserCorrectionData = () => {
       }
     });
   };
+  // console.log(task.templeteId)
 
-  const imageFocusHandler = (headerName) => {
-    let matchedValue = null;
-    const data = JSON.parse(JSON.stringify(mappedData));
-    const arrayOfObjects = Object.entries(data).map(([key, value]) => ({
-      [key]: value,
-    }));
-
-    for (let i = 0; i < arrayOfObjects?.length; i++) {
-      if (arrayOfObjects[i][headerName]) {
-        matchedValue = arrayOfObjects[i][headerName];
-        break;
-      }
-    }
-
-    if (matchedValue === null) {
-      toast.error("Header not found: " + headerName);
+  const imageFocusHandler = async (headerName) => {
+    const res = await dataEntryMetaData(task.templeteId, headerName);
+    if (!res) {
+      toast.error("Header not found");
       return;
     }
+    const coordinateData = res.data;
 
-    const matchedCoordinate = templateHeaders?.templetedata?.find(
-      (data) => data.attribute === matchedValue
-    );
-
-    if (matchedCoordinate) {
-      setCurrentImageIndex(matchedCoordinate.pageNo);
-    }
-
-    if (!imageNotFound) {
-      return;
-    }
-
-    if (!imageUrls || !imageContainerRef || !imageRef) {
-      setPopUp(true);
-    }
-
-    if (!filterResults.hasOwnProperty(headerName)) {
-      toast.error("Header not found: " + headerName);
-      return;
-    }
-
-    const { coordinateX, coordinateY, width, height } = matchedCoordinate;
+    const { coordinateX, coordinateY, width, height } = coordinateData[0];
 
     const containerWidth = imageContainerRef?.current?.offsetWidth;
     const containerHeight = imageContainerRef?.current?.offsetHeight;
@@ -815,7 +801,7 @@ const UserCorrectionData = () => {
                       // handleKeyDownJump={handleKeyDownJump}
                       // onNextHandler={onNextHandler}
                       // changeCurrentCsvDataHandler={changeCurrentCsvDataHandler}
-                      // imageFocusHandler={imageFocusHandler}
+                      imageFocusHandler={imageFocusHandler}
                     />
                   </section>
                 </div>

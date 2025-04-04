@@ -15,6 +15,7 @@ const CorrectionField = ({
   taskId,
   nextHandler,
   currIndex,
+  imageFocusHandler,
 }) => {
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
   const token = JSON.parse(localStorage.getItem("userData"));
@@ -27,6 +28,9 @@ const CorrectionField = ({
   const [updatedeData, setUpdatedData] = useState([]);
   const isUpdatingRef = useRef(false);
 
+
+
+  
   useEffect(() => {
     setDataRow(currentData);
     setInputValue({});
@@ -168,7 +172,7 @@ const CorrectionField = ({
         updated: filtered,
         parentId: currentData?.parentId,
         taskId: taskId,
-        errorDataId : currentData.id 
+        errorDataId: currentData.id,
       };
 
       const response = await axios.post(
@@ -245,7 +249,7 @@ const CorrectionField = ({
               // );
             }}
             onFocus={(e) => {
-              // imageFocusHandler(dataItem.COLUMN_NAME); // First function
+              imageFocusHandler(dataItem?.Column_Name); // First function
               handleVisit(index); // Second function
             }} // Mark row as visited
             ref={(el) => (inputRefs.current[index] = el)}
