@@ -171,6 +171,7 @@ console.log(editedData)
           formData={formData}
           setFormData={setFormData}
           setEditedData={setEditedData}
+          setImageData={setImageData}
         />
 
         <div className="flex-col w-full">

@@ -1,11 +1,41 @@
 import React, { useEffect, useState } from "react";
+import { dataEntryMetaData } from "../services/common";
 
-const FormDataEntrySection = ({ formData, setFormData,setEditedData }) => {
+const FormDataEntrySection = ({
+  formData,
+  setImageData,
+  setFormData,
+  setEditedData,
+}) => {
+  const [columnName, setColumnName] = useState("");
+  const taskData = JSON.parse(localStorage.getItem("taskdata"));
+
+  useEffect(() => {
+    if (columnName !== "") {
+      const fetchData = async () => {
+        try {
+          const response = await dataEntryMetaData(
+            taskData.templeteId,
+            columnName
+          );
+          const data = response.data;
+          console.log(data);
+          setImageData(data[0]);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      fetchData();
+      //  const res =  getMetaDataHandler();
+    }
+  }, [columnName]);
   const handleInputChange = (key, value) => {
     setEditedData((prev) => {
       const updatedData = [...prev];
-      const existingIndex = updatedData.findIndex((item) => Object.keys(item)[0] === key);
-  
+      const existingIndex = updatedData.findIndex(
+        (item) => Object.keys(item)[0] === key
+      );
+
       if (existingIndex !== -1) {
         // If key exists, update its value
         updatedData[existingIndex] = { [key]: value };
@@ -13,7 +43,7 @@ const FormDataEntrySection = ({ formData, setFormData,setEditedData }) => {
         // If key does not exist, add a new entry
         updatedData.push({ [key]: value });
       }
-  
+
       return updatedData;
     });
     setFormData((prevData) => {
@@ -24,7 +54,7 @@ const FormDataEntrySection = ({ formData, setFormData,setEditedData }) => {
       return updatedData;
     });
   };
-console.log(formData)
+  console.log(formData);
   return (
     <div className="border-e min-w-60 order-lg-1">
       <div className="">
@@ -48,6 +78,7 @@ console.log(formData)
                   value={value || ""}
                   onChange={(e) => handleInputChange(key, e.target.value)}
                   className="mt-1 border-none p-2 focus:border-transparent text-center rounded-lg focus:outline-none focus:ring-0 sm:text-sm w-48"
+                  onFocus={() => setColumnName(key)}
                 />
               </div>
             ))
