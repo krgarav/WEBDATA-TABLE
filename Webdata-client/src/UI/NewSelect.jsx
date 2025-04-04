@@ -18,32 +18,15 @@ const NewSelect = (props) => {
   const fetchFile = async (templateId) => {
     try {
       const response = await fetchFilesAssociatedWithTemplate(templateId);
-      const tasks = await onGetAllTasksHandler();
-      const taskStatusArr = tasks.filter((task) => task.taskStatus);
-
-      const filteredFile = [];
-      const seenFileIds = new Set();
-
-      for (let i = 0; i < tasks?.length; i++) {
-        for (let j = 0; j < response?.length; j++) {
-          if (taskStatusArr[i]?.fileId == response[j]?.id) {
-            if (!seenFileIds.has(response[j].id)) {
-              filteredFile.push(response[j]);
-              seenFileIds.add(response[j].id);
-            }
-            break;
-          }
-        }
-      }
-
-      const csvOptions = filteredFile.map((item) => ({
+      const csvOptions = response.map((item) => ({
         label: item.csvFile,
         value: item.id,
       }));
-      const zipOptions = filteredFile.map((item) => ({
+      const zipOptions = response.map((item) => ({
         label: item.zipFile,
         value: item.id,
       }));
+      console.log(csvOptions, "csvOptions");
       setFileOptions(csvOptions);
       setZipFileOptions(zipOptions);
     } catch (error) {
@@ -77,6 +60,7 @@ const NewSelect = (props) => {
       fetchFile(props.selectedTemplate);
     }
   }, [props.label, props.selectedTemplate]);
+
   const fetchHeaders = async (fileName) => {
     try {
       const res = await axios.get(

@@ -11,10 +11,11 @@ import { use } from "react";
 import axios from "axios";
 import DeactivateModal from "../../components/DeactivateModal";
 import MergeModal from "../../UI/MergeModal";
-
+import Select from "react-select";
 const Merge = () => {
   const [options, setOptions] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState("");
+  const [selectedFile, setSelectedFile] = useState("");
   const [selectedValues, setSelectedValues] = useState([]);
   const [modals, setModals] = useState(false);
   const [message, setMessage] = useState("");
@@ -53,7 +54,7 @@ const Merge = () => {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const fetchFile = async (templateId) => {
     try {
@@ -69,6 +70,8 @@ const Merge = () => {
       console.error("Error fetching files:", error);
     }
   };
+  console.log(options);
+  console.log(selectedTemplate);
   return (
     <>
       {modals && (
@@ -76,7 +79,7 @@ const Merge = () => {
           isOpen={modals}
           onClose={() => setModals(false)}
           message={message}
-        table={tableName}
+          table={tableName}
           templateId={selectedTemplate}
           // taskId={taskId}
         />
@@ -84,7 +87,7 @@ const Merge = () => {
       <div className="h-[100vh] pt-24 overflow-y-hidden bg-blue-500 flex justify-center items-start">
         <div className="my-auto bg-white p-10 rounded-3xl mx-10">
           <h1 className="text-center mb-6 text-black text-2xl font-bold">
-            MERGE
+            Duplicate Detect
           </h1>
           <div className="flex flex-row items-end gap-4 lg:gap-7">
             <p className="text-black font-semibold lg:text-xl sm:min-w-40 mb-2">
@@ -95,87 +98,60 @@ const Merge = () => {
                 label="Select Template"
                 onTemplateSelect={setSelectedTemplate}
                 values={selectedTemplate}
+                selectedTemplate={selectedTemplate}
               />
             </div>
           </div>
-          {/* <div className="flex flex-row items-start gap-5 lg:gap-7 mt-5">
+          <div className="flex flex-row items-end gap-4 lg:gap-7">
             <p className="text-black font-semibold lg:text-xl sm:min-w-40 mb-2">
-              Select CSV File :{" "}
+              Select File :{" "}
             </p>
             <div className="sm:w-80 md:w-96">
-              <div className="lg:w-96">
-                <button
-                  onClick={handleSelectAll}
-                  className="w-40 text-start mb-2 flex gap-2"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedValues.length === options.length}
-                    readOnly
-                  />
-                  <span>
-                    {selectedValues.length === options.length
-                      ? "Deselect All"
-                      : "Select All"}
-                  </span>
-                </button>
-                <Multiselect
-                  options={options}
-                  displayValue="label"
-                  selectedValues={selectedValues}
-                  onSelect={setSelectedValues}
-                  onRemove={setSelectedValues}
-                  showCheckbox
-                  placeholder="Select CSV Files"
-                  style={{
-                    multiselectContainer: {
-                      maxHeight: "200px",
-                      overflowY: "auto",
-                      minHeight: "200px",
-                    }, // Set max height and scroll
-                    chips: { background: "#007bff" }, // Optional: Style selected items
-                    searchBox: {
-                      border: "1px solid #ccc",
-                      borderRadius: "5px",
-                    }, // Optional: Style input
-                  }}
-                />
-              </div>
+              <NewSelect
+                label="Select Csv Files 2"
+                onTemplateSelect={setSelectedFile}
+                values={selectedFile}
+                selectedTemplate={selectedTemplate}
+              />
             </div>
-          </div> */}
+          </div>
           <div className="flex justify-center items-center mt-10">
             <button
               type="button"
-              class={`text-white focus:outline-none focus:ring-2 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all ${loading ? "bg-blue-500":"bg-blue-700 hover:bg-blue-800"}`}
+              className={`text-white focus:outline-none focus:ring-2 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 transition-all ${
+                loading ? "bg-blue-500" : "bg-blue-700 hover:bg-blue-800"
+              }`}
               onClick={checkMergeHandler}
             >
               {loading ? (
-                    <span className="flex">
-                      <svg
-                        className="ml-1 mr-2 h-5 w-5 animate-spin text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                        />
-                      </svg>
-                      Checking...
-                    </span>
-                  ) : (
-                    <span className="flex justify-center items-center gap-2"><MdCompareArrows size={23} /> Check Merge</span>
-                  )}
+                <span className="flex">
+                  <svg
+                    className="ml-1 mr-2 h-5 w-5 animate-spin text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
+                  </svg>
+                  Checking...
+                </span>
+              ) : (
+                <span className="flex justify-center items-center gap-2">
+                  <MdCompareArrows size={23} /> Check Duplicate
+                </span>
+              )}
             </button>
           </div>
         </div>

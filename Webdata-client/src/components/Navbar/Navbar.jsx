@@ -45,7 +45,7 @@ const menuItems = [
   //   href: "partA",
   // },
   {
-    name: "Merge",
+    name: "Duplicate Check",
     permission: "resultGenerator",
     href: "merge",
   },
