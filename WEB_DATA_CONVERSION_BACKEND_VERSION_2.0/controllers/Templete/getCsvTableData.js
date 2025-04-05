@@ -140,14 +140,13 @@ const getCsvTableData = async (req, res) => {
         .json({ success: false, error: "No relevant columns found" });
     }
     if (assignedData.tableName) {
-      let indexToSearch=currentIndex;
+      let indexToSearch = currentIndex;
 
       if (currentIndex == min) {
         // const query = `SELECT id FROM \`${assignedData.tableName}\` WHERE parentId >= ${min} ORDER BY parentId ASC LIMIT 1`;
         // const [countId] = await sequelize.query(query, {
         //   type: sequelize.QueryTypes.SELECT,
         // });
-
         // indexToSearch = countId.id;
         // assignedData.currentIndex = indexToSearch;
         // await assignedData.save();

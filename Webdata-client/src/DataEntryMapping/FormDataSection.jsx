@@ -77,7 +77,11 @@ const FormDataEntrySection = ({
                   type="text"
                   value={value || ""}
                   onChange={(e) => handleInputChange(key, e.target.value)}
-                  className="mt-1 border-none p-2 focus:border-transparent text-center rounded-lg focus:outline-none focus:ring-0 sm:text-sm w-48"
+                  className={`mt-1 border-none p-2 focus:border-transparent text-center rounded-lg focus:outline-none focus:ring-0 sm:text-sm w-48 ${
+                    value === " " || value === "*" || value.includes("*")
+                      ? "bg-red-500"
+                      : ""
+                  } `}
                   onFocus={() => setColumnName(key)}
                 />
               </div>

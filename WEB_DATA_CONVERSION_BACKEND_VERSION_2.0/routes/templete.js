@@ -88,7 +88,7 @@ router.get("/getcsvheaders", getCsvHeaderController);
 router.post("/checkduplicatekey", checkDuplicateController);
 router.get("/checkmappeddataexits", checkMappedDataExistsController);
 router.get("/gettotaldata", getTotalCsvDataController);
-router.post("/get/csvdata", authMiddleware, getCsvTableData);
+router.post("/get/csvdata", authMiddleware, getCsvTableData); // for fething csv data
 router.get("/get/metadata", getMetaData);
 router.get("/update/assignedData", authMiddleware, getMetaData);
 router.post("/update/currentIndex", authMiddleware, updateCurrentIndex);
