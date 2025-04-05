@@ -352,3 +352,23 @@ export const getMetaData = async (columnName, templateId) => {
     console.log(error);
   }
 };
+export const changeTaskStatus = async (taskId) => {
+  const token = JSON.parse(localStorage.getItem("userData"));
+  try {
+    const response = await axios.post(
+      `http://${window.APP_IP}:4000/taskupdation/${taskId}`,
+      {
+        taskStatus: 1,
+      },
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return error?.response?.data;
+  }
+};

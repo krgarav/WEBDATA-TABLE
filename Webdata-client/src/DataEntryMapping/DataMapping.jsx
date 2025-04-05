@@ -18,7 +18,9 @@ const DataMapping = () => {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [editedData, setEditedData] = useState([]);
   const imageRef = useRef(null);
-
+  const inputRefs = useRef({});
+  const invalidIndex = useRef(0);
+  console.log(inputRefs);
   useEffect(() => {
     const enableFullscreen = () => {
       const element = document.documentElement;
@@ -46,6 +48,11 @@ const DataMapping = () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [currentIndex]);
+
+  // useEffect(() => {
+  //   inputRefs.current = {};
+  //   invalidIndex.current = 0; // Reset the index when currentIndex changes
+  // }, [currentIndex]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -89,6 +96,42 @@ const DataMapping = () => {
     fetchData();
   }, [currentIndex]);
 
+  useEffect(() => {
+    const handleTabKey = (e) => {
+      if (e.key === "Tab") {
+        e.preventDefault(); // Stop normal tab behavior
+
+        // Get all keys from inputRefs (which are the keys of invalid inputs)
+        const invalidKeys = Object.keys(inputRefs.current);
+
+        // Log the refs and keys if you want to debug
+        console.log("inputRefs:", inputRefs.current);
+        console.log("invalidKeys:", invalidKeys);
+
+        // No invalid inputs? Do nothing
+        if (invalidKeys.length === 0) return;
+
+        // Reset index if out of bounds
+        if (invalidIndex.current >= invalidKeys.length) {
+          invalidIndex.current = 0;
+        }
+
+        const keyToFocus = invalidKeys[invalidIndex.current];
+        const element = inputRefs.current[keyToFocus];
+
+        if (element) {
+          element.focus();
+          invalidIndex.current += 1; // Move to next invalid input for next Tab
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleTabKey);
+    return () => {
+      document.removeEventListener("keydown", handleTabKey);
+    };
+  }, [formData]);
+
   const prevHandler = async () => {
     try {
       const taskData = localStorage.getItem("taskdata");
@@ -101,8 +144,15 @@ const DataMapping = () => {
           return;
         }
         setCurrenIndex(res);
+        // inputRefs.current = {};
+        // invalidIndex.current = 0;
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    } finally {
+      inputRefs.current = {};
+      invalidIndex.current = 0;
+    }
   };
   const nextHandler = async () => {
     try {
@@ -121,6 +171,9 @@ const DataMapping = () => {
     } catch (error) {
       console.log(error);
       toast.error(error);
+    } finally {
+      inputRefs.current = {};
+      invalidIndex.current = 0;
     }
   };
 
@@ -161,7 +214,7 @@ const DataMapping = () => {
       imageRef.current.style.transformOrigin = "initial";
     }
   };
-console.log(editedData)
+  console.log(editedData);
   return (
     <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-[100vh] pt-16">
       <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-600 dataEntry ">
@@ -172,6 +225,7 @@ console.log(editedData)
           setFormData={setFormData}
           setEditedData={setEditedData}
           setImageData={setImageData}
+          inputRefs={inputRefs}
         />
 
         <div className="flex-col w-full">
@@ -197,6 +251,7 @@ console.log(editedData)
             saveHandler={saveHandler}
             setImageData={setImageData}
             setEditedData={setEditedData}
+            inputRefs={inputRefs}
           />
         </div>
       </div>

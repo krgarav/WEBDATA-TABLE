@@ -6,6 +6,7 @@ const FormDataEntrySection = ({
   setImageData,
   setFormData,
   setEditedData,
+  inputRefs,
 }) => {
   const [columnName, setColumnName] = useState("");
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
@@ -74,6 +75,13 @@ const FormDataEntrySection = ({
                   </span>
                 </label>
                 <input
+                  ref={(el) => {
+                    if (value === " " || value === "*" || value.includes("*")) {
+                      inputRefs.current[key] = el;
+                    } else {
+                      delete inputRefs.current[key]; // Clean up any previous ref
+                    }
+                  }}
                   type="text"
                   value={value || ""}
                   onChange={(e) => handleInputChange(key, e.target.value)}
