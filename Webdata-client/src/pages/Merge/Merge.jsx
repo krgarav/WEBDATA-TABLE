@@ -3,7 +3,9 @@ import NewSelect from "../../UI/NewSelect";
 import { MdCompareArrows } from "react-icons/md";
 import Multiselect from "multiselect-react-dropdown";
 import {
+  checkMappedDataExits,
   fetchFilesAssociatedWithTemplate,
+  fetchHeadersInDuplicate,
   onGetAllTasksHandler,
   REACT_APP_IP,
 } from "../../services/common";
@@ -12,6 +14,7 @@ import axios from "axios";
 import DeactivateModal from "../../components/DeactivateModal";
 import MergeModal from "../../UI/MergeModal";
 import Select from "react-select";
+import { useNavigate } from "react-router-dom";
 const Merge = () => {
   const [options, setOptions] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState("");
@@ -21,6 +24,7 @@ const Merge = () => {
   const [message, setMessage] = useState("");
   const [tableName, setTableName] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSelectAll = () => {
     if (selectedValues.length === options.length) {
@@ -41,14 +45,14 @@ const Merge = () => {
     };
     try {
       setLoading(true);
-      const res = await axios.post(
-        `http://${REACT_APP_IP}:4000/checkmergecsv`,
-        obj
-      );
-      setModals(true);
-      setMessage(res.data.message);
-      setTableName(res.data.tableName);
-      console.log(res);
+      const res = await fetchHeadersInDuplicate(+selectedTemplate);
+      const { headers } = res;
+      navigate("/merge/duplicate", {
+        state: { headers, selectedFile },
+      });
+      // setModals(true);
+      // setMessage(res.data.message);
+      // setTableName(res.data.tableName);
     } catch (error) {
       console.log(error);
     } finally {
@@ -70,8 +74,8 @@ const Merge = () => {
       console.error("Error fetching files:", error);
     }
   };
-  console.log(options);
-  console.log(selectedTemplate);
+
+  console.log(selectedFile);
   return (
     <>
       {modals && (
@@ -109,7 +113,9 @@ const Merge = () => {
             <div className="sm:w-80 md:w-96">
               <NewSelect
                 label="Select Csv Files 2"
-                onTemplateSelect={setSelectedFile}
+                onTemplateSelect={(item) => {
+                  setSelectedFile(item);
+                }}
                 values={selectedFile}
                 selectedTemplate={selectedTemplate}
               />

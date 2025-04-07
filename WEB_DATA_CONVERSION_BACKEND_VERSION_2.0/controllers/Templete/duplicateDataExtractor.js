@@ -32,7 +32,7 @@ const duplicateDataExtractor = async (req, res) => {
             return res.status(404).json({ error: "No matching data found" });
         }
 
-        return res.status(200).json({ data });
+        return res.status(200).json({success:true, data });
     } catch (error) {
         console.error("Error processing CSV file:", error);
         return res.status(500).json({ error: "An error occurred while processing your request" });

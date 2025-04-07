@@ -84,8 +84,7 @@ const NewSelect = (props) => {
       props.onTemplateSelect(selectedOption.value);
       fetchFile(selectedOption.value);
     } else if (props.label === "Select Csv Files 2") {
-      dataCtx.addSecondInputFileName(selectedOption.label);
-      fetchHeaders(selectedOption.label);
+      props.onTemplateSelect(selectedOption.value);
     } else if (props.label === "Select Zip Files") {
       dataCtx.setUploadZipImage(selectedOption.label);
       dataCtx.modifyFileId(selectedOption.value);

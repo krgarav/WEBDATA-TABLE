@@ -29,12 +29,18 @@ const duplicateChecker = async (req, res) => {
     );
 
     if (!data || data.length === 0) {
-      return res.status(404).json({ message: "No duplicates found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "No duplicates found" });
     }
 
     return res
       .status(200)
-      .json({ duplicates: data, message: data.length + " Duplicates found" });
+      .json({
+        success: true,
+        duplicates: data,
+        message: data.length + " Duplicates found",
+      });
   } catch (error) {
     console.error("Error checking duplicates:", error);
     return res

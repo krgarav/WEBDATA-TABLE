@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { REACT_APP_IP } from "../../services/common";
+import { getDuplicateData, REACT_APP_IP } from "../../services/common";
 import axios from "axios";
 
 import MergeDownload from "./MergeDownload";
 
 import { toast } from "react-toastify";
-
 
 const MergeDuplicateDetect = () => {
   const [headers, setHeaders] = useState([]);
@@ -15,38 +14,36 @@ const MergeDuplicateDetect = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { tableName, templateId } = location.state || {};
+  const { tableName, templateId, selectedFile } = location.state || {};
   useEffect(() => {
     const { headers } = location.state;
     if (headers) {
-    
       setHeaders(headers);
     }
   }, []);
-
+  console.log(selectedFile);
   const headerHandler = async (header) => {
     try {
-      const obj = {
-        header,
-        tableName,
-      };
-      const response = await axios.post(
-        `http://${REACT_APP_IP}:4000/checkduplicates`,
-        obj
-      );
-      const { data } = response;
-      if (data.duplicates.length > 0) {
-
-        const duplicates = data.duplicates
-        navigate("/merge/duplicate/data", { state: {duplicates ,header,templateId} });
-      }else{
-        toast.warning("No Duplicates Found")
+      const response = await getDuplicateData(header, selectedFile);
+      console.log(response, "response");
+      if (!response?.success) {
+        toast.warning(response.message);
+        return;
       }
-    } catch (error) {}
+      if (response?.success) {
+        toast.success(response.message);
+        const duplicates = response.duplicates;
+        navigate("/merge/duplicate/data", {
+          state: { duplicates, header, selectedFile },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
-  const allHeaders = headers.map((header) => {
+  const allHeaders = headers.map((header, index) => {
     return (
-      <div className="flex justify-between items-center">
+      <div key={index} className="flex justify-between items-center">
         <div className="whitespace-nowrap px-4 py-4">
           <div className="flex items-center">
             <div className="ml-4 w-full font-semibold">
@@ -71,11 +68,11 @@ const MergeDuplicateDetect = () => {
   return (
     <>
       <div className="flex justify-center items-center w-[100%] pt-20 h-[100vh] bg-blue-500">
-      {download && (
-        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
-          <MergeDownload setDownload={setDownload} />
-        </div>
-      )}
+        {download && (
+          <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+            <MergeDownload setDownload={setDownload} />
+          </div>
+        )}
         <div className=" w-[800px]">
           {/* MAIN SECTION  */}
           <section className="mx-auto w-full max-w-7xl  px-12 py-6 bg-white rounded-xl">
@@ -105,9 +102,9 @@ const MergeDuplicateDetect = () => {
               </div>
             </div>
             <div className="text-right">
-              <button class="group inline-block rounded-3xl bg-teal-500 p-[2px] text-white hover:bg-blue-600 focus:outline-none focus:ring active:text-opacity-75">
+              <button className="group inline-block rounded-3xl bg-teal-500 p-[2px] text-white hover:bg-blue-600 focus:outline-none focus:ring active:text-opacity-75">
                 <span
-                  class="block  px-8 py-2 text-md font-medium group-hover:bg-transparent"
+                  className="block  px-8 py-2 text-md font-medium group-hover:bg-transparent"
                   onClick={() => setDownload(true)}
                 >
                   Complete

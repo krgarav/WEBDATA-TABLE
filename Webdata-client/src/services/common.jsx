@@ -372,3 +372,58 @@ export const changeTaskStatus = async (taskId) => {
     return error?.response?.data;
   }
 };
+
+export const getDuplicateData = async (columnName, fileId) => {
+  const token = JSON.parse(localStorage.getItem("userData"));
+  try {
+    const response = await axios.post(
+      `http://${window.APP_IP}:4000/duplicate/data`,
+      {
+        colName: columnName,
+        fileID: fileId,
+      },
+      {
+        headers: {
+          token: token,
+        },
+      },
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return error?.response?.data;
+  }
+};
+
+export const getDuplicateDataWithValue = async (columnName, fileId,value) => {
+  const token = JSON.parse(localStorage.getItem("userData"));
+  try {
+    const response = await axios.post(
+      `http://${window.APP_IP}:4000/get/duplicate/data`,
+      {
+        columnName: columnName,
+        fileId: fileId,
+        value:value
+      },
+      {
+        headers: {
+          token: token,
+        },
+      },
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return error?.response?.data;
+  }
+};
