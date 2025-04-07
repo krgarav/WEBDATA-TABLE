@@ -148,9 +148,10 @@ function installPM2() {
         return resolve();
       }
 
-      // If not installed, install it
-      console.log("📦 Installing PM2 globally...");
-      exec("npm install -g pm2", (installErr, installStdout, installStderr) => {
+      console.log("📦 Installing PM2 from local package...");
+      const pm2TgzPath = path.resolve(__dirname, "pm2-6.0.5.tgz"); // adjust path if needed
+
+      exec(`npm install -g "${pm2TgzPath}"`, (installErr, installStdout, installStderr) => {
         if (installErr) {
           console.error("❌ Failed to install PM2:", installStderr);
           return reject(installErr);
