@@ -240,10 +240,9 @@ async function main() {
   if (installed) {
     // Skip full installation, just start MySQL and run server
     try {
+      await installPM2();
       await startMySQLService();
       await checkMySQLStatus();
-      await installPM2();
-      // await buildClient();
       await runStartServer();
     } catch (error) {
       console.error("❌ Error during startup:", error);
