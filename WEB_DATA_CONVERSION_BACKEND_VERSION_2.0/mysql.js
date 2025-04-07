@@ -14,6 +14,11 @@ const mysqlServiceName = "MySQL80"; // Change based on MySQL version
 
 // 🛠 Function to extract MySQL ZIP
 async function extractMySQL() {
+  if (fs.existsSync(mysqlBasePath)) {
+    console.log("📁 MySQL already extracted, skipping extraction.");
+    return;
+  }
+
   console.log("📦 Extracting MySQL...");
   try {
     await extract(mysqlZipPath, { dir: extractPath });
@@ -23,6 +28,7 @@ async function extractMySQL() {
     process.exit(1);
   }
 }
+
 
 // 🛠 Function to initialize MySQL
 function initializeMySQL() {
@@ -69,21 +75,30 @@ function installMySQLService() {
   });
 }
 
-// 🛠 Function to start MySQL service
 function startMySQLService() {
   return new Promise((resolve, reject) => {
     console.log("🚀 Starting MySQL service...");
 
-    exec(`net start ${mysqlServiceName}`, (error, stdout, stderr) => {
-      if (error) {
-        console.error("❌ Failed to start MySQL service:", stderr);
-        return reject(error);
+    // Check if already running
+    exec(`sc query ${mysqlServiceName}`, (error, stdout) => {
+      if (stdout.includes("RUNNING")) {
+        console.log("✅ MySQL service is already running.");
+        return resolve(); // No need to start again
       }
-      console.log("✅ MySQL service started successfully!", stdout);
-      resolve();
+
+      // Start the service if not running
+      exec(`net start ${mysqlServiceName}`, (error, stdout, stderr) => {
+        if (error) {
+          console.error("❌ Failed to start MySQL service:", stderr);
+          return reject(error);
+        }
+        console.log("✅ MySQL service started successfully!", stdout);
+        resolve();
+      });
     });
   });
 }
+
 
 // 🛠 Function to check MySQL status
 function checkMySQLStatus() {
@@ -122,6 +137,82 @@ function createRootUser() {
     );
   });
 }
+// 🛠 Function to install PM2 globally
+function installPM2() {
+  return new Promise((resolve, reject) => {
+    console.log("🔍 Checking if PM2 is already installed...");
+
+    exec("pm2 -v", (checkErr, checkStdout) => {
+      if (!checkErr && checkStdout) {
+        console.log(`✅ PM2 is already installed (version: ${checkStdout.trim()})`);
+        return resolve();
+      }
+
+      // If not installed, install it
+      console.log("📦 Installing PM2 globally...");
+      exec("npm install -g pm2", (installErr, installStdout, installStderr) => {
+        if (installErr) {
+          console.error("❌ Failed to install PM2:", installStderr);
+          return reject(installErr);
+        }
+        console.log("✅ PM2 installed globally.", installStdout);
+        resolve();
+      });
+    });
+  });
+}
+
+function buildClient() {
+  return new Promise((resolve, reject) => {
+    console.log("🔨 Running Startbuild.bat...");
+
+    const clientDir = path.join(__dirname, "Webdata-client");
+
+    exec("Startbuild.bat", { cwd: clientDir }, (error, stdout, stderr) => {
+      if (error) {
+        console.error("❌ Failed to build client:", stderr || error.message);
+        return reject(error);
+      }
+      console.log("✅ Client built successfully via Startbuild.bat.");
+      console.log(stdout);
+      resolve();
+    });
+  });
+}
+
+// 🛠 Function to run Startserver.bat
+function runStartServer() {
+  return new Promise((resolve, reject) => {
+    console.log("🖥️ Launching Startserver.bat...");
+
+    exec("Startserver.bat", { cwd: __dirname }, (error, stdout, stderr) => {
+      if (error) {
+        console.error("❌ Failed to start server:", stderr);
+        return reject(error);
+      }
+      console.log(
+        "✅ Server started successfully via Startserver.bat.",
+        stdout
+      );
+      resolve();
+    });
+  });
+}
+// 🧠 Check if MySQL is already installed
+function isMySQLInstalled() {
+  return new Promise((resolve) => {
+    exec(`sc query ${mysqlServiceName}`, (error, stdout, stderr) => {
+      if (stdout && stdout.includes("STATE")) {
+        console.log("✅ MySQL service already exists.");
+        resolve(true);
+      } else {
+        console.log("ℹ️ MySQL service not found.");
+        resolve(false);
+      }
+    });
+  });
+}
+
 
 // 🛠 Main Function to Run Everything
 async function installMySQL() {
@@ -139,5 +230,28 @@ async function installMySQL() {
   }
 }
 
-// 🔥 Run the Installation
-installMySQL();
+
+
+
+// 🔥 Run Based on Installation Status
+async function main() {
+  const installed = await isMySQLInstalled();
+
+  if (installed) {
+    // Skip full installation, just start MySQL and run server
+    try {
+      await startMySQLService();
+      await checkMySQLStatus();
+      await installPM2();
+      // await buildClient();
+      await runStartServer();
+    } catch (error) {
+      console.error("❌ Error during startup:", error);
+    }
+  } else {
+    // Run full installation
+    await installMySQL();
+  }
+}
+
+main();
