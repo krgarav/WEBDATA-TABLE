@@ -4,7 +4,7 @@ import MergeEditDeleteDuplicate from "./MergeEditDeleteDuplicate";
 import { useLocation } from "react-router-dom";
 import MergeEditDuplicateData from "./MergeEditDuplicateData";
 import axios from "axios";
-import { getDuplicateDataWithValue, REACT_APP_IP } from "../../services/common";
+import { getDuplicateDataWithValue } from "../../services/common";
 
 const MergeDuplicateData = () => {
   const [editmodel, setEditmodel] = useState(false);
@@ -12,6 +12,9 @@ const MergeDuplicateData = () => {
   const [duplicateData, setDuplicateData] = useState([]);
   const [editViewModal, setEditViewModal] = useState(false);
   const [editModalData, setEditModalData] = useState({});
+  const [imageUrl, setImageUrl] = useState(null);
+  const [imageColName, setImageColName] = useState(null);
+  const [loading, setLoading] = useState(false);
   const location = useLocation();
   const state = location.state;
   const { duplicates, header, templateId, selectedFile } = state;
@@ -24,19 +27,22 @@ const MergeDuplicateData = () => {
 
   const duplicateViewHandler = async (item) => {
     try {
-      // console.log(header);
-      // console.log(item[header])
-      const obj = { colName: header, colValue: item[header], templateId };
-      const res =await  getDuplicateDataWithValue(header, selectedFile, item[header]);
-      console.log(res, "res");
-      if(res.success){
-        setDuplicateData(res.data)
+      setLoading(true);
+      const res = await getDuplicateDataWithValue(
+        header,
+        selectedFile,
+        item[header]
+      );
+      if (res.success) {
+        setDuplicateData(res.data);
+        setImageUrl(res.imageUrl);
+        setImageColName(res.imageColName);
         setEditmodel(true);
       }
-      // console.log(res)
-      // const res =
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
   const Duplicates = duplicate.map((item, index) => {
@@ -65,6 +71,7 @@ const MergeDuplicateData = () => {
       </dl>
     );
   });
+
   return (
     <>
       {!editViewModal && (
@@ -131,7 +138,10 @@ const MergeDuplicateData = () => {
               templateId={templateId}
               setEditModalData={setEditModalData}
               duplicateData={duplicateData}
+              imageUrl={imageUrl}
               setEditViewModal={setEditViewModal}
+              selectedFile={selectedFile}
+              setEditmodel={setEditmodel}
             />
           </div>
         </div>
@@ -142,6 +152,9 @@ const MergeDuplicateData = () => {
           templateId={templateId}
           editModalData={editModalData}
           setEditViewModal={setEditViewModal}
+          imageUrl={imageUrl}
+          imageColName={imageColName}
+          selectedFile={selectedFile}
         />
       )}
     </>

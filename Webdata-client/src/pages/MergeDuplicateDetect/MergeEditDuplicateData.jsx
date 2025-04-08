@@ -2,45 +2,51 @@ import React, { useEffect, useState } from "react";
 import img23 from "./img23.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { REACT_APP_IP } from "../../services/common";
+import {
+  REACT_APP_IP,
+  updateDuplicateDataWithValue,
+} from "../../services/common";
 import { toast } from "react-toastify";
 
 const MergeEditDuplicateData = ({
   templateId,
   editModalData,
   setEditViewModal,
+  imageUrl,
+  imageColName,
+  selectedFile,
 }) => {
   const [formData, setFormData] = useState(editModalData || {});
   const [editableData, setEditableData] = useState({});
   const [headerData, setHeaderData] = useState([]);
-  const [imageUrl, setImageUrl] = useState(null);
+  // const [imageUrl, setImageUrl] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(
-          `http://${REACT_APP_IP}:4000/getImageCol?templateId=${templateId}`
-        );
-        if (res.data.success) {
-          setImageUrl(res.data.imageCol);
-        }
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const res = await axios.get(
+  //         `http://${window.APP_IP}:4000/getImageCol?templateId=${templateId}`
+  //       );
+  //       if (res.data.success) {
+  //         setImageUrl(res.data.imageCol);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching image column:", error);
 
-        // console.log(headerData)
-        // console.log(editModalData[imageUrl]);
-      } catch (error) {}
-    };
-    fetchData();
-  }, []);
-  useEffect(() => {
-    console.log(headerData);
-    console.log(editModalData[imageUrl]);
-  }, [imageUrl]);
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
 
   useEffect(() => {
     const header = Object.keys(editModalData);
     if (header) {
-      setHeaderData(header);
+      const filteredHeader = header.filter(
+        (item) => item !== "foreignKeyData" && item !== "column"
+      );
+
+      setHeaderData(filteredHeader);
     }
   }, [editModalData]);
   const handleInputChange = (key, value) => {
@@ -49,9 +55,10 @@ const MergeEditDuplicateData = ({
       [key]: value, // Update specific field
     }));
   };
-  const alldata = headerData.map((item) => {
+
+  const alldata = headerData.map((item, index) => {
     return (
-      <div className="flex justify-center overflow-y-auto">
+      <div key={index} className="flex justify-center overflow-y-auto">
         <div className="py-2 px-2 text-center w-1/3">{item}</div>
         <div className="py-2 p-2 px-2 text-center">
           <input
@@ -70,22 +77,25 @@ const MergeEditDuplicateData = ({
 
   const saveHandler = async () => {
     const obj = { ...formData };
+    const id = obj["id"];
     delete obj["column"];
     delete obj["id"];
     delete obj["index"];
-    // delete obj["Serial No."];
+    delete obj["foreignKeyData"];
+
     try {
-      const res = await axios.put(
-        `http://${REACT_APP_IP}:4000/updateRow?templateId=${templateId}&rowId=${formData.id}`,
-        obj
-      );
-      if (res?.data?.success) {
+      const res = await updateDuplicateDataWithValue(id, selectedFile, obj);
+
+      if (res?.success) {
         toast.success("Updated the data successfully");
-         setEditViewModal(false);
+        setEditViewModal(false);
       }
-      console.log(res.data);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
   };
+
   return (
     <>
       <div className="w-[100%] pt-20 lg:h-[100vh] bg-blue-500 lg:flex gap-10 xl:gap-80 px-5">
@@ -104,9 +114,9 @@ const MergeEditDuplicateData = ({
             </div>
 
             <div className="flex  justify-around pb-3 lg:w-full">
-              <button class="group inline-block rounded-3xl bg-blue-500 p-[2px] text-white hover:bg-indigo-600 focus:outline-none focus:ring active:text-opacity-75">
+              <button className="group inline-block rounded-3xl bg-blue-500 p-[2px] text-white hover:bg-indigo-600 focus:outline-none focus:ring active:text-opacity-75">
                 <span
-                  class="block rounded-sm  px-10 py-2 text-md font-medium group-hover:bg-transparent"
+                  className="block rounded-sm  px-10 py-2 text-md font-medium group-hover:bg-transparent"
                   onClick={backHandler}
                   //  onClick={() => {
                   //     navigate("/merge/duplicate/data");
@@ -116,10 +126,10 @@ const MergeEditDuplicateData = ({
                 </span>
               </button>
               <button
-                class="group inline-block rounded-3xl bg-blue-500 p-[2px] text-white hover:bg-indigo-600 focus:outline-none focus:ring active:text-opacity-75"
+                className="group inline-block rounded-3xl bg-blue-500 p-[2px] text-white hover:bg-indigo-600 focus:outline-none focus:ring active:text-opacity-75"
                 onClick={saveHandler}
               >
-                <span class="block rounded-sm  px-10 py-2 text-md font-medium group-hover:bg-transparent">
+                <span className="block rounded-sm  px-10 py-2 text-md font-medium group-hover:bg-transparent">
                   Save
                 </span>
               </button>
@@ -151,7 +161,11 @@ const MergeEditDuplicateData = ({
                 >
                   <img
                     // src={`data:image/jpeg;base64,${imageUrl}`}
-                    src={`http://${REACT_APP_IP}:4000/images/${editModalData[imageUrl]}`}
+                    src={`http://${
+                      window.APP_IP
+                    }:4000/images/${imageUrl}/${editModalData[imageColName]
+                      .split("\\")
+                      .pop()}`}
                     alt="Selected"
                     // style={{
                     //   width: "48rem",

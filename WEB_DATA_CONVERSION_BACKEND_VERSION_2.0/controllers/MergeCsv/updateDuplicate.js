@@ -1,6 +1,7 @@
 const Templete = require("../../models/TempleteModel/templete");
 const { Sequelize, DataTypes } = require("sequelize");
 const sequelize = require("../../utils/database");
+const Files = require("../../models/TempleteModel/files");
 const { QueryTypes } = require("sequelize");
 
 exports.updateDuplicate = async (req, res) => {
@@ -72,10 +73,11 @@ exports.updateDuplicate = async (req, res) => {
 
 exports.deleteDuplicate = async (req, res) => {
   try {
-    const templateId = +req.query.templateId; // Converts to a number
+    const fileId = req.query.fileId;
     const rowId = +req.query.rowId; // Converts to a number
-    // Assuming you send data in body
-    console.log(req.query);
+
+    const fileData = await Files.findByPk(fileId);
+    const { templeteId: templateId } = fileData;
     if (!templateId || !rowId) {
       return res
         .status(400)
@@ -84,14 +86,14 @@ exports.deleteDuplicate = async (req, res) => {
 
     // Fetch template to get associated table name
     const template = await Templete.findByPk(templateId);
-    if (!template || !template.mergedTableName) {
+    if (!template || !template.csvTableName) {
       return res.status(404).json({
         success: false,
         message: "Template or associated table not found",
       });
     }
 
-    const tableName = template.mergedTableName.trim(); // Trim any spaces
+    const tableName = template.csvTableName.trim(); // Trim any spaces
 
     if (!tableName) {
       return res.status(400).json({ message: "Invalid table name" });
@@ -109,8 +111,8 @@ exports.deleteDuplicate = async (req, res) => {
     });
 
     res.status(200).json({
+      success: true,
       message: "Duplicate entries deleted successfully",
-      affectedRows: result[1], // Number of deleted rows
     });
   } catch (error) {
     console.error("Error deleting duplicates:", error);

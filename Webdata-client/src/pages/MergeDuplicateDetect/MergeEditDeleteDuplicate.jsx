@@ -11,13 +11,19 @@ import {
 import "@syncfusion/ej2-base/styles/material.css";
 import "@syncfusion/ej2-react-grids/styles/material.css";
 import axios from "axios";
-import { REACT_APP_IP } from "../../services/common";
+import {
+  deleteDuplicateDataWithValue,
+  REACT_APP_IP,
+} from "../../services/common";
+import { toast } from "react-toastify";
 
 const MergeEditDeleteDuplicate = ({
   templateId,
   setEditModalData,
   setEditViewModal,
   duplicateData,
+  selectedFile,
+  setEditmodel
 }) => {
   const [data, setData] = useState([]);
 
@@ -89,11 +95,16 @@ const MergeEditDeleteDuplicate = ({
       return;
     }
     try {
-      const obj = { rowId: rowData.id, templateId };
+      const obj = { rowId: rowData.id };
       console.log(obj);
-      const res = await axios.delete(`http://${REACT_APP_IP}:4000/deleteRow?rowId=${rowData.id}&templateId=${templateId}`)
-      console.log(res)
-    } catch (error) {}
+      const res = await deleteDuplicateDataWithValue(rowData.id, selectedFile);
+      if (res?.success) {
+        toast.success(res.message);
+        setEditmodel(false)
+      }
+    } catch (error) {
+      console.error("Error deleting item:", error);
+    }
     // setData((prevData) => prevData.filter((item) => item !== rowData));
   };
 

@@ -400,7 +400,7 @@ export const getDuplicateData = async (columnName, fileId) => {
   }
 };
 
-export const getDuplicateDataWithValue = async (columnName, fileId,value) => {
+export const getDuplicateDataWithValue = async (columnName, fileId, value) => {
   const token = JSON.parse(localStorage.getItem("userData"));
   try {
     const response = await axios.post(
@@ -408,13 +408,49 @@ export const getDuplicateDataWithValue = async (columnName, fileId,value) => {
       {
         columnName: columnName,
         fileId: fileId,
-        value:value
+        value: value,
       },
       {
         headers: {
           token: token,
         },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return error?.response?.data;
+  }
+};
+
+export const updateDuplicateDataWithValue = async (id, fileID, rowData) => {
+  const token = JSON.parse(localStorage.getItem("userData"));
+  try {
+    const response = await axios.post(
+      `http://${window.APP_IP}:4000/update/duplicatedata`,
+      {
+        id,
+        fileID,
+        rowData,
       },
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return error?.response?.data;
+  }
+};
+
+export const deleteDuplicateDataWithValue = async (rowId, fileId) => {
+  const token = JSON.parse(localStorage.getItem("userData"));
+  try {
+    const response = await axios.delete(
+      `http://${window.APP_IP}:4000/deleteRow?rowId=${rowId}&fileId=${fileId}`,
       {
         headers: {
           token: token,
