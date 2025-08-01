@@ -21,13 +21,13 @@ const EditMappedDataModel = ({ isOpen, onClose, selectedCoordinates }) => {
   const [prevValue, setPrevValue] = useState([]);
 
   let { fileId } = JSON.parse(localStorage.getItem("fileId")) || "";
-  let token = JSON.parse(localStorage.getItem("fileId"));
+  let templeteId = JSON.parse(localStorage.getItem("templeteId"));
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTemplate = async () => {
       try {
-        const response = await checkMappedDataExits(token.templeteId);
+        const response = await checkMappedDataExits(templeteId);
         console.log(response.records);
         const keys = response.records.map((item) => item.key);
         console.log(keys);

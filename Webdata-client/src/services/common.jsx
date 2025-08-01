@@ -182,8 +182,7 @@ export const submitMappedData = async (mappedData) => {
   const token = JSON.parse(localStorage.getItem("userData"));
   // http://localhost:4000/getcsvheaders?templateId=1
   try {
-    const data = await JSON.parse(localStorage.getItem("fileId"));
-    const templateId = data.templeteId;
+    const templateId = await JSON.parse(localStorage.getItem("templeteId"));
     const response = await axios.post(
       `http://${window.APP_IP}:4000/data`,
       { mappedData, templateId },

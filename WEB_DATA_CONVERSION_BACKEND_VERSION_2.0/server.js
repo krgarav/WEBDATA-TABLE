@@ -34,6 +34,7 @@ const builtPath = path.join(
   "../../WEBDATA-TABLE/Webdata-client/dist"
 );
 const buildBat = path.join(__dirname, "../../webdata/Webdata-client/start.bat");
+const { swaggerUi, swaggerSpec } = require("./swagger");
 // const projectPath = path.resolve(__dirname, "../../Webdata-client");
 // Check if build exists, if not, run `npm run build`
 // Check if index.html exists
@@ -93,6 +94,8 @@ app.get("/GetImage", (req, res) => {
     }
   });
 });
+// Swagger docs route
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Handle all other routes and serve 'index.html'
 app.get("*", (req, res) => {
   res.sendFile(path.join(builtPath, "index.html"));
@@ -217,8 +220,7 @@ ErrorAggregatedTable.belongsTo(ErrorTable, {
 async function startServer() {
   try {
     await createDatabaseIfNotExists(); // Ensure the database exists
-
-    await sequelize.sync({ alter: !true }); // Sync database schema
+    await sequelize.sync({ force: false }); // Sync database schema
 
     // Check if admin user exists
     const adminUser = await User.findOne({ where: { role: "Admin" } });
