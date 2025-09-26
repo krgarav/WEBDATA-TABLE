@@ -5,7 +5,7 @@ import FormDataEntrySection from "./FormDataSection";
 import ButtonDataEntrySection from "./ButtonDataEntrySection";
 import ImageDataEntrySection from "./ImageDataEntrySection";
 import QuestionDataEntrySection from "./QuestionDataEntrySection";
-import { updateCsvData, updateCurrentIndex } from "../services/common";
+import { updateCsvData, updateCurrentIndex, onGetTemplateHandler } from "../services/common";
 
 const DataMapping = () => {
   const token = JSON.parse(localStorage.getItem("userData"));
@@ -53,6 +53,7 @@ const DataMapping = () => {
   //   inputRefs.current = {};
   //   invalidIndex.current = 0; // Reset the index when currentIndex changes
   // }, [currentIndex]);
+  
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -252,6 +253,8 @@ const DataMapping = () => {
             setImageData={setImageData}
             setEditedData={setEditedData}
             inputRefs={inputRefs}
+            editedData={editedData}
+           
           />
         </div>
       </div>

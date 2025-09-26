@@ -15,6 +15,7 @@ const TemplateData = ({
   setConfirmationModal,
   setPermissionModal,
   templatePermissions,
+  setselectedtemplate
 }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Modal State
   const onCheckHandler = () => {
@@ -37,6 +38,10 @@ const TemplateData = ({
       setOptionModel(true);
     }
   };
+
+  const handleselect = (fId)=>{
+    setselectedtemplate(fId)
+  }
 // console.log(selectedCoordinates)
   return (
     <>
@@ -64,6 +69,7 @@ const TemplateData = ({
                     <div
                       key={data.fId}
                       className="odd:bg-gray-50 h-[40px] flex justify-around"
+                      onClick={()=>handleselect(data.fId)}
                     >
                       <div className="whitespace-nowrap px-4 py-2 text-center font-semibold text-md text-gray-900 text-ellipsis overflow-x-hidden w-1/2">
                         {data.attribute}

@@ -39,7 +39,7 @@ const Sequelize = require("sequelize");
 //   storage: 'database.sqlite', // SQLite database file
 //   logging: false, // Disable logging (optional)
 // });
-const sequelize = new Sequelize("webdataconversion", "root", "root", {
+const sequelize = new Sequelize("webdataconversion", "root", "123abc123", {
   dialect: "mysql",
   host: "localhost",
   logging: false,

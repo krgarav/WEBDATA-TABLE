@@ -6,14 +6,16 @@ const MappedData = require("../../models/TempleteModel/mappedData");
 const jsonToCsv = require("../../services/json_to_csv");
 const csvToJson = require("../../services/csv_to_json");
 
-const handleData = async (req, res, next) => {
+const handleData = async (req, res) => {
   const userRole = req.role;
+  console.log(userRole)
   if (userRole !== "Admin") {
     return res
       .status(500)
       .json({ message: "You don't have access for performing this action" });
   }
   const { mappedData ,templateId} = req.body;
+  console.log(mappedData,templateId)
   try {
     // if (!mappedData.fileId) {
     //   return res.status(400).json({ error: "File not provided" });
@@ -58,7 +60,7 @@ const handleData = async (req, res, next) => {
     }
 
     // Remove fileId from mappedData and transform associationData back to key-value object
-    const associationDataArray = mappedData.associationData;
+    const associationDataArray = mappedData;
     const associationData = associationDataArray.reduce((acc, item) => {
       acc[item.key] = item.value;
       return acc;

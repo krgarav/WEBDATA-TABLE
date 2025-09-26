@@ -16,6 +16,7 @@ const CoordinateData = ({
   inputField,
   setInputField,
 }) => {
+  console.log(lengthOfField)
   return (
     <>
       {open && (

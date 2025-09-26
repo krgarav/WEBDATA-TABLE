@@ -107,6 +107,7 @@ Templete.hasMany(MetaData, {
     name: "templeteId",
     allowNull: false,
   },
+  onDelete: "CASCADE",
   onUpdate: "CASCADE",
 });
 
@@ -115,6 +116,7 @@ MetaData.belongsTo(Templete, {
     name: "templeteId",
     allowNull: false,
   },
+  onDelete: "CASCADE",
   onUpdate: "CASCADE",
 });
 
@@ -123,6 +125,7 @@ Templete.hasMany(Files, {
     allowNull: false,
   },
   onUpdate: "CASCADE",
+  onDelete: "CASCADE",
 });
 
 Files.belongsTo(Templete, {
@@ -130,6 +133,7 @@ Files.belongsTo(Templete, {
     allowNull: false,
   },
   onUpdate: "CASCADE",
+  onDelete: "CASCADE",
 });
 
 Assigndata.hasMany(RowIndexData, {
@@ -137,6 +141,7 @@ Assigndata.hasMany(RowIndexData, {
     allowNull: false,
   },
   onUpdate: "CASCADE",
+  onDelete: "CASCADE",
 });
 
 RowIndexData.belongsTo(Assigndata, {
@@ -144,6 +149,7 @@ RowIndexData.belongsTo(Assigndata, {
     allowNull: false,
   },
   onUpdate: "CASCADE",
+  onDelete: "CASCADE",
 });
 
 Templete.hasMany(ImageDataPath, {
@@ -152,6 +158,7 @@ Templete.hasMany(ImageDataPath, {
     allowNull: false,
   },
   onUpdate: "CASCADE",
+  onDelete: "CASCADE",
 });
 
 ImageDataPath.belongsTo(Templete, {
@@ -160,6 +167,7 @@ ImageDataPath.belongsTo(Templete, {
     allowNull: false,
   },
   onUpdate: "CASCADE",
+  onDelete: "CASCADE",
 });
 
 UpdatedData.belongsTo(User, {
@@ -168,6 +176,7 @@ UpdatedData.belongsTo(User, {
     allowNull: false,
   },
   onUpdate: "CASCADE",
+  onDelete: "CASCADE",
 });
 
 User.hasMany(UpdatedData, {
@@ -176,6 +185,7 @@ User.hasMany(UpdatedData, {
     allowNull: false,
   },
   onUpdate: "CASCADE",
+  onDelete: "CASCADE",
 });
 
 Templete.hasMany(MappedData, {
@@ -184,6 +194,7 @@ Templete.hasMany(MappedData, {
     allowNull: false,
   },
   onUpdate: "CASCADE",
+  onDelete: "CASCADE",
 });
 
 MappedData.belongsTo(Templete, {
@@ -192,6 +203,7 @@ MappedData.belongsTo(Templete, {
     allowNull: false,
   },
   onUpdate: "CASCADE",
+  onDelete: "CASCADE",
 });
 
 // MappedData.belongsTo(MetaData);
@@ -220,8 +232,8 @@ ErrorAggregatedTable.belongsTo(ErrorTable, {
 async function startServer() {
   try {
     await createDatabaseIfNotExists(); // Ensure the database exists
-    await sequelize.sync({ force: false }); // Sync database schema
-
+    await sequelize.sync({ force: !true }); // Sync database schema
+    await sequelize.sync({ alter: true });
     // Check if admin user exists
     const adminUser = await User.findOne({ where: { role: "Admin" } });
     if (!adminUser) {

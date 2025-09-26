@@ -7,7 +7,7 @@ const deleteTemplate = async (req, res) => {
 
     // Find the template by primary key
     const template = await Template.findByPk(templateId);
-
+    console.log(template);
     if (!template) {
       return res.status(404).json({ error: "Template not found" });
     }
@@ -16,7 +16,8 @@ const deleteTemplate = async (req, res) => {
       where: { templeteId: templateId },
     });
 
-    if(assignData ){
+    if (assignData) {
+      
       return res.status(400).json({ error: "Template has assigned task" });
     }
 

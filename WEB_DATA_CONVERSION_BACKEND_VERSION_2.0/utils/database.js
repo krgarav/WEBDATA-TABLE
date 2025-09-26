@@ -19,7 +19,7 @@ const Sequelize = require("sequelize");
 
 
 
-const sequelize = new Sequelize("webdatatable", "root", "root", {
+const sequelize = new Sequelize("webdatatable", "root", "123abc123", {
   dialect: "mysql",
   host: "localhost",
   logging: false,

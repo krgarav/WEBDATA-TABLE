@@ -8,7 +8,7 @@ const createDatabaseIfNotExists = async () => {
     const connection = await mysql.createConnection({
       host: "localhost",
       user: "root",
-      password: "root",
+      password: "123abc123",
     });
 
     await connection.query(`CREATE DATABASE IF NOT EXISTS ${DB_name}`);

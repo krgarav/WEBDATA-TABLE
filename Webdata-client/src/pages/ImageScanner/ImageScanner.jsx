@@ -12,6 +12,7 @@ import OptionData from "./OptionData";
 import DynamicInput from "./DynamicInput";
 import ConfirmationModal from "../../components/ConfirmationModal/ConfirmationModal";
 import Permissions from "./Permissions";
+import useAutoScroll from '../../components/useAutoScroll'
 
 const ImageScanner = () => {
   const [selection, setSelection] = useState(null);
@@ -32,6 +33,8 @@ const ImageScanner = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const dataCtx = useContext(dataContext);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedtemplate, setselectedtemplate] = useState("")
+  // const { startAutoScroll, stopAutoScroll } = useAutoScroll();
   const [templatePermissions, setTemplatePermissions] = useState({
     blankDefination: "",
     patternDefinition: "",
@@ -47,6 +50,9 @@ const ImageScanner = () => {
     min: "",
     max: "",
   });
+  const containerRef = useRef(null);
+
+  const { updateScroll, stopScroll } = useAutoScroll({ containerRef, threshold: 50, speed: 10 });
 
   const token = JSON.parse(localStorage.getItem("userData"));
   const imageRef = useRef(null);
@@ -144,6 +150,7 @@ const ImageScanner = () => {
     if (dragStart) {
       setDragStart(null);
       setOpen(true);
+      stopScroll()
     }
   };
   // Function to handle mouse move event for drag selection
@@ -155,10 +162,17 @@ const ImageScanner = () => {
     const offsetX = e.clientX - boundingRect.left;
     const offsetY = e.clientY - boundingRect.top;
 
-    // const container = imageRef.current.parentElement;
-    // if (offsetY > container.clientHeight - 10) {
-    //   container.scrollTop += 5;
-    // }
+    
+    updateScroll(e.clientY)
+
+  //   const container = imageRef.current.parentElement;
+  //   if (offsetY > container.clientHeight - 10) {
+  //     container.scrollBy({
+  //   top: 30,             // amount to scroll
+  //   left: 0,
+  //   behavior: "smooth",  // enables smooth scrolling
+  // });
+  //   }
 
     setSelection({
       coordinateX: Math.min(dragStart.x, offsetX),
@@ -168,6 +182,7 @@ const ImageScanner = () => {
       pageNo: currentImageIndex,
     });
   };
+ 
 
   const onResetHandler = () => {
     setDragStart(null);
@@ -241,7 +256,6 @@ const ImageScanner = () => {
           );
           return;
         }
-       
       }
 
       const allSelectedCoordinates = selectedCoordinates.filter(
@@ -438,16 +452,13 @@ const ImageScanner = () => {
 
     // Append the array of image files under the key "images"
     try {
-      await axios.post(
-        `${window.SERVER_IP}/add/templete`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            token: token,
-          },
-        }
-      );
+      console.log(formData);
+      await axios.post(`${window.SERVER_IP}/add/templete`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          token: token,
+        },
+      });
       toast.success("Template created & updated successfully!");
       dataCtx.modifyTemplateData(null);
       localStorage.removeItem("images");
@@ -573,7 +584,7 @@ const ImageScanner = () => {
     setSelectedCoordinateData(selectedCoordinate);
     setOpen(true);
   };
-
+  console.log(selectedtemplate);
   return (
     <div className="flex flex-col-reverse lg:flex-row justify-center items-center scannerbg bg-gradient-to-r from-blue-400 to-blue-600 border-1 pt-20 ">
       {/* LEFT SECTION  */}
@@ -590,6 +601,7 @@ const ImageScanner = () => {
             setConfirmationModal={setConfirmationModal}
             setPermissionModal={setPermissionModal}
             templatePermissions={templatePermissions}
+            setselectedtemplate={setselectedtemplate}
           />
         </div>
       </div>
@@ -656,8 +668,10 @@ const ImageScanner = () => {
                     style={{
                       position: "relative",
                       height: "50rem",
+                       
                     }}
                     className="w-full overflow-y-auto"
+                    ref={containerRef}
                   >
                     <img
                       ref={imageRef}
@@ -684,10 +698,14 @@ const ImageScanner = () => {
                             onDoubleClick={() =>
                               onEditCoordinateDataHanlder(data.fId)
                             }
+                            onClick={()=>console.log({left: data.coordinateX,
+                              top: data.coordinateY,
+                              width: data.width,
+                              height: data.height})}
                             style={{
-                              border: "3px solid #007bff",
+                              border:data.fId===selectedtemplate? "3px solid #ff0000ff":"3px solid #007bff",
                               position: "absolute",
-                              backgroundColor: "rgba(0, 123, 255, 0.2)",
+                              backgroundColor:data.fId===selectedtemplate? "rgba(255, 0, 21, 0.2)":"rgba(0, 123, 255, 0.2)",
                               left: data.coordinateX,
                               top: data.coordinateY,
                               width: data.width,
@@ -701,6 +719,7 @@ const ImageScanner = () => {
                             border: "3px solid #007bff",
                             backgroundColor: "rgba(0, 123, 255, 0.2)",
                             position: "absolute",
+                            pointerEvents: "none",
                             left: selection.coordinateX,
                             top: selection.coordinateY,
                             width: selection.width,

@@ -251,6 +251,7 @@ const CsvUploader = () => {
       localStorage.setItem("templateOption", JSON.stringify("updating"));
       localStorage.setItem("images", JSON.stringify(response.data.imagePaths));
       localStorage.setItem("templeteId", JSON.stringify(data.id));
+      console.log(data.id)
       navigate("/imageuploader/scanner");
     } catch (error) {
       console.error("Error uploading files: ", error);

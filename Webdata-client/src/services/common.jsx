@@ -181,11 +181,12 @@ export const checkMappedDataExits = async (templateId) => {
 export const submitMappedData = async (mappedData) => {
   const token = JSON.parse(localStorage.getItem("userData"));
   // http://localhost:4000/getcsvheaders?templateId=1
+  console.log(mappedData)
   try {
     const templateId = await JSON.parse(localStorage.getItem("templeteId"));
     const response = await axios.post(
       `http://${window.APP_IP}:4000/data`,
-      { mappedData, templateId },
+      mappedData,
       {
         headers: {
           token: token,

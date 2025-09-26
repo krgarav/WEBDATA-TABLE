@@ -30,6 +30,8 @@ const UploadSection = ({
     }
   }, [data]);
 
+  localStorage.setItem("templeteId", selectedId)
+
   const changeHandler = (index) => {};
   return (
     <div className="pt-4 xl:pt-0 bg-gradient-to-r from-blue-400 to-blue-600">

@@ -143,11 +143,13 @@ const TemplateMapping = () => {
     }
 
     const mappedData = {
-      associationData: associationData,
-      fileId: fileId,
+      mappedData: associationData,
+      templateId: fileId,
     };
 
     try {
+      // console.log(mappedData)
+      // return 
       const response = await submitMappedData(mappedData);
       if (response.success) {
         toast.success("Mapping successfully done.");

@@ -1,5 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { changeTaskStatus, dataEntryMetaData } from "../services/common";
+import { useEffect, useState } from "react";
+import {
+  changeTaskStatus,
+  dataEntryMetaData,
+  onGetTemplateHandler,
+} from "../services/common";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
 const QuestionDataEntrySection = ({
@@ -13,18 +17,36 @@ const QuestionDataEntrySection = ({
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
   const [columnName, setColumnName] = useState("");
   const [editableData, setEditableData] = useState(null);
+  const [templateHeader, settemplateHeader] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
     setEditableData(data.questionData);
     setEditedData([]);
   }, [data]);
+  console.log(data, setImageData, saveHandler, setEditedData, taskData);
   // useEffect(() => {
   //   setQuestionData(
   //     Array.isArray(data.questionData) ? data.questionData : [data.questionData]
   //   );
   // }, [data]);
   // console.log(data.questionData);
+  useEffect(() => {
+    const fetchTemplate = async () => {
+      try {
+        const response = await onGetTemplateHandler();
 
+        settemplateHeader(
+          response.filter((a) => a.id === parseInt(taskData.templeteId))
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchTemplate();
+  }, []);
+  // console.log(templateHeader[0].typeOption.split("-"));
+  const allowedOptions = templateHeader[0]?.typeOption?.split("-") || [];
+  // console.log(parseInt(taskData.templeteId))
   useEffect(() => {
     const handleAltSKey = (e) => {
       if (e.altKey && e.key.toLowerCase() === "s") {
@@ -40,10 +62,18 @@ const QuestionDataEntrySection = ({
   }, [editableData, saveHandler]); // Ensure latest state values
 
   const handleInputChange = (key, newValue) => {
+    // ✅ Remove any character not in the allowed list
+    const filteredValue = newValue
+      .toUpperCase() // optional: make case-insensitive
+      .split("") // split into individual chars
+      .filter((char) => allowedOptions.includes(char))
+      .join("");
+
     setEditableData((prevData) => ({
       ...prevData,
-      [key]: newValue,
+      [key]: filteredValue, // ✅ only allowed chars are stored
     }));
+
     setEditedData((prev) => {
       const updatedData = [...prev];
       const existingIndex = updatedData.findIndex(
@@ -51,11 +81,9 @@ const QuestionDataEntrySection = ({
       );
 
       if (existingIndex !== -1) {
-        // If key exists, update its value
-        updatedData[existingIndex] = { [key]: newValue };
+        updatedData[existingIndex] = { [key]: filteredValue };
       } else {
-        // If key does not exist, add a new entry
-        updatedData.push({ [key]: newValue });
+        updatedData.push({ [key]: filteredValue });
       }
 
       return updatedData;
@@ -96,7 +124,7 @@ const QuestionDataEntrySection = ({
   const submitHandler = async () => {
     const result = window.confirm("Are you sure you want to submit the task?");
     if (!result) {
-      return;// Exit the function if the user cancels
+      return; // Exit the function if the user cancels
     }
     try {
       const taskData = localStorage.getItem("taskdata");
@@ -215,30 +243,39 @@ const QuestionDataEntrySection = ({
 
           {editableData ? (
             Object.entries(editableData).map(([key, value], index) => {
-              const red = value === " " || value === "*";
+              const red = value === " " || value === "*" || value==="";
 
               return (
                 <div key={index} className="flex">
                   <div className="me-3 my-1 flex">
                     <label className="font-bold text-sm w-9 my-1">{key}</label>
                     <div className="flex rounded">
-                      <input
-                        type="text"
-                        ref={(el) => {
-                          if (red) {
-                            inputRefs.current[key] = el;
-                          } else {
-                            delete inputRefs.current[key]; // Clean up any previous ref
-                          }
-                        }}
-                        value={value}
-                        className={`h-7 w-7 text-center text-black rounded text-sm ${
-                          red ? "bg-red-500" : ""
-                        }`}
-                        onChange={(e) => handleInputChange(key, e.target.value)}
-                        onClick={() => setColumnName(key)}
-                        onFocus={() => setColumnName(key)}
-                      />
+                         <input
+              type="text"
+              ref={(el) => {
+                if (red) {
+                  inputRefs.current[key] = el;
+                } else {
+                  delete inputRefs.current[key];
+                }
+              }}
+              value={value}
+              className={`h-7 w-7 text-center text-black rounded text-sm ${
+                red ? "bg-red-500 text-white" : ""
+              }`}
+              onChange={(e) => handleInputChange(key, e.target.value)}
+              onClick={() => setColumnName(key)}
+              onFocus={() => setColumnName(key)}
+              onKeyDown={(e) => {
+                const keyPressed = e.key.toUpperCase();
+                if (
+                  keyPressed.length === 1 && // Only single-character keys
+                  !allowedOptions.includes(keyPressed)
+                ) {
+                  e.preventDefault(); // Block invalid key
+                }
+              }}
+            />
                     </div>
                   </div>
                 </div>

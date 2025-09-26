@@ -63,20 +63,7 @@ const MetaData = sequelize.define("templetedata", {
     },
   },
 });
-MetaData.belongsTo(Template, {
-  foreignKey: {
-    name: "templeteId",
-    allowNull: false,
-  },
-  onUpdate: "CASCADE",
-});
-Template.hasMany(MetaData, {
-  foreignKey: {
-    name: "templeteId",
-    allowNull: false,
-  },
-  onUpdate: "CASCADE",
-});
+
 
 
 module.exports = MetaData;
