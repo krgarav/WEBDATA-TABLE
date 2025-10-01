@@ -11,7 +11,7 @@ const updateCurrentIndex = async (req, res) => {
     }
 
     const { min, max, tableName } = assignData;
-    const query = `SELECT COUNT(*) AS count FROM \`${tableName}\` WHERE parentId >= ${min} AND parentId <= ${max} ORDER BY parentId ASC LIMIT 1`;
+    const query = `SELECT COUNT(*) AS count FROM \`${tableName}\` `;
     const [countId] = await sequelize.query(query, {
       type: sequelize.QueryTypes.SELECT,
     });

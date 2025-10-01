@@ -209,6 +209,7 @@ const getCsvTableData = async (req, res) => {
     }
 
     const columnNames = columns.map((col) => `\`${col.key}\``);
+    const startingCsvIndex= fileName.startIndex;
 
     const conditions = columnNames
       .map((col) => `${col} = :patternDefinition OR ${col} = :blankDefination`)
@@ -224,8 +225,8 @@ const getCsvTableData = async (req, res) => {
 
     const filteredData = await sequelize.query(query, {
       replacements: {
-        min: Number(min),
-        max: Number(max),
+        min: Number(startingCsvIndex)===1 ? Number(min): Number(min)+ Number(startingCsvIndex),
+        max: Number(startingCsvIndex)===1 ? Number(max): Number(max)+ Number(startingCsvIndex),
         patternDefinition,
         blankDefination,
       },
