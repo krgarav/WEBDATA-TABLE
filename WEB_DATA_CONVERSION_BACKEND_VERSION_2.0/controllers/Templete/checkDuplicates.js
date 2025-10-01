@@ -83,19 +83,20 @@ exports.getTotalCsvDataController = async (req, res) => {
 
     // Find template by ID
     const template = await Template.findByPk(templateId);
-    const assignData = await Files.findByPk(fileId);
+    const fileData = await Files.findByPk(fileId);
     if (!template) {
       return res
         .status(404)
         .json({ success: false, message: "Template not found" });
     }
     const tableName = template.csvTableName;
-    const startIndex = assignData.startIndex;
+    const startIndex = fileData.startIndex===1 ?fileData.startIndex : +fileData.startIndex +1;
+    // const startIndex = fileData.startIndex;
     const [result] = await sequelize.query(
       `
       SELECT COUNT(*) AS count 
       FROM ${tableName}
-      WHERE id > ${startIndex}
+      WHERE id >= ${startIndex}
     `,
       { type: sequelize.QueryTypes.SELECT }
     );
