@@ -21,6 +21,7 @@ const AdminAssined = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [taskType, setTaskType] = useState("ALL");
   const [loading,setLoading] = useState(false)
+  const [taskstatus, settaskstatus] = useState()
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -248,9 +249,9 @@ const AdminAssined = () => {
   };
 
   const onCompleteHandler = async (currentTask) => {
-    console.log("fdsfdsf");
+    // console.log(currentTask);
     try {
-      await axios.post(
+      const data = await axios.post(
         `${window.SERVER_IP}/taskupdation/${parseInt(
           currentTask.id
         )}`,
@@ -261,6 +262,8 @@ const AdminAssined = () => {
           },
         }
       );
+      console.log(data.data)
+      settaskstatus(data.data)
       const updatedTasks = compareTask.map((task) => {
         if (task.id === currentTask.id) {
           return { ...task, taskStatus: false };
@@ -269,12 +272,12 @@ const AdminAssined = () => {
       });
       setCompareTask(updatedTasks);
       // setMatchingTask(updatedTasks);
+      // console.log(updatedTasks)
       toast.success("Task status updated.");
     } catch (error) {
       toast.error(error.message);
     }
   };
-
   const onEditTaskHandler = async (user) => {
     if (!user) {
       toast.warning("Please select the user.");
@@ -439,6 +442,7 @@ const AdminAssined = () => {
                         setTaskEditId={setTaskEditId}
                         taskType={taskType}
                         selectedDate={selectedDate}
+                        taskStatus={taskstatus}
                       />
                     </div>
                   </div>

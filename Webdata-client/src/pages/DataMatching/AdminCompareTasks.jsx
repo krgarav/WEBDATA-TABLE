@@ -38,7 +38,7 @@ const AdminCompareTasks = ({
       })
     );
 
-    // console.log(response);
+    console.log(response);
   };
 
   return (

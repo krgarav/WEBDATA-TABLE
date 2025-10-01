@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { MdOutlineRestartAlt } from "react-icons/md";
 import { FaCloudDownloadAlt, FaRegEdit } from "react-icons/fa";
 import { MdOutlineTaskAlt } from "react-icons/md";
@@ -14,8 +14,11 @@ const AdminMatchingTasks = ({
   taskType,
   selectedDate,
   setMatchingTask,
+  taskstatus,
 }) => {
   const token = JSON.parse(localStorage.getItem("userData"));
+  const [status, setstatus] = useState({});
+
   const completeHandler = async (taskId) => {
     const response = await axios.get(
       `${window.SERVER_IP}/submitTask/${taskId}`,
@@ -58,6 +61,33 @@ const AdminMatchingTasks = ({
 
   const filteredTasks = onFilteredTasksHandler(matchingTask);
 
+  // console.log(filteredTasks)
+  const gettask = async (data) => {
+    //   console.log(data)
+    onCompleteHandler(data);
+    //  const response = await axios.get(`${window.SERVER_IP}/getassigntask/${data.id}`,
+    //         {
+    //           headers: {
+    //             token: token,
+    //           },
+    //         })
+    console.log(matchingTask);
+     setMatchingTask(prev =>
+    prev.map(task =>
+      task.id === data.id
+        ? { ...task, taskStatus: false }  // update only the matching one
+        : task
+    )
+  );
+    console.log(matchingTask);
+    //  setstatus(response.data)
+  };
+  useEffect(() => {
+  console.log("matchingTask updated:", matchingTask);
+}, [matchingTask]);
+
+  console.log(status);
+
   return (
     <div>
       {filteredTasks?.map((taskData) => (
@@ -91,7 +121,7 @@ const AdminMatchingTasks = ({
                     : "bg-emerald-100 text-emerald-700"
                 } px-2.5 py-0.5`}
               >
-                {!taskData.taskStatus ? (
+                {!taskData.taskStatus && !status.taskStatus ? (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -123,11 +153,14 @@ const AdminMatchingTasks = ({
                   </svg>
                 )}
               </span>
+              <button></button>
             </div>
           </div>
           <div className="whitespace-nowrap text-center w-[100px] py-2">
             <button
-              onClick={() => onCompleteHandler(taskData)}
+              onClick={() => {
+                gettask(taskData);
+              }}
               className={`rounded-3xl px-4 py-1 font-semibold ${
                 taskData.taskStatus
                   ? "bg-indigo-500 text-white border border-indigo-500"

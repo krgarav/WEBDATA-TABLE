@@ -16,7 +16,7 @@ const CoordinateData = ({
   inputField,
   setInputField,
 }) => {
-  console.log(lengthOfField)
+  console.log(lengthOfField);
   return (
     <>
       {open && (
@@ -121,30 +121,50 @@ const CoordinateData = ({
                                   id="Quantity"
                                   value={questionRange.min}
                                   onChange={(e) => {
-                                    const value = parseInt(e.target.value);
-                                    if (!isNaN(value) && value >= 0) {
+                                    const rawValue = e.target.value; // keep raw string
+                                    if (rawValue === "") {
+                                      // user cleared the field
                                       setQuestionRange({
                                         ...questionRange,
-                                        min: value,
+                                        min: "",
                                       });
+                                    } else {
+                                      const value = parseInt(rawValue, 10);
+                                      if (!isNaN(value) && value >= 0) {
+                                        setQuestionRange({
+                                          ...questionRange,
+                                          min: value,
+                                        });
+                                      }
                                     }
                                   }}
                                   className="h-10 w-16 rounded border-2 border-gray-200 text-center"
                                 />
                               </div>
                               <div className="flex items-center gap-4">
-                                <span className="font-bold text-gray-700">End</span>
+                                <span className="font-bold text-gray-700">
+                                  End
+                                </span>
                                 <input
                                   type="number"
                                   id="Quantity"
                                   value={questionRange.max}
                                   onChange={(e) => {
-                                    const value = parseInt(e.target.value);
-                                    if (!isNaN(value) && value >= 0) {
+                                    const rawValue = e.target.value; // keep raw string
+                                    if (rawValue === "") {
+                                      // user cleared the field
                                       setQuestionRange({
                                         ...questionRange,
-                                        max: value,
+                                        max: "",
                                       });
+                                    } else {
+                                      const value = parseInt(rawValue, 10);
+                                      if (!isNaN(value) && value >= 0) {
+                                        setQuestionRange({
+                                          ...questionRange,
+                                          max: value,
+                                        });
+                                      }
                                     }
                                   }}
                                   className="h-10 w-16 rounded border-2 border-gray-200 text-center"
@@ -163,9 +183,14 @@ const CoordinateData = ({
                               id="Quantity"
                               value={lengthOfField}
                               onChange={(e) => {
-                                const value = parseInt(e.target.value);
-                                if (!isNaN(value) && value >= 0) {
-                                  setLengthOfField(e.target.value);
+                                const raw = e.target.value; // raw string, can be ""
+                                if (raw === "") {
+                                  setLengthOfField(""); // let user clear field
+                                } else {
+                                  const num = parseInt(raw, 10);
+                                  if (!isNaN(num) && num >= 0) {
+                                    setLengthOfField(raw); // or num if you strictly need a number
+                                  }
                                 }
                               }}
                               className="h-10 w-16 rounded border-2 border-gray-200 text-center"
@@ -198,12 +223,21 @@ const CoordinateData = ({
                             id="Quantity"
                             value={questionRange.min}
                             onChange={(e) => {
-                              const value = parseInt(e.target.value);
-                              if (!isNaN(value) && value >= 0) {
+                              const rawValue = e.target.value; // keep raw string
+                              if (rawValue === "") {
+                                // user cleared the field
                                 setQuestionRange({
                                   ...questionRange,
-                                  min: value,
+                                  min: "",
                                 });
+                              } else {
+                                const value = parseInt(rawValue, 10);
+                                if (!isNaN(value) && value >= 0) {
+                                  setQuestionRange({
+                                    ...questionRange,
+                                    min: value,
+                                  });
+                                }
                               }
                             }}
                             className="h-10 w-16 rounded border-2 border-gray-200 text-center"
@@ -216,12 +250,21 @@ const CoordinateData = ({
                             id="Quantity"
                             value={questionRange.max}
                             onChange={(e) => {
-                              const value = parseInt(e.target.value);
-                              if (!isNaN(value) && value >= 0) {
+                              const rawValue = e.target.value; // keep raw string
+                              if (rawValue === "") {
+                                // user cleared the field
                                 setQuestionRange({
                                   ...questionRange,
-                                  max: value,
+                                  max: "",
                                 });
+                              } else {
+                                const value = parseInt(rawValue, 10);
+                                if (!isNaN(value) && value >= 0) {
+                                  setQuestionRange({
+                                    ...questionRange,
+                                    max: value,
+                                  });
+                                }
                               }
                             }}
                             className="h-10 w-16 rounded border-2 border-gray-200 text-center"
@@ -244,7 +287,6 @@ const CoordinateData = ({
         </Draggable>
       )}
     </>
-
   );
 };
 

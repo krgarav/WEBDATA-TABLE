@@ -18,6 +18,8 @@ const TemplateData = ({
   setselectedtemplate
 }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Modal State
+  const editFlag = localStorage.getItem("editModel")
+  console.log(typeof(editFlag))
   const onCheckHandler = () => {
     if (!templatePermissions.patternDefinition) {
       setPermissionModal(true);
@@ -41,8 +43,8 @@ const TemplateData = ({
 
   const handleselect = (fId)=>{
     setselectedtemplate(fId)
+    console.log(fId)
   }
-// console.log(selectedCoordinates)
   return (
     <>
    
@@ -71,7 +73,7 @@ const TemplateData = ({
                       className="odd:bg-gray-50 h-[40px] flex justify-around"
                       onClick={()=>handleselect(data.fId)}
                     >
-                      <div className="whitespace-nowrap px-4 py-2 text-center font-semibold text-md text-gray-900 text-ellipsis overflow-x-hidden w-1/2">
+                      <div className="whitespace-nowrap px-4 py-2 text-center font-semibold text-md text-gray-900 text-ellipsis overflow-x-hidden w-1/2 cursor-pointer">
                         {data.attribute}
                       </div>
                       <div className="whitespace-nowrap px-4 py-2 text-center font-semibold text-md text-gray-900 w-1/3">
@@ -129,7 +131,7 @@ const TemplateData = ({
                     Save Template
                   </span>
                 </button>
-                <button
+                {editFlag==="true"?<button
                   // onClick={onCheckHandler}
                   onClick={() => setIsEditModalOpen(true)}
                   className="ms-auto group rounded-md mt-6 flex items-center md:w-full sm:w-full bg-teal-600 hover:shadow-lg hover:shadow-blue-200 py-2 px-4 transition-colors hover:bg-teal-700 focus:outline-none focus:ring"
@@ -137,7 +139,7 @@ const TemplateData = ({
                   <span className="font-medium flex text-white transition-colors group-hover:text-white group-active:text-white mx-auto">
                     Edit Mapped Data
                   </span>
-                </button>
+                </button>:<p></p>}
               </div>
             </div>
           </div>

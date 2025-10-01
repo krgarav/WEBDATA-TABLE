@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 const EditMappedDataModel = ({ isOpen, onClose, selectedCoordinates }) => {
   if (!isOpen) return null; // Don't render if modal is not open
 
+  
   const [csvHeaders, setCsvHeaders] = useState([]);
   const [templateHeaders, setTemplateHeaders] = useState([]);
   const [selectedAssociations, setSelectedAssociations] = useState({});
@@ -95,48 +96,50 @@ const EditMappedDataModel = ({ isOpen, onClose, selectedCoordinates }) => {
     setSelectedAssociations(updatedAssociations);
   };
 
-  const onMapSubmitHandler = async () => {
-    const mappedvalues = Object.values(selectedAssociations);
-
-    for (let i = 1; i <= templateHeaders.pageCount; i++) {
-      if (!mappedvalues.includes(`Image${i}`)) {
-        toast.error("Please select all the field properly.");
-        return;
-      }
-    }
-    setSubmitLoading(true);
-    const associationData = [];
-    const obj = { ...selectedAssociations };
-    for (let i = 0; i < csvHeaders.length; i++) {
-      const header = csvHeaders[i];
-      if (obj.hasOwnProperty(header)) {
-        associationData.push({
-          key: header,
-          value: obj[header],
-        });
-      }
-    }
-
-    const mappedData = {
-      associationData: associationData,
-      fileId: fileId,
-    };
-
-    try {
-      const response = await submitMappedData(mappedData);
-      console.log(response);
-      if (response.success) {
-        toast.success("Mapping Updated Successfully.");
-        onClose();
-      } else {
-        toast.error("Something went wrong");
-      }
-    } catch (error) {
-      toast.error(error.message);
-    } finally {
-      setSubmitLoading(false);
-    }
-  };
+ const onMapSubmitHandler = async () => {
+     const mappedvalues = Object.values(selectedAssociations);
+ 
+     for (let i = 1; i <= templateHeaders.pageCount; i++) {
+       if (!mappedvalues.includes(`Image${i}`)) {
+         toast.error("Please select all the field properly.");
+         return;
+       }
+     }
+     setSubmitLoading(true);
+     const associationData = [];
+     const obj = { ...selectedAssociations };
+     for (let i = 0; i < csvHeaders.length; i++) {
+       const header = csvHeaders[i];
+       if (obj.hasOwnProperty(header)) {
+         associationData.push({
+           key: header,
+           value: obj[header],
+         });
+       }
+     }
+ 
+     const mappedData = {
+       mappedData: associationData,
+       templateId: templeteId,
+     };
+ 
+     try {
+       // console.log(mappedData)
+       // return 
+       const response = await submitMappedData(mappedData);
+       if (response.success) {
+         toast.success("Mapping successfully done.");
+        //  navigate("/imageuploader/scanner");
+       } else {
+         toast.error("Something went wrong");
+       }
+     } catch (error) {
+      console.log(error)
+      //  toast.error(error.message);
+     } finally {
+       setSubmitLoading(false);
+     }
+   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
