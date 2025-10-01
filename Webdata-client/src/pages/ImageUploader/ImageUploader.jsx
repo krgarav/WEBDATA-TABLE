@@ -11,7 +11,8 @@ const ImageUploader = () => {
   const [openUpload, setOpenUpload] = useState(true);
   const [instruction, setInstuction] = useState(false);
   const navigate = useNavigate();
-
+localStorage.setItem("editModel",false)
+localStorage.setItem("templeteId",undefined)
   // Function to handle image selection
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);

@@ -13,11 +13,11 @@ const taskUpdation = async (req, res, next) => {
     }
 
     // Correct usage of update method
-    await assignData.update({
+    const updatedAssignData = await assignData.update({
       taskStatus: taskStatus,
     });
     assignData.save();
-    return res.status(200).json({ message: "Task Completed successfully" });
+    return res.status(200).json(updatedAssignData);
   } catch (error) {
     console.error("Error updating data:", error);
     return res.status(500).json({ error: "Internal Server Error" });

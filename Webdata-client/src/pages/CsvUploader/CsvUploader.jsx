@@ -38,6 +38,7 @@ const CsvUploader = () => {
   const token = JSON.parse(localStorage.getItem("userData"));
 
   const data = allTemplates?.find((item) => item.id === selectedId);
+  localStorage.setItem("editModel",editModal)
 
   // Tab Button disabled
   useEffect(() => {

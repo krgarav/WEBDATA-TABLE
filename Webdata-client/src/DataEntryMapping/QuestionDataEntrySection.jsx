@@ -46,6 +46,7 @@ const QuestionDataEntrySection = ({
   }, []);
   // console.log(templateHeader[0].typeOption.split("-"));
   const allowedOptions = templateHeader[0]?.typeOption?.split("-") || [];
+  allowedOptions.push(" ")
   // console.log(parseInt(taskData.templeteId))
   useEffect(() => {
     const handleAltSKey = (e) => {
@@ -243,39 +244,54 @@ const QuestionDataEntrySection = ({
 
           {editableData ? (
             Object.entries(editableData).map(([key, value], index) => {
-              const red = value === " " || value === "*" || value==="";
+              const red = value === " " || value === "*" || value === "";
 
               return (
                 <div key={index} className="flex">
                   <div className="me-3 my-1 flex">
                     <label className="font-bold text-sm w-9 my-1">{key}</label>
                     <div className="flex rounded">
-                         <input
-              type="text"
-              ref={(el) => {
-                if (red) {
-                  inputRefs.current[key] = el;
-                } else {
-                  delete inputRefs.current[key];
-                }
-              }}
-              value={value}
-              className={`h-7 w-7 text-center text-black rounded text-sm ${
-                red ? "bg-red-500 text-white" : ""
-              }`}
-              onChange={(e) => handleInputChange(key, e.target.value)}
-              onClick={() => setColumnName(key)}
-              onFocus={() => setColumnName(key)}
-              onKeyDown={(e) => {
-                const keyPressed = e.key.toUpperCase();
-                if (
-                  keyPressed.length === 1 && // Only single-character keys
-                  !allowedOptions.includes(keyPressed)
-                ) {
-                  e.preventDefault(); // Block invalid key
-                }
-              }}
-            />
+                      <input
+                        type="text"
+                        ref={(el) => {
+                          if (red) {
+                            inputRefs.current[key] = el;
+                          } else {
+                            delete inputRefs.current[key];
+                          }
+                        }}
+                        value={value}
+                        className={`h-7 w-7 text-center text-black rounded text-sm ${
+                          red ? "bg-red-500 text-white" : ""
+                        }`}
+                        onChange={(e) => {
+                          const char = e.target.value.slice(0, 1); // ✅ Only keep first character
+                          if (
+                            allowedOptions.includes(char.toUpperCase()) ||
+                            char === " " || // ✅ allow single space
+                            char === "" // ✅ allow empty to clear
+                          ) {
+                            handleInputChange(
+                              key,
+                              char === " " ? " " : char.toUpperCase()
+                            );
+                          }
+                        }}
+                        onClick={() => setColumnName(key)}
+                        onFocus={() => setColumnName(key)}
+                        onKeyDown={(e) => {
+                          const rawKey = e.key; // actual key
+                          const keyUpper = rawKey.toUpperCase();
+
+                          if (
+                            rawKey.length === 1 && // single-character keys only
+                            !allowedOptions.includes(keyUpper) &&
+                            rawKey !== " " // ✅ allow space
+                          ) {
+                            e.preventDefault(); // block invalid keys
+                          }
+                        }}
+                      />
                     </div>
                   </div>
                 </div>

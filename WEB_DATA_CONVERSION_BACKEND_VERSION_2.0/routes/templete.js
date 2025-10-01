@@ -46,6 +46,7 @@ const duplicateChecker = require("../controllers/Templete/duplicateChecker");
 const duplicateDataExtractor = require("../controllers/Templete/duplicateDataExtractor");
 const getCsvRowData = require("../controllers/Templete/getCsvRowData");
 const updateDuplicateData = require("../controllers/Templete/updateDuplicateData");
+
 const router = express.Router();
 
 router.get("/get/templetedata/:id", authMiddleware, getTempleteData); //templeteId
@@ -75,6 +76,7 @@ router.post("/data", authMiddleware, handleData);
 router.post("/updatecsvdata/:id", authMiddleware, updateCsvData); //fileId
 router.post("/assign/user", authMiddleware, assignUser);
 router.post("/taskupdation/:id", authMiddleware, taskUpdation); //assigndata Id
+
 router.post("/delete/duplicate", authMiddleware, deleteDuplicateData);
 // router.post("/update/duplicatedata", authMiddleware, editDuplicateData);
 router.post("/delete/template/:id", authMiddleware, deleteTemplate); //templateId

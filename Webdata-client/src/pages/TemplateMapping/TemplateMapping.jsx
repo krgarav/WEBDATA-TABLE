@@ -20,7 +20,7 @@ const TemplateMapping = () => {
   const { id } = useParams();
 
   const navigate = useNavigate();
-  let { fileId } = JSON.parse(localStorage.getItem("fileId")) || "";
+  let  fileId  = JSON.parse(localStorage.getItem("templeteId")) || "";
   let token = JSON.parse(localStorage.getItem("userData"));
 
   useEffect(() => {

@@ -15,7 +15,7 @@ const handleData = async (req, res) => {
       .json({ message: "You don't have access for performing this action" });
   }
   const { mappedData ,templateId} = req.body;
-  console.log(mappedData,templateId)
+  console.log(templateId)
   try {
     // if (!mappedData.fileId) {
     //   return res.status(400).json({ error: "File not provided" });

@@ -469,6 +469,7 @@ const ImageScanner = () => {
         isPermittedToEdit: false,
       }));
       navigate("/imageuploader");
+      // localStorage.setItem("editModel",false)
     } catch (error) {
       console.log(error);
       toast.error(error.message);
@@ -703,9 +704,9 @@ const ImageScanner = () => {
                               width: data.width,
                               height: data.height})}
                             style={{
-                              border:data.fId===selectedtemplate? "3px solid #ff0000ff":"3px solid #007bff",
+                              border:data?.fId===selectedtemplate? "3px solid #ff0000ff":"3px solid #007bff",
                               position: "absolute",
-                              backgroundColor:data.fId===selectedtemplate? "rgba(255, 0, 21, 0.2)":"rgba(0, 123, 255, 0.2)",
+                              backgroundColor:data?.fId===selectedtemplate? "rgba(255, 0, 21, 0.2)":"rgba(0, 123, 255, 0.2)",
                               left: data.coordinateX,
                               top: data.coordinateY,
                               width: data.width,
