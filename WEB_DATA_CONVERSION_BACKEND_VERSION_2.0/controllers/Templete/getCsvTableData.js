@@ -211,9 +211,14 @@ const getCsvTableData = async (req, res) => {
     const columnNames = columns.map((col) => `\`${col.key}\``);
     const startingCsvIndex= fileName.startIndex;
 
-    const conditions = columnNames
-      .map((col) => `${col} = :patternDefinition OR ${col} = :blankDefination`)
-      .join(" OR ");
+    // const conditions = columnNames
+    //   .map((col) => `${col} = :patternDefinition OR ${col} = :blankDefination`)
+    //   .join(" OR ");
+
+      const conditions = columnNames  
+     .map((col) => `${col} LIKE :patternDefinition OR ${col} LIKE :blankDefination`)
+     .join(" OR ");
+
 
     const query = `
     SELECT * FROM \`${csvTableName}\`
@@ -227,8 +232,8 @@ const getCsvTableData = async (req, res) => {
       replacements: {
         min: Number(startingCsvIndex)===1 ? Number(min): Number(min)+ Number(startingCsvIndex),
         max: Number(startingCsvIndex)===1 ? Number(max): Number(max)+ Number(startingCsvIndex),
-        patternDefinition,
-        blankDefination,
+       patternDefinition: `%${patternDefinition}%`,
+    blankDefination: `%${blankDefination}%`,
       },
       type: sequelize.QueryTypes.SELECT,
     });
