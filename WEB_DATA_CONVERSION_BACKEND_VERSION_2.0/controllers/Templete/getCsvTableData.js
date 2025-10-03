@@ -173,6 +173,7 @@ const getCsvTableData = async (req, res) => {
         });
         const imageName = resultTwo[imageColName];
         const baseName = path.basename(imageName);
+        console.log(baseName)
         const formData = {};
         const questionData = {};
 

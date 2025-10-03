@@ -8,62 +8,52 @@ const ImageDataEntrySection = ({
   prevHandler,
   nextHandler,
   imageRef,
-  zoomLevel,
 }) => {
   const [imageUrl, setImageUrl] = useState("");
-  // const imageRef = useRef();
+  const [zoomLevel] = useState(1); // Keep it normal, no auto shrinking
+
   const imageContainerRef = useRef();
+
   useEffect(() => {
     setImageUrl(`${window.SERVER_IP}/images/${data.imageName}`);
-  });
+  }, [data]);
+
   useEffect(() => {
-    if (imageData) {
+    if (imageData && imageRef.current && imageContainerRef.current) {
       const { coordinateX, coordinateY, width, height } = imageData;
 
       const containerWidth = imageContainerRef.current.offsetWidth || 0;
       const containerHeight = imageContainerRef.current.offsetHeight || 0;
 
-      // Calculate the zoom level based on container size and area size
-      const zoomLevel = Math.min(
-        containerWidth / width,
-        containerHeight / height
-      );
+      // Keep zoom at 1 (normal scale)
+      imageRef.current.style.transform = `scale(${zoomLevel})`;
+      imageRef.current.style.transformOrigin = `0 0`;
 
-      // Calculate the scroll position to center the selected area
-      const scrollX =
-        coordinateX * zoomLevel - containerWidth / 2 + (width / 2) * zoomLevel;
-      const scrollY =
-        coordinateY * zoomLevel -
-        containerHeight / 2 +
-        (height / 2) * zoomLevel;
+      // Just scroll to center the selected field
+      const scrollX = coordinateX - containerWidth / 2 + width / 2;
+      const scrollY = coordinateY - containerHeight / 2 + height / 2;
 
-      // Check if imageRef.current is available before updating style
-      if (imageRef.current) {
-        imageRef.current.style.transform = `scale(${zoomLevel})`;
-        imageRef.current.style.transformOrigin = `0 0`;
-      }
-
-      // Scroll to the calculated position if container reference is available
-      imageContainerRef.current?.scrollTo({
+      imageContainerRef.current.scrollTo({
         left: scrollX,
         top: scrollY,
         behavior: "smooth",
       });
     }
-  }, [imageData]);
+  }, [imageData, imageRef, zoomLevel]);
 
   return (
     <div className="flex gap-5 justify-center items-center">
+      {/* Prev button */}
       <div
-        onClick={() => {
-          prevHandler();
-        }}
+        onClick={prevHandler}
         className="text-white px-3 py-8 bg-blue-400 rounded-3xl mx-2 hover:bg-blue-800 text-lg transition-all cursor-pointer"
       >
         <button>
           <GrPrevious />
         </button>
       </div>
+
+      {/* Image container */}
       <div>
         <div
           className="bg-white rounded-lg shadow-lg"
@@ -83,9 +73,8 @@ const ImageDataEntrySection = ({
               ref={imageRef}
               alt="Selected"
               style={{
-                width: "48rem",
-                transform: `scale(${zoomLevel})`,
-                transformOrigin: "center center",
+                width: "48rem", // fixed readable width
+                transformOrigin: "top left",
                 borderRadius: "0.5rem",
                 boxShadow: "0 4px 8px rgba(0, 0, 0, 0.8)",
               }}
@@ -108,27 +97,28 @@ const ImageDataEntrySection = ({
             </div>
           )}
 
-          <div
-            style={{
-              border: "2px solid rgba(0, 123, 255, 0.8)",
-              position: "absolute",
-              backgroundColor: "rgba(0, 123, 255, 0.2)",
-              left: `${imageData?.coordinateX}px`,
-              top: `${imageData?.coordinateY}px`,
-              width: `${imageData?.width}px`,
-              height: `${imageData?.height}px`,
-              transform: `scale(${zoomLevel})`,
-              transformOrigin: "center center",
-              borderRadius: "0.25rem",
-              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-            }}
-          ></div>
+          {/* Highlight Box */}
+          {imageData && (
+            <div
+              style={{
+                border: "2px solid rgba(0, 123, 255, 0.8)",
+                position: "absolute",
+                backgroundColor: "rgba(0, 123, 255, 0.2)",
+                left: `${imageData.coordinateX * zoomLevel}px`,
+                top: `${imageData.coordinateY * zoomLevel}px`,
+                width: `${imageData.width * zoomLevel}px`,
+                height: `${imageData.height * zoomLevel}px`,
+                borderRadius: "0.25rem",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+              }}
+            ></div>
+          )}
         </div>
       </div>
+
+      {/* Next button */}
       <div
-        onClick={() => {
-          nextHandler();
-        }}
+        onClick={nextHandler}
         className="text-white px-3 py-8 bg-blue-400 rounded-3xl mx-2 hover:bg-blue-800 text-lg transition-all cursor-pointer"
       >
         <button>
