@@ -32,7 +32,7 @@ const getMetaData = async (req, res) => {
 
     // Fetch data concurrently for better performance
     const [metaData, mappedData] = await Promise.all([
-      MetaData.findAll(),
+      MetaData.findAll({where: { templeteId: templateId }, }),
       MappedData.findAll({
         where: { templeteId: templateId }, // Fixed typo from `templeteId` to `templateId`
         attributes: ["key", "value"],

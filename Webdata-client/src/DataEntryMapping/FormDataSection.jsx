@@ -20,7 +20,6 @@ const FormDataEntrySection = ({
             columnName
           );
           const data = response.data;
-          console.log(data);
           setImageData(data[0]);
         } catch (error) {
           console.log(error);
@@ -28,6 +27,7 @@ const FormDataEntrySection = ({
       };
       fetchData();
       //  const res =  getMetaDataHandler();
+    
     }
   }, [columnName]);
   const handleInputChange = (key, value) => {
