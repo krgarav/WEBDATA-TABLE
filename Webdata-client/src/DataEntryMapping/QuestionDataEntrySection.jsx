@@ -147,6 +147,8 @@ const QuestionDataEntrySection = ({
       // Reset any necessary state or perform cleanup here
     }
   };
+
+  console.log(editableData)
   return (
     <div className="w-full 2xl:w-2/3 xl:px-6 mx-auto text-white">
       <div className="my-4 w-full ">

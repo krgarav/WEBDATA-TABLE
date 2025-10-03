@@ -215,7 +215,7 @@ const DataMapping = () => {
       imageRef.current.style.transformOrigin = "initial";
     }
   };
-  console.log(editedData);
+  console.log(imageData);
   return (
     <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-[100vh] pt-16">
       <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-600 dataEntry ">

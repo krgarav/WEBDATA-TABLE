@@ -17,6 +17,7 @@ const ImageDataEntrySection = ({
   useEffect(() => {
     setImageUrl(`${window.SERVER_IP}/images/${data.imageName}`);
   }, [data]);
+  console.log(imageData)
 
   useEffect(() => {
     if (imageData && imageRef.current && imageContainerRef.current) {
@@ -40,6 +41,8 @@ const ImageDataEntrySection = ({
       });
     }
   }, [imageData, imageRef, zoomLevel]);
+
+  console.log(imageData)
 
   return (
     <div className="flex gap-5 justify-center items-center">
@@ -74,7 +77,7 @@ const ImageDataEntrySection = ({
               alt="Selected"
               style={{
                 width: "48rem", // fixed readable width
-                transformOrigin: "top left",
+                transformOrigin: "center center",
                 borderRadius: "0.5rem",
                 boxShadow: "0 4px 8px rgba(0, 0, 0, 0.8)",
               }}
@@ -104,10 +107,10 @@ const ImageDataEntrySection = ({
                 border: "2px solid rgba(0, 123, 255, 0.8)",
                 position: "absolute",
                 backgroundColor: "rgba(0, 123, 255, 0.2)",
-                left: `${imageData.coordinateX * zoomLevel}px`,
-                top: `${imageData.coordinateY * zoomLevel}px`,
-                width: `${imageData.width * zoomLevel}px`,
-                height: `${imageData.height * zoomLevel}px`,
+                left: `${imageData.coordinateX }px`,
+                top: `${imageData.coordinateY }px`,
+                width: `${imageData.width}px`,
+                height: `${imageData.height}px`,
                 borderRadius: "0.25rem",
                 boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
               }}
