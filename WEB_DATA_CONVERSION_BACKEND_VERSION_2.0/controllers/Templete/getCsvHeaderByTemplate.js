@@ -18,7 +18,7 @@ const getCsvHeaderByTemplate = async (req, res, next) => {
         const fileData = await Files.findOne({ where: { templeteId: template_id } });
 
         if (!fileData) {
-            return res.status(200).json({ error: "File not found",data: [] });
+            return res.status(200).json({ error: "File not found", data: [] });
         }
 
         const fileName = fileData.csvFile;
@@ -40,9 +40,9 @@ const getCsvHeaderByTemplate = async (req, res, next) => {
             return res.status(404).json({ error: "No content found in excel sheet", data: [] });
         }
 
-        // Extract headers from the first row
-        let headers = Object.keys(data[0]);
-
+        // Extract headers from the first row and trim spaces
+        let headers = Object.keys(data[0]).map(header => header.trim());
+            // console.log(headers)
         // Columns to remove
         const columnsToRemove = [
             "User Details",

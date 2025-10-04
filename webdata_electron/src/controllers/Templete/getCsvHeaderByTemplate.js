@@ -58,7 +58,7 @@ const getCsvHeaderByTemplate = async (req, res, next) => {
         if (headers.length === 0) {
             return res.status(400).json({ error: "No valid headers found after filtering" });
         }
-
+            
         res.status(200).json(headers);
     } catch (error) {
         console.error("Error in getCsvHeaderByTemplate:", error);

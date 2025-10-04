@@ -19,24 +19,43 @@ const upload = multer({ storage: storage });
 
 // Function to insert data into a table
 async function insertDataIntoTable(tableName, data) {
-  if (data.length === 0) return;
+  if (!data || data.length === 0) return;
 
-  const columnsForRead = Object.keys(data[0]);
-  const columns = Object.keys(data[0]).map((col) => `\`${col}\``);
-  const values = data
+  // Step 1: Trim spaces from column names for all rows
+  const normalizedData = data.map((row) => {
+    const normalizedRow = {};
+    Object.keys(row).forEach((key) => {
+      const trimmedKey = key.trim(); // Trim spaces from column name
+      normalizedRow[trimmedKey] = row[key];
+    });
+    return normalizedRow;
+  });
+
+  // Step 2: Get column names from the first row (already trimmed)
+  const columnsForRead = Object.keys(normalizedData[0]);
+  const columns = columnsForRead.map((col) => `\`${col}\``); // Backticks handle special chars
+
+  // Step 3: Build values string safely, escaping quotes
+  const values = normalizedData
     .map(
       (row) =>
-        `(${columnsForRead.map((col) => `'${(row[col] || "").replace(/\\/g, "\\\\")}'`
-).join(",")})`
+        `(${columnsForRead
+          .map(
+            (col) =>
+              `'${(row[col] !== undefined ? row[col] : "")
+                .toString()
+                .replace(/\\/g, "\\\\")
+                .replace(/'/g, "\\'")}'`
+          )
+          .join(",")})`
     )
     .join(",");
 
-  const query = `INSERT INTO ${tableName} (${columns.join(
-    ","
-  )}) VALUES ${values};`;
-
+  // Step 4: Execute the SQL INSERT
+  const query = `INSERT INTO \`${tableName}\` (${columns.join(",")}) VALUES ${values};`;
   await sequelize.query(query, { type: QueryTypes.INSERT });
-  return columns;
+
+  return columnsForRead;
 }
 /**
  * Function to process the uploaded CSV file
@@ -291,6 +310,7 @@ async function mergeCSVFiles(fileNames) {
  */
 const handleUpload = async (req, res) => {
   // Step 1: Check user role
+  console.log(req)
   const userRole = req.role;
   if (userRole !== "Admin") {
     return res
