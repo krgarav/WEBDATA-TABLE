@@ -38,7 +38,7 @@ const CsvUploader = () => {
   const token = JSON.parse(localStorage.getItem("userData"));
 
   const data = allTemplates?.find((item) => item.id === selectedId);
-  localStorage.setItem("editModel",editModal)
+  localStorage.setItem("editModel", editModal);
 
   // Tab Button disabled
   useEffect(() => {
@@ -116,6 +116,7 @@ const CsvUploader = () => {
       const extension = file.name.split(".").pop().toLowerCase();
       if (!allowedExtensions.includes(extension)) {
         toast.error(errorMessage);
+        console.log(errorMessage);
         return;
       }
       setFileState(file);
@@ -214,6 +215,7 @@ const CsvUploader = () => {
       navigate(`/csvuploader/duplicatedetector/${fileId.templeteId}`);
     } catch (error) {
       toast.error(error.message);
+      console.log(error.message);
     } finally {
       setLoading(false);
     }
@@ -252,7 +254,7 @@ const CsvUploader = () => {
       localStorage.setItem("templateOption", JSON.stringify("updating"));
       localStorage.setItem("images", JSON.stringify(response.data.imagePaths));
       localStorage.setItem("templeteId", JSON.stringify(data.id));
-      console.log(data.id)
+      console.log(data.id);
       navigate("/imageuploader/scanner");
     } catch (error) {
       console.error("Error uploading files: ", error);
@@ -361,13 +363,13 @@ const CsvUploader = () => {
           headers: { token },
         }
       );
-     
+
       if (response.data?.data?.length === 0) {
         setConfirmationModal(true);
         return;
       }
       const expectedHeaders = response.data || [];
-// console.log(expectedHeaders)
+      // console.log(expectedHeaders)
       // If expectedHeaders is empty, skip the validation
       if (expectedHeaders.length === 0) {
         setConfirmationModal(true);
@@ -382,16 +384,27 @@ const CsvUploader = () => {
             return;
           }
           // Extract headers from the first row
-          const uploadedHeaders = Object.keys(result.data[0]);
+         const uploadedHeaders = Object.keys(result.data[0]).map(header => header.trim());
 
           // Check if headers match
-          const isMatching =
-            expectedHeaders.length === uploadedHeaders.length &&
-            expectedHeaders.every(
-              (header, index) => header === uploadedHeaders[index]
-            );
+          const mismatchedHeader = expectedHeaders.find(
+            (header, index) => header !== uploadedHeaders[index]
+          );
 
-          if (!isMatching) {
+          if (mismatchedHeader) {
+            toast.error(
+              `Header mismatch: expected "${mismatchedHeader}" but got "${
+                uploadedHeaders[expectedHeaders.indexOf(mismatchedHeader)] ||
+                "undefined"
+              }"`
+            );
+          } else {
+            toast.success("Headers match correctly!");
+          }
+          console.log(expectedHeaders);
+          console.log(uploadedHeaders);
+
+          if (mismatchedHeader) {
             toast.error(
               "Please upload the correct CSV file. Headers do not match."
             );
@@ -403,7 +416,6 @@ const CsvUploader = () => {
         header: true,
         skipEmptyLines: true,
       });
-
     } catch (error) {
       console.error(error);
       toast.error("Error fetching CSV headers.");
