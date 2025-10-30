@@ -5,7 +5,11 @@ import FormDataEntrySection from "./FormDataSection";
 import ButtonDataEntrySection from "./ButtonDataEntrySection";
 import ImageDataEntrySection from "./ImageDataEntrySection";
 import QuestionDataEntrySection from "./QuestionDataEntrySection";
-import { updateCsvData, updateCurrentIndex, onGetTemplateHandler } from "../services/common";
+import {
+  updateCsvData,
+  updateCurrentIndex,
+  onGetTemplateHandler,
+} from "../services/common";
 
 const DataMapping = () => {
   const token = JSON.parse(localStorage.getItem("userData"));
@@ -20,6 +24,7 @@ const DataMapping = () => {
   const imageRef = useRef(null);
   const inputRefs = useRef({});
   const invalidIndex = useRef(0);
+  const inputIndexRef = useRef(null);
   console.log(inputRefs);
   useEffect(() => {
     const enableFullscreen = () => {
@@ -53,7 +58,6 @@ const DataMapping = () => {
   //   inputRefs.current = {};
   //   invalidIndex.current = 0; // Reset the index when currentIndex changes
   // }, [currentIndex]);
-  
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -104,20 +108,42 @@ const DataMapping = () => {
 
         // Get all keys from inputRefs (which are the keys of invalid inputs)
         const invalidKeys = Object.keys(inputRefs.current);
+        const sortedData = [...invalidKeys].sort((a, b) => {
+          const isAAlphaOnly = /^[A-Za-z]+$/.test(a); // true if only letters
+          const isBAlphaOnly = /^[A-Za-z]+$/.test(b);
 
+          // 🟢 Step 1: Pure alphabets come first
+          if (isAAlphaOnly && !isBAlphaOnly) return -1;
+          if (!isAAlphaOnly && isBAlphaOnly) return 1;
+
+          // 🟡 Step 2: If both are alphabet-only, sort alphabetically
+          if (isAAlphaOnly && isBAlphaOnly) return a.localeCompare(b);
+
+          // 🔵 Step 3: Otherwise (both have numbers), sort by prefix then number
+          const prefixA = a.match(/[A-Za-z]+/)[0];
+          const prefixB = b.match(/[A-Za-z]+/)[0];
+
+          if (prefixA !== prefixB) return prefixA.localeCompare(prefixB);
+
+          const numA = parseInt(a.match(/\d+/)?.[0] || "0", 10);
+          const numB = parseInt(b.match(/\d+/)?.[0] || "0", 10);
+
+          return numA - numB;
+        });
+        console.log();
         // Log the refs and keys if you want to debug
         console.log("inputRefs:", inputRefs.current);
-        console.log("invalidKeys:", invalidKeys);
+        console.log("invalidKeys:", sortedData);
 
         // No invalid inputs? Do nothing
-        if (invalidKeys.length === 0) return;
+        if (sortedData.length === 0) return;
 
         // Reset index if out of bounds
-        if (invalidIndex.current >= invalidKeys.length) {
+        if (invalidIndex.current >= sortedData.length) {
           invalidIndex.current = 0;
         }
 
-        const keyToFocus = invalidKeys[invalidIndex.current];
+        const keyToFocus = sortedData[invalidIndex.current];
         const element = inputRefs.current[keyToFocus];
 
         if (element) {
@@ -126,6 +152,8 @@ const DataMapping = () => {
         }
       }
     };
+
+    document.addEventListener("click", () => {});
 
     document.addEventListener("keydown", handleTabKey);
     return () => {
@@ -254,7 +282,8 @@ const DataMapping = () => {
             setEditedData={setEditedData}
             inputRefs={inputRefs}
             editedData={editedData}
-           
+            inputIndexRef={inputIndexRef}
+            invalidIndex={invalidIndex}
           />
         </div>
       </div>

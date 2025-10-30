@@ -12,6 +12,8 @@ const QuestionDataEntrySection = ({
   saveHandler,
   setEditedData,
   inputRefs,
+  inputIndexRef,
+  invalidIndex,
 }) => {
   const [questionData, setQuestionData] = useState([]);
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
@@ -44,9 +46,10 @@ const QuestionDataEntrySection = ({
     };
     fetchTemplate();
   }, []);
-  // console.log(templateHeader[0].typeOption.split("-"));
+  // console.log(templateHeader[0]);
   const allowedOptions = templateHeader[0]?.typeOption?.split("-") || [];
-  allowedOptions.push(" ")
+  allowedOptions.push(templateHeader[0]?.blankDefination);
+  allowedOptions.push(templateHeader[0]?.patternDefinition);
   // console.log(parseInt(taskData.templeteId))
   useEffect(() => {
     const handleAltSKey = (e) => {
@@ -148,7 +151,7 @@ const QuestionDataEntrySection = ({
     }
   };
 
-  console.log(editableData)
+  console.log(editableData);
   return (
     <div className="w-full 2xl:w-2/3 xl:px-6 mx-auto text-white">
       <div className="my-4 w-full ">
@@ -279,8 +282,50 @@ const QuestionDataEntrySection = ({
                             );
                           }
                         }}
-                        onClick={() => setColumnName(key)}
-                        onFocus={() => setColumnName(key)}
+                        onClick={() => {
+                          setColumnName(key);
+                          const invalidKeys = Object.keys(inputRefs.current);
+                          const sortedData = [...invalidKeys].sort((a, b) => {
+                            const isAAlphaOnly = /^[A-Za-z]+$/.test(a); // true if only letters
+                            const isBAlphaOnly = /^[A-Za-z]+$/.test(b);
+
+                            // 🟢 Step 1: Pure alphabets come first
+                            if (isAAlphaOnly && !isBAlphaOnly) return -1;
+                            if (!isAAlphaOnly && isBAlphaOnly) return 1;
+
+                            // 🟡 Step 2: If both are alphabet-only, sort alphabetically
+                            if (isAAlphaOnly && isBAlphaOnly)
+                              return a.localeCompare(b);
+
+                            // 🔵 Step 3: Otherwise (both have numbers), sort by prefix then number
+                            const prefixA = a.match(/[A-Za-z]+/)[0];
+                            const prefixB = b.match(/[A-Za-z]+/)[0];
+
+                            if (prefixA !== prefixB)
+                              return prefixA.localeCompare(prefixB);
+
+                            const numA = parseInt(
+                              a.match(/\d+/)?.[0] || "0",
+                              10
+                            );
+                            const numB = parseInt(
+                              b.match(/\d+/)?.[0] || "0",
+                              10
+                            );
+
+                            return numA - numB;
+                          });
+                          console.log(sortedData);
+                          const currentIndex = sortedData.indexOf(key);
+                          if (currentIndex !== -1) {
+                            invalidIndex.current = currentIndex;
+                            console.log("Clicked cell index:", currentIndex);
+                          }
+                        }}
+                        onFocus={() => {
+                          setColumnName(key);
+                          console.log("Focused index: ", index); // 👈 here’s your index
+                        }}
                         onKeyDown={(e) => {
                           const rawKey = e.key; // actual key
                           const keyUpper = rawKey.toUpperCase();
