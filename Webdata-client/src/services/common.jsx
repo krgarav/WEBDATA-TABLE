@@ -98,7 +98,7 @@ export const fetchFilesAssociatedWithTemplate = async (templateId) => {
 
   try {
     const response = await axios.post(
-      `http://${window.APP_IP}:4000/getUploadedFiles/${templateId}`,
+      `${window.SERVER_IP}/getUploadedFiles/${templateId}`,
       {
         headers: {
           token: token,
@@ -115,7 +115,7 @@ export const fetchLatestTaskData = async (taskId) => {
   const token = JSON.parse(localStorage.getItem("userData"));
 
   const response = await axios.get(
-    `http://${window.APP_IP}:4000/getTask/${taskId}`,
+    `${window.SERVER_IP}/getTask/${taskId}`,
     { headers: { token } }
   );
   return response.data; // Return latest task data
@@ -124,7 +124,7 @@ export const fetchTemplateFormData = async (templateId, colName) => {
   const token = JSON.parse(localStorage.getItem("userData"));
   const obj = { templateId, colName };
   const response = await axios.post(
-    `http://${window.APP_IP}:4000/formfileddetails/`,
+    `${window.SERVER_IP}/formfileddetails/`,
     obj,
     { headers: { token } }
   );
@@ -135,7 +135,7 @@ export const fetchIP = async () => {
   const token = JSON.parse(localStorage.getItem("userData"));
 
   const response = await axios.get(
-    `http://${window.APP_IP}:4000/settings/get-device-ip`,
+    `${window.SERVER_IP}/settings/get-device-ip`,
     { headers: { token } }
   );
   return response.data;
@@ -146,7 +146,7 @@ export const fetchHeadersInDuplicate = async (templateId) => {
   // http://localhost:4000/getcsvheaders?templateId=1
   try {
     const response = await axios.get(
-      `http://${window.APP_IP}:4000/getcsvheaders?templateId=${templateId}`,
+      `${window.SERVER_IP}/getcsvheaders?templateId=${templateId}`,
       {
         headers: {
           token: token,
@@ -164,7 +164,7 @@ export const checkMappedDataExits = async (templateId) => {
   // http://localhost:4000/getcsvheaders?templateId=1
   try {
     const response = await axios.get(
-      `http://${window.APP_IP}:4000/checkmappeddataexits?templateId=${templateId}`,
+      `${window.SERVER_IP}/checkmappeddataexits?templateId=${templateId}`,
       {
         headers: {
           token: token,
@@ -185,7 +185,7 @@ export const submitMappedData = async (mappedData) => {
   try {
     const templateId = await JSON.parse(localStorage.getItem("templeteId"));
     const response = await axios.post(
-      `http://${window.APP_IP}:4000/data`,
+      `${window.SERVER_IP}/data`,
       mappedData,
       {
         headers: {
@@ -204,7 +204,7 @@ export const getTotalCSVData = async (templateId, fileId) => {
   // http://localhost:4000/getcsvheaders?templateId=1
   try {
     const response = await axios.get(
-      `http://${window.APP_IP}:4000/gettotaldata?templateId=${templateId}&fileId=${fileId}`,
+      `${window.SERVER_IP}/gettotaldata?templateId=${templateId}&fileId=${fileId}`,
       {
         headers: {
           token: token,
@@ -241,7 +241,7 @@ export const dataEntryMetaData = async (templateId, columnName) => {
   // http://localhost:4000/getcsvheaders?templateId=1
   try {
     const response = await axios.get(
-      `http://${window.APP_IP}:4000/get/metadata?templateId=${templateId}&columnName=${columnName}`,
+      `${window.SERVER_IP}/get/metadata?templateId=${templateId}&columnName=${columnName}`,
       {
         headers: {
           token: token,
@@ -259,7 +259,7 @@ export const updateCurrentIndex = async (taskId, direction) => {
   // http://localhost:4000/getcsvheaders?templateId=1
   try {
     const response = await axios.post(
-      `http://${window.APP_IP}:4000/update/currentIndex`,
+      `${window.SERVER_IP}/update/currentIndex`,
       {
         taskId: taskId,
         direction: direction,
@@ -281,7 +281,7 @@ export const updateCsvData = async (obj) => {
   // http://localhost:4000/getcsvheaders?templateId=1
   try {
     const response = await axios.post(
-      `http://${window.APP_IP}:4000/update/csvdata`,
+      `${window.SERVER_IP}/update/csvdata`,
       obj,
       {
         headers: {
@@ -300,7 +300,7 @@ export const getRowCsvData = async (taskId, rowId) => {
   // http://localhost:4000/getcsvheaders?templateId=1
   try {
     const response = await axios.get(
-      `http://${window.APP_IP}:4000/getCsvRowData?taskId=${taskId}&rowId=${rowId}`,
+      `${window.SERVER_IP}/getCsvRowData?taskId=${taskId}&rowId=${rowId}`,
 
       {
         headers: {
@@ -318,7 +318,7 @@ export const updateCurrIndexData = async (taskId, direction) => {
   const token = JSON.parse(localStorage.getItem("userData"));
   try {
     const response = await axios.post(
-      `http://${window.APP_IP}:4000/updateCurrentIndex`,
+      `${window.SERVER_IP}/updateCurrentIndex`,
       {
         taskId: taskId,
         direction: direction,
@@ -339,7 +339,7 @@ export const getMetaData = async (columnName, templateId) => {
   const token = JSON.parse(localStorage.getItem("userData"));
   try {
     const response = await axios.get(
-      `http://${window.APP_IP}:4000/get/metadata?columnName=${columnName}&templateId=${templateId}`,
+      `${window.SERVER_IP}/get/metadata?columnName=${columnName}&templateId=${templateId}`,
 
       {
         headers: {
@@ -356,7 +356,7 @@ export const changeTaskStatus = async (taskId) => {
   const token = JSON.parse(localStorage.getItem("userData"));
   try {
     const response = await axios.post(
-      `http://${window.APP_IP}:4000/taskupdation/${taskId}`,
+      `${window.SERVER_IP}/taskupdation/${taskId}`,
       {
         taskStatus: 1,
       },
@@ -377,7 +377,7 @@ export const getDuplicateData = async (columnName, fileId) => {
   const token = JSON.parse(localStorage.getItem("userData"));
   try {
     const response = await axios.post(
-      `http://${window.APP_IP}:4000/duplicate/data`,
+      `${window.SERVER_IP}/duplicate/data`,
       {
         colName: columnName,
         fileID: fileId,
@@ -404,7 +404,7 @@ export const getDuplicateDataWithValue = async (columnName, fileId, value) => {
   const token = JSON.parse(localStorage.getItem("userData"));
   try {
     const response = await axios.post(
-      `http://${window.APP_IP}:4000/get/duplicate/data`,
+      `${window.SERVER_IP}/get/duplicate/data`,
       {
         columnName: columnName,
         fileId: fileId,
@@ -427,7 +427,7 @@ export const updateDuplicateDataWithValue = async (id, fileID, rowData) => {
   const token = JSON.parse(localStorage.getItem("userData"));
   try {
     const response = await axios.post(
-      `http://${window.APP_IP}:4000/update/duplicatedata`,
+      `${window.SERVER_IP}/update/duplicatedata`,
       {
         id,
         fileID,
@@ -450,7 +450,7 @@ export const deleteDuplicateDataWithValue = async (rowId, fileId) => {
   const token = JSON.parse(localStorage.getItem("userData"));
   try {
     const response = await axios.delete(
-      `http://${window.APP_IP}:4000/deleteRow?rowId=${rowId}&fileId=${fileId}`,
+      `${window.SERVER_IP}/deleteRow?rowId=${rowId}&fileId=${fileId}`,
       {
         headers: {
           token: token,
