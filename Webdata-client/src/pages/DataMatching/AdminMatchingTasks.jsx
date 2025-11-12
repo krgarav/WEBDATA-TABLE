@@ -3,7 +3,11 @@ import { MdOutlineRestartAlt } from "react-icons/md";
 import { FaCloudDownloadAlt, FaRegEdit } from "react-icons/fa";
 import { MdOutlineTaskAlt } from "react-icons/md";
 import axios from "axios";
-import { REACT_APP_IP } from "../../services/common";
+import {
+  onGetAllUsersHandler,
+  SERVER_IP,
+  assignTasksToUsers,
+} from "../../services/common";
 
 const AdminMatchingTasks = ({
   onCompleteHandler,
@@ -18,16 +22,80 @@ const AdminMatchingTasks = ({
 }) => {
   const token = JSON.parse(localStorage.getItem("userData"));
   const [status, setstatus] = useState({});
+  const [openBox, setOpenBox] = useState(null);
+  const [activeTaskId, setActiveTaskId] = useState(null);
+  const [allusers, setallusers] = useState([]);
+  const [newTask, setnewTask] = useState([]);
+
+  const toggleReassignBox = (taskId) => {
+    setOpenBox(null);
+    setActiveTaskId((prev) => (prev === taskId ? null : taskId));
+    console.log(activeTaskId)
+  };
+
+  const toggleBox = (taskId) => {
+    setActiveTaskId(null);
+    setOpenBox(taskId);
+  };
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await onGetAllUsersHandler();
+        setallusers(response.users);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+  console.log(allusers);
+
+  const createNewTask = async (taskData, user) => {
+    if (!user || !taskData) return;
+
+    // build the payload expected by the backend (an array of tasks)
+    const payload = [
+      {
+        fileId: taskData.fileId,
+        templeteId: taskData.templeteId,
+        userId: user.id ?? user._id ?? user.userId, // adjust according to user shape
+        min: taskData.min,
+        max: taskData.max,
+        userName: user.userName || user.name,
+        taskName: taskData.taskName,
+        // any other required fields from your API
+      },
+    ];
+
+    try {
+      // call service directly with payload
+      const response = await assignTasksToUsers(payload);
+      console.log("assign response:", response);
+
+      // optional: update UI — mark task as assigned or remove from list etc.
+      // Example: close the assign box and clear active
+      setOpenBox(null);
+      setActiveTaskId(null);
+
+      // optional: show toast or set status state
+      // setstatus({ ...status, [taskData.id]: 'assigned' });
+
+      // refresh tasks if backend returns updated data or call parent handler
+      // e.g., fetch tasks again or update matchingTask state
+    } catch (err) {
+      console.error("assignTasksToUsers failed", err);
+      // show user error toast or set state
+    }
+  };
 
   const completeHandler = async (taskId) => {
-    const response = await axios.get(
-      `${window.SERVER_IP}/submitTask/${taskId}`,
-      {
-        headers: {
-          token: token,
-        },
-      }
-    );
+    const response = await axios.get(`${window.SERVER_IP}/submitTask/${taskId}`, {
+      headers: {
+        token: token,
+      },
+    });
     setMatchingTask((prev) =>
       prev.map((task) => {
         if (task.id == taskId) {
@@ -38,6 +106,7 @@ const AdminMatchingTasks = ({
     );
   };
   const onFilteredTasksHandler = (tasks) => {
+    console.log(tasks);
     let filterdTaskData = tasks;
     if (taskType !== "ALL") {
       if (taskType === "pending") {
@@ -61,7 +130,7 @@ const AdminMatchingTasks = ({
 
   const filteredTasks = onFilteredTasksHandler(matchingTask);
 
-  // console.log(filteredTasks)
+  console.log(filteredTasks);
   const gettask = async (data) => {
     //   console.log(data)
     onCompleteHandler(data);
@@ -71,28 +140,31 @@ const AdminMatchingTasks = ({
     //             token: token,
     //           },
     //         })
+    setActiveTaskId(null);
     console.log(matchingTask);
-     setMatchingTask(prev =>
-    prev.map(task =>
-      task.id === data.id
-        ? { ...task, taskStatus: false }  // update only the matching one
-        : task
-    )
-  );
+    setMatchingTask((prev) =>
+      prev.map((task) =>
+        task.id === data.id
+          ? { ...task, taskStatus: false } // update only the matching one
+          : task
+      )
+    );
     console.log(matchingTask);
     //  setstatus(response.data)
   };
   useEffect(() => {
-  console.log("matchingTask updated:", matchingTask);
-}, [matchingTask]);
+    console.log("matchingTask updated:", matchingTask);
+  }, [matchingTask]);
 
-  console.log(status);
+  console.log({"allusers":allusers,"taskData":filteredTasks});
 
   return (
     <div>
       {filteredTasks?.map((taskData) => (
+        
         <div key={taskData.id} className="flex  justify-center">
           <div className="whitespace-nowrap w-[100px] py-2">
+         
             <div className="text-center text-md ">{taskData.templateName}</div>
           </div>
           <div className="whitespace-nowrap w-[100px] py-2">
@@ -107,6 +179,7 @@ const AdminMatchingTasks = ({
           <div className="whitespace-nowrap w-[100px] py-2">
             <div className="text-md text-center">{taskData.max}</div>
           </div>
+
           <div className="whitespace-nowrap w-[100px] py-2">
             <div className="text-md text-center border-2 ">
               {taskData.moduleType}
@@ -159,7 +232,8 @@ const AdminMatchingTasks = ({
           <div className="whitespace-nowrap text-center w-[100px] py-2">
             <button
               onClick={() => {
-                gettask(taskData);
+                // gettask(taskData);
+                toggleReassignBox(taskData.id);
               }}
               className={`rounded-3xl px-4 py-1 font-semibold ${
                 taskData.taskStatus
@@ -170,6 +244,84 @@ const AdminMatchingTasks = ({
             >
               <MdOutlineRestartAlt />
             </button>
+            {activeTaskId === taskData.id && (
+              <div className="absolute  w-[200px] h-[200px] z-20 bg-white shadow-lg border border-gray-300 rounded-xl flex justify-center items-center flex-col gap-10">
+                <div
+                  className="inline-block px-5 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold  rounded-full  shadow-md hover:from-indigo-600 hover:to-purple-700 hover:shadow-lg active:scale-95 transition-all duration-300 ease-in-out cursor-pointer"
+                  onClick={() => gettask(taskData)}
+                >
+                  Assign to same
+                </div>
+                <div
+                  className="inline-block px-5 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold  rounded-full  shadow-md hover:from-indigo-600 hover:to-purple-700 hover:shadow-lg active:scale-95 transition-all duration-300 ease-in-out cursor-pointer"
+                  onClick={() => toggleBox(taskData.id)}
+                >
+                  Assign to other
+                </div>
+              </div>
+            )}
+            {openBox === taskData.id && (
+              <div className="absolute  w-[250px] h-[250px] z-20 bg-white shadow-lg border border-gray-300 rounded-xl flex justify-center items-center flex-col gap-10">
+                <div className="overflow-y-auto h-[310px]">
+                  {allusers?.map((user, i) => {
+                    if (user.role !== "Admin"&& user.userName!==taskData.userName) {
+                      return (
+                        <label
+                          key={user.id}
+                          htmlFor={`userId-${user.id}`}
+                          className="block w-full cursor-pointer"
+                          onClick={() => createNewTask(taskData, user)}
+                        >
+                          <div
+                            className="
+      flex items-center justify-between 
+      gap-3 mt-2 p-3
+      rounded-xl border border-transparent
+      bg-gradient-to-r from-blue-50 to-blue-100
+      shadow-sm
+      hover:from-blue-100 hover:to-blue-200
+      hover:border-blue-400 hover:shadow-md
+      transition-all duration-200 ease-in-out
+      active:scale-[0.98]
+    "
+                          >
+                            <div className="flex items-center gap-3">
+                              <div
+                                className="
+          flex items-center justify-center 
+          h-9 w-9 rounded-full 
+          bg-blue-500 text-white font-semibold text-lg
+          shadow-sm
+        "
+                              >
+                                {user.userName?.charAt(0).toUpperCase()}
+                              </div>
+                              <span className="text-gray-800 font-medium text-[15px] tracking-wide">
+                                {user.userName}
+                              </span>
+                            </div>
+
+                            <span
+                              className="
+        text-[12px] font-semibold
+        px-2 py-[2px]
+        rounded-full 
+        bg-blue-200 text-blue-800
+        uppercase tracking-wider
+      "
+                            >
+                              {user.role}
+                            </span>
+                          </div>
+                        </label>
+                      );
+                    } else {
+                      return null;
+                    }
+                  })}
+                </div>
+              </div>
+            )}
           </div>
           <div className="whitespace-nowrap text-center w-[100px] py-2">
             <button

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 function HeaderData({
   csvHeaders,
@@ -8,6 +8,9 @@ function HeaderData({
   handleCsvHeaderChange,
 }) {
   console.log(templateHeaders);
+
+  const [tempValue, settempValue] = useState();
+
   return (
     <div className="relative">
       <div>
@@ -34,8 +37,18 @@ function HeaderData({
                   csvHeader !== "Updated Col. Name"
               )
               .map((csvHeader, index) => {
+                // Compute validValue INSIDE the map, per csvHeader
+                const getValidValue = () => {
+                  const current = selectedAssociations[csvHeader];
+                  if (current && templateHeaders.includes(current)) {
+                    return current;
+                  }
+                  return "UserFieldName";
+                };
+
                 return (
                   <div key={index} className="flex w-full justify-around mb-3">
+                    {/* CSV Header Select */}
                     <select
                       className="block w-1/3 py-1 me-10 text-xl font-semibold text-center border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                       aria-label="CSV Header Name"
@@ -44,7 +57,7 @@ function HeaderData({
                       }
                       value={csvHeader}
                     >
-                      <option disabled defaultValue>
+                      <option disabled value="">
                         Select CSV Header Name
                       </option>
                       {csvHeaders
@@ -59,21 +72,22 @@ function HeaderData({
                           </option>
                         ))}
                     </select>
+
+                    {/* Template Header Select */}
                     <select
                       className="block w-1/3 py-1 ms-10 text-xl font-semibold text-center border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                       aria-label="Template Header"
                       onChange={(e) =>
                         handleTemplateHeaderChange(csvHeader, e.target.value)
                       }
-                      value={selectedAssociations[csvHeader] || "UserFieldName"}
+                      value={getValidValue()} // Now correct per row
                     >
-                      <option>UserFieldName</option>
-                      {templateHeaders &&
-                        templateHeaders.map((template, idx) => (
-                          <option key={idx} value={template}>
-                            {template}
-                          </option>
-                        ))}
+                      <option value="UserFieldName">UserFieldName</option>
+                      {templateHeaders?.map((template, idx) => (
+                        <option key={idx} value={template}>
+                          {template}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 );

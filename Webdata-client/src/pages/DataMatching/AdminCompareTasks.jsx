@@ -4,7 +4,7 @@ import { FaCloudDownloadAlt, FaRegEdit } from "react-icons/fa";
 import DeactivateModal from "../../components/DeactivateModal";
 import { MdOutlineTaskAlt } from "react-icons/md";
 import axios from "axios";
-import { REACT_APP_IP } from "../../services/common";
+import { REACT_APP_IP,SERVER_IP } from "../../services/common";
 const AdminCompareTasks = ({
   compareTask,
   onCompareTaskStartHandler,
@@ -15,14 +15,18 @@ const AdminCompareTasks = ({
 }) => {
   const [modals, setModals] = useState(false);
   const [taskId, setTaskId] = useState(null);
+  
   const token = JSON.parse(localStorage.getItem("userData"));
   // const modalClose = () => {
   //   setModals(false);
   // };
 
+
+ 
+
   const completeHandler = async (taskId) => {
     const response = await axios.get(
-      `http://${REACT_APP_IP}:4000/submitTask/${taskId}`,
+      `http://${SERVER_IP}/submitTask/${taskId}`,
       {
         headers: {
           token: token,
@@ -127,6 +131,7 @@ const AdminCompareTasks = ({
             > */}
             <button
               onClick={() => onCompleteHandler(taskData)}
+              // onClick={()=>ressigning()}
               className={`rounded-3xl px-4 py-1 font-semibold ${
                 taskData.taskStatus
                   ? "bg-indigo-500 text-white border border-indigo-500"

@@ -109,7 +109,7 @@ const AssigningTask = ({
                             {allUsers?.map((user, i) => {
                               if (user.role !== "Admin") {
                                 return (
-                                  <label
+                                  <label key={i}
                                     htmlFor={`userId-${user.id}`}
                                     className="flex items-center"
                                   >

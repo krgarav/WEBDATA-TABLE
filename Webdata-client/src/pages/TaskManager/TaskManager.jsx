@@ -39,6 +39,7 @@ const TemplateMapping = () => {
 
     fetchUsers();
   }, [selectedUser]);
+  console.log(allUsers)
 
   useEffect(() => {
     const fetchUsers = async () => {

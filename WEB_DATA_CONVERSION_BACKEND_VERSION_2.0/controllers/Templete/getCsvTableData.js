@@ -102,11 +102,15 @@ const getCsvTableData = async (req, res) => {
     const columns = await MappedData.findAll({
       where: {
         templeteId: templeteId,
-        value: { [Op.ne]: null },
+        [Op.and]: [
+          { value: { [Op.ne]: null } }, // not NULL
+          { value: { [Op.ne]: "" } }, // not blank
+        ],
       },
       attributes: ["key", "value"],
     });
 
+    console.log(columns);
     const metaData = await MetaData.findAll({
       where: {
         templeteId: templeteId,
@@ -173,7 +177,7 @@ const getCsvTableData = async (req, res) => {
         });
         const imageName = resultTwo[imageColName];
         const baseName = path.basename(imageName);
-        console.log(baseName)
+        console.log(baseName);
         const formData = {};
         const questionData = {};
 
@@ -225,14 +229,13 @@ const getCsvTableData = async (req, res) => {
        OR ${col} IS NULL`
       )
       .join(" OR ");
-
     const query = `
-    SELECT * FROM \`${csvTableName}\`
-    WHERE id BETWEEN :min AND :max
-    AND (
-      ${conditions}
-    )
-  `;
+      SELECT * FROM \`${csvTableName}\`
+      WHERE id BETWEEN :min AND :max
+      AND (
+        ${conditions}
+        )
+        `;
 
     const filteredData = await sequelize.query(query, {
       replacements: {
@@ -245,10 +248,12 @@ const getCsvTableData = async (req, res) => {
             ? Number(max)
             : Number(max) + Number(startingCsvIndex),
         patternDefinition: `%${patternDefinition}%`,
-        blankDefination: `%${blankDefination}%`|| null|| '',
+        blankDefination: `%${blankDefination}%` || null || "",
       },
       type: sequelize.QueryTypes.SELECT,
     });
+    // console.log(filteredData);
+
     const updatedFilteredData = filteredData.map(({ id }) => ({
       parentId: id,
     }));

@@ -41,8 +41,8 @@ const AssignedTaskReview = ({
                       Mapped Data..
                     </h1>
                     <div className="overflow-y-auto h-[400px]">
-                      {assignedUsers.map((assignUser) => (
-                        <article className="flex justify-between rounded-lg border border-gray-100 bg-white p-6">
+                      {assignedUsers.map((assignUser,i) => (
+                        <article key={i} className="flex justify-between rounded-lg border border-gray-100 bg-white p-6">
                           <p className="text-2xl font-medium text-gray-900 text-center">
                             {assignUser.userName}
                           </p>
