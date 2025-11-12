@@ -7,6 +7,7 @@ const HeaderMappedReview = ({
   selectedAssociations,
   submitLoading
 }) => {
+  console.log(selectedAssociations)
   return (
     <div className="text-center mt-5 pt-5">
       <label

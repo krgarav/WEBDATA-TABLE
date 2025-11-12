@@ -13,7 +13,6 @@ import { toast } from "react-toastify";
 const EditMappedDataModel = ({ isOpen, onClose, selectedCoordinates }) => {
   if (!isOpen) return null; // Don't render if modal is not open
 
-  
   const [csvHeaders, setCsvHeaders] = useState([]);
   const [templateHeaders, setTemplateHeaders] = useState([]);
   const [selectedAssociations, setSelectedAssociations] = useState({});
@@ -39,9 +38,10 @@ const EditMappedDataModel = ({ isOpen, onClose, selectedCoordinates }) => {
         setTemplateHeaders(latestData);
         setPrevValue(values);
         const associatedData = response.records.map((item) => ({
-          [item.key]: item.value,
+          [item.key]: latestData.includes(item.value) ? item.value : "",
         }));
-
+        console.log(associatedData);
+        // const updatedAssociatedData = latestData.ma
         const obj = Object.assign({}, ...associatedData);
 
         setSelectedAssociations(obj);
@@ -70,76 +70,73 @@ const EditMappedDataModel = ({ isOpen, onClose, selectedCoordinates }) => {
     const updatedAssociations = { ...selectedAssociations };
 
     if (templateHeader.includes("--")) {
-      const [min, max] = templateHeader.split("--");
-      const newMin = parseInt(min);
-      const newMax = parseInt(max);
-      // Loop through all headers
-
-      Object.keys(selectedAssociations).forEach((header) => {
-        const questionNumber = parseInt(header.replace(/\D/g, ""));
-        if (questionNumber >= newMin && questionNumber <= newMax) {
+      const [min, max] = templateHeader.split("--").map(Number);
+      Object.keys(updatedAssociations).forEach((header) => {
+        const questionNumber = parseInt(header.replace(/\D/g, ""), 10);
+        if (questionNumber >= min && questionNumber <= max) {
           updatedAssociations[header] = templateHeader;
         }
       });
     } else if (templateHeader === "UserFieldName") {
-      updatedAssociations[csvHeader] = "";
+      updatedAssociations[csvHeader] = ""; // "" means unmapped
     } else {
       updatedAssociations[csvHeader] = templateHeader;
     }
-    // Ensure all headers are included in updatedAssociations
+
+    // Ensure all CSV headers exist
     csvHeaders.forEach((header) => {
       if (!(header in updatedAssociations)) {
         updatedAssociations[header] = "";
       }
     });
-
+    console.log(templateHeaders);
+    console.log(updatedAssociations);
     setSelectedAssociations(updatedAssociations);
   };
+  const onMapSubmitHandler = async () => {
+    const mappedvalues = Object.values(selectedAssociations);
 
- const onMapSubmitHandler = async () => {
-     const mappedvalues = Object.values(selectedAssociations);
- 
-     for (let i = 1; i <= templateHeaders.pageCount; i++) {
-       if (!mappedvalues.includes(`Image${i}`)) {
-         toast.error("Please select all the field properly.");
-         return;
-       }
-     }
-     setSubmitLoading(true);
-     const associationData = [];
-     const obj = { ...selectedAssociations };
-     for (let i = 0; i < csvHeaders.length; i++) {
-       const header = csvHeaders[i];
-       if (obj.hasOwnProperty(header)) {
-         associationData.push({
-           key: header,
-           value: obj[header],
-         });
-       }
-     }
- 
-     const mappedData = {
-       mappedData: associationData,
-       templateId: templeteId,
-     };
- 
-     try {
-       // console.log(mappedData)
-       // return 
-       const response = await submitMappedData(mappedData);
-       if (response.success) {
-         toast.success("Mapping successfully done.");
+    for (let i = 1; i <= templateHeaders.pageCount; i++) {
+      if (!mappedvalues.includes(`Image${i}`)) {
+        toast.error("Please select all the field properly.");
+        return;
+      }
+    }
+    setSubmitLoading(true);
+    const associationData = [];
+    const obj = { ...selectedAssociations };
+    for (let i = 0; i < csvHeaders.length; i++) {
+      const header = csvHeaders[i];
+      if (obj.hasOwnProperty(header)) {
+        associationData.push({
+          key: header,
+          value: obj[header],
+        });
+      }
+    }
+
+    const mappedData = {
+      mappedData: associationData,
+      templateId: templeteId,
+    };
+
+    try {
+      // console.log(mappedData)
+      // return
+      const response = await submitMappedData(mappedData);
+      if (response.success) {
+        toast.success("Mapping successfully done.");
         //  navigate("/imageuploader/scanner");
-       } else {
-         toast.error("Something went wrong");
-       }
-     } catch (error) {
-      console.log(error)
+      } else {
+        toast.error("Something went wrong");
+      }
+    } catch (error) {
+      console.log(error);
       //  toast.error(error.message);
-     } finally {
-       setSubmitLoading(false);
-     }
-   };
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
