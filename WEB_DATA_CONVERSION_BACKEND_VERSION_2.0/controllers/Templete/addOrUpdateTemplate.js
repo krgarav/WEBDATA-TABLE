@@ -110,7 +110,7 @@ const addOrUpdateTemplate = async (req, res) => {
       });
 
       // Delete existing metadata and images
-      await MetaData.destroy({ where: { templeteId: template.id } });
+      // await MetaData.destroy({ where: { templeteId: template.id } });
       await ImageData.destroy({ where: { templeteId: template.id } });
     } else if (templateId === undefined) {
       // Create a new template
@@ -129,14 +129,30 @@ const addOrUpdateTemplate = async (req, res) => {
     }
 
     // Add new metadata
-    await Promise.all(
-      metaData.map((current) => {
-        return MetaData.create({
-          ...current,
-          templeteId: template.id,
-        });
-      })
-    );
+   await Promise.all(
+  metaData.map(async (current) => {
+    const existing = await MetaData.findOne({
+      where: {
+        templeteId: template.id,              // must match id
+        attribute: current.attribute // must match attribute
+      },
+    });
+
+    if (existing) {
+      // ✔ UPDATE if both id & attribute match
+      return existing.update({
+        ...current,
+        templeteId: template.id,
+      });
+    } else {
+      // ✔ CREATE new record otherwise
+      return MetaData.create({
+        ...current,
+        templeteId: template.id,
+      });
+    }
+  })
+);
 
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: "No images were uploaded" });

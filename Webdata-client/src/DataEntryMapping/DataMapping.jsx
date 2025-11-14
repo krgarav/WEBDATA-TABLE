@@ -21,6 +21,10 @@ const DataMapping = () => {
   const [formData, setFormData] = useState([]);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [editedData, setEditedData] = useState([]);
+  const [templateData, settemplateData] = useState([]);
+ 
+  const [invalidMap, setInvalidMap] = useState(); // { key: boolean }
+  console.log(invalidMap);
   const imageRef = useRef(null);
   const inputRefs = useRef({});
   const invalidIndex = useRef(0);
@@ -79,6 +83,11 @@ const DataMapping = () => {
   useEffect(() => {
     setFormData(Array.isArray(data.formdata) ? data.formdata : [data.formdata]);
   }, [data]);
+// console.log(templateData?.[0]?.patternDefinition)
+// console.log(templateData?.[0]?.blankDefination)
+// console.log(formData)
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -100,7 +109,7 @@ const DataMapping = () => {
     };
     fetchData();
   }, [currentIndex]);
-
+  console.log(data);
   useEffect(() => {
     const handleTabKey = (e) => {
       if (e.key === "Tab") {
@@ -207,11 +216,23 @@ const DataMapping = () => {
   };
 
   const saveHandler = async (updatedData) => {
+
+  //   const hasInvalid = Object.values(invalidMap).some(v => v === true);
+
+  // if (hasInvalid) {
+  //  toast.error("formField still has error")
+  //  return
+  // }
+
+  
+    
     const mergedData = {
       ...(Array.isArray(formData) && formData.length > 0
         ? formData[0]
         : formData),
       ...updatedData,
+
+      
     };
     // console.log(updatedData);
     const obj = {
@@ -243,7 +264,7 @@ const DataMapping = () => {
       imageRef.current.style.transformOrigin = "initial";
     }
   };
-  console.log(imageData);
+  console.log(templateData);
   return (
     <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-[100vh] pt-16">
       <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-600 dataEntry ">
@@ -255,6 +276,13 @@ const DataMapping = () => {
           setEditedData={setEditedData}
           setImageData={setImageData}
           inputRefs={inputRefs}
+          imageData={imageData}
+          editedData={editedData}
+          templateData={templateData}
+          setInvalidMap={setInvalidMap}
+          invalidMap={invalidMap}
+          //   setHasInvalidFields={setHasInvalidFields}
+          //   hasInvalidFields={hasInvalidFields}
         />
 
         <div className="flex-col w-full">
@@ -284,6 +312,8 @@ const DataMapping = () => {
             editedData={editedData}
             inputIndexRef={inputIndexRef}
             invalidIndex={invalidIndex}
+            settemplateData={settemplateData}
+            formData={formData}
           />
         </div>
       </div>

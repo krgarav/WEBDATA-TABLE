@@ -14,6 +14,8 @@ const QuestionDataEntrySection = ({
   inputRefs,
   inputIndexRef,
   invalidIndex,
+  settemplateData,
+  formData
 }) => {
   const [questionData, setQuestionData] = useState([]);
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
@@ -25,7 +27,7 @@ const QuestionDataEntrySection = ({
     setEditableData(data.questionData);
     setEditedData([]);
   }, [data]);
-  console.log(data, setImageData, saveHandler, setEditedData, taskData);
+  console.log({data:data, setImageData:setImageData, saveHandler:saveHandler, setEditedData:setEditedData, taskData:taskData});
   // useEffect(() => {
   //   setQuestionData(
   //     Array.isArray(data.questionData) ? data.questionData : [data.questionData]
@@ -40,6 +42,7 @@ const QuestionDataEntrySection = ({
         settemplateHeader(
           response.filter((a) => a.id === parseInt(taskData.templeteId))
         );
+        settemplateData(response.filter((a) => a.id === parseInt(taskData.templeteId)))
       } catch (error) {
         console.log(error);
       }
@@ -104,6 +107,8 @@ const QuestionDataEntrySection = ({
   //     toast.error(error?.message);
   //   }
   // };
+
+  
 
   useEffect(() => {
     if (columnName !== "") {

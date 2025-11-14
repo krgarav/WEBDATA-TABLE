@@ -53,6 +53,15 @@ const MetaData = sequelize.define("templetedata", {
   fieldLength: {
     type: Sequelize.STRING,
   },
+  pattern:{
+     type: Sequelize.BOOLEAN,
+  },
+  blank:{
+     type: Sequelize.BOOLEAN,
+  },
+  empty:{
+     type: Sequelize.BOOLEAN,
+  },
 
   templeteId: {
     type: Sequelize.INTEGER,

@@ -23,7 +23,7 @@ const EditMappedDataModel = ({ isOpen, onClose, selectedCoordinates }) => {
   let { fileId } = JSON.parse(localStorage.getItem("fileId")) || "";
   let templeteId = JSON.parse(localStorage.getItem("templeteId"));
   const navigate = useNavigate();
-
+console.log(selectedCoordinates)
   useEffect(() => {
     const fetchTemplate = async () => {
       try {
