@@ -9,7 +9,7 @@ const getTempleteData = async (req, res, next) => {
         {
           model: MetaData,
           attributes: {
-            exclude: ["id", "templeteId", "createdAt", "updatedAt"], // Specify the fields to be excluded
+            exclude: [ "templeteId", "createdAt", "updatedAt"], // Specify the fields to be excluded
           },
         },
       ],

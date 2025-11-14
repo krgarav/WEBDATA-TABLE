@@ -15,8 +15,10 @@ const CoordinateData = ({
   setLengthOfField,
   inputField,
   setInputField,
+  // patternSelection,
+  // setpatternSelection,
 }) => {
-  console.log(lengthOfField);
+  // console.log(patternSelection);
   return (
     <>
       {open && (
@@ -213,6 +215,52 @@ const CoordinateData = ({
                             Save
                           </button>
                         </div>
+                        {/* <div className="flex items-center gap-6">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={!!patternSelection.pattern}
+                              onChange={(e) =>
+                                setpatternSelection((prev) => ({
+                                  ...prev,
+                                  pattern: e.target.checked,
+                                }))
+                              }
+                              className="w-5 h-5"
+                            />
+                            <span className="text-lg select-none">Pattern</span>
+                          </label>
+
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={!!patternSelection.blank}
+                              onChange={(e) =>
+                                setpatternSelection((prev) => ({
+                                  ...prev,
+                                  blank: e.target.checked,
+                                }))
+                              }
+                              className="w-5 h-5"
+                            />
+                            <span className="text-lg select-none">Blank</span>
+                          </label>
+
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={!!patternSelection.empty}
+                              onChange={(e) =>
+                                setpatternSelection((prev) => ({
+                                  ...prev,
+                                  empty: e.target.checked,
+                                }))
+                              }
+                              className="w-5 h-5"
+                            />
+                            <span className="text-lg select-none">Empty</span>
+                          </label>
+                        </div> */}
                       </div>
                     ) : (
                       <div className="flex gap-5">
@@ -270,6 +318,7 @@ const CoordinateData = ({
                             className="h-10 w-16 rounded border-2 border-gray-200 text-center"
                           />
                         </div>
+                        
                         <button
                           type="button"
                           className="bg-teal-600 hover:bg-indigo-500 text-white rounded-lg hover:shadow-lg hover:shadow-blue-200 text-md font-medium px-6"

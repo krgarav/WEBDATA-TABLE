@@ -12,7 +12,9 @@ import OptionData from "./OptionData";
 import DynamicInput from "./DynamicInput";
 import ConfirmationModal from "../../components/ConfirmationModal/ConfirmationModal";
 import Permissions from "./Permissions";
-import useAutoScroll from '../../components/useAutoScroll'
+import useAutoScroll from "../../components/useAutoScroll";
+import { IoSettings } from "react-icons/io5";
+import SettingModel from "./SettingModel";
 
 const ImageScanner = () => {
   const [selection, setSelection] = useState(null);
@@ -33,7 +35,12 @@ const ImageScanner = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const dataCtx = useContext(dataContext);
   const [selectedRow, setSelectedRow] = useState(null);
-  const [selectedtemplate, setselectedtemplate] = useState("")
+  const [selectedtemplate, setselectedtemplate] = useState("");
+  const [patternSelection, setpatternSelection] = useState({
+    pattern: "",
+    blank: "",
+    empty: "",
+  });
   // const { startAutoScroll, stopAutoScroll } = useAutoScroll();
   const [templatePermissions, setTemplatePermissions] = useState({
     blankDefination: "",
@@ -52,9 +59,16 @@ const ImageScanner = () => {
   });
   const containerRef = useRef(null);
 
-  const { updateScroll, stopScroll } = useAutoScroll({ containerRef, threshold: 50, speed: 10 });
+  const { updateScroll, stopScroll } = useAutoScroll({
+    containerRef,
+    threshold: 50,
+    speed: 10,
+  });
+
+  const [settingModel, setsettingModel] = useState(false);
 
   const token = JSON.parse(localStorage.getItem("userData"));
+  const templateId = JSON.parse(localStorage.getItem("templeteId"));
   const imageRef = useRef(null);
   const navigate = useNavigate();
   const imageURL = JSON.parse(localStorage.getItem("images"));
@@ -81,6 +95,7 @@ const ImageScanner = () => {
                 fieldRange: data.fieldRange,
                 fieldLength: data.fieldLength,
                 dataFieldType: data.dataFieldType,
+             
               };
               return newObj;
             }
@@ -104,7 +119,7 @@ const ImageScanner = () => {
       }
     }
   }, []);
-
+// console.log(selectedCoordinateData)
   useEffect(() => {
     if (imageURL && imageURL.length > 0) {
       setImage(imageURL[currentImageIndex]);
@@ -150,7 +165,7 @@ const ImageScanner = () => {
     if (dragStart) {
       setDragStart(null);
       setOpen(true);
-      stopScroll()
+      stopScroll();
     }
   };
   // Function to handle mouse move event for drag selection
@@ -162,17 +177,16 @@ const ImageScanner = () => {
     const offsetX = e.clientX - boundingRect.left;
     const offsetY = e.clientY - boundingRect.top;
 
-    
-    updateScroll(e.clientY)
+    updateScroll(e.clientY);
 
-  //   const container = imageRef.current.parentElement;
-  //   if (offsetY > container.clientHeight - 10) {
-  //     container.scrollBy({
-  //   top: 30,             // amount to scroll
-  //   left: 0,
-  //   behavior: "smooth",  // enables smooth scrolling
-  // });
-  //   }
+    //   const container = imageRef.current.parentElement;
+    //   if (offsetY > container.clientHeight - 10) {
+    //     container.scrollBy({
+    //   top: 30,             // amount to scroll
+    //   left: 0,
+    //   behavior: "smooth",  // enables smooth scrolling
+    // });
+    //   }
 
     setSelection({
       coordinateX: Math.min(dragStart.x, offsetX),
@@ -182,7 +196,6 @@ const ImageScanner = () => {
       pageNo: currentImageIndex,
     });
   };
- 
 
   const onResetHandler = () => {
     setDragStart(null);
@@ -669,7 +682,6 @@ const ImageScanner = () => {
                     style={{
                       position: "relative",
                       height: "50rem",
-                       
                     }}
                     className="w-full overflow-y-auto"
                     ref={containerRef}
@@ -699,14 +711,24 @@ const ImageScanner = () => {
                             onDoubleClick={() =>
                               onEditCoordinateDataHanlder(data.fId)
                             }
-                            onClick={()=>console.log({left: data.coordinateX,
-                              top: data.coordinateY,
-                              width: data.width,
-                              height: data.height})}
+                            onClick={() =>
+                              console.log({
+                                left: data.coordinateX,
+                                top: data.coordinateY,
+                                width: data.width,
+                                height: data.height,
+                              })
+                            }
                             style={{
-                              border:data?.fId===selectedtemplate? "3px solid #ff0000ff":"3px solid #007bff",
+                              border:
+                                data?.fId === selectedtemplate
+                                  ? "3px solid #ff0000ff"
+                                  : "3px solid #007bff",
                               position: "absolute",
-                              backgroundColor:data?.fId===selectedtemplate? "rgba(255, 0, 21, 0.2)":"rgba(0, 123, 255, 0.2)",
+                              backgroundColor:
+                                data?.fId === selectedtemplate
+                                  ? "rgba(255, 0, 21, 0.2)"
+                                  : "rgba(0, 123, 255, 0.2)",
                               left: data.coordinateX,
                               top: data.coordinateY,
                               width: data.width,
@@ -743,6 +765,8 @@ const ImageScanner = () => {
                         setLengthOfField={setLengthOfField}
                         inputField={inputField}
                         setInputField={setInputField}
+                        // setpatternSelection={setpatternSelection}
+                        // patternSelection={patternSelection}
                       />
                     </>
                   </div>
@@ -752,6 +776,23 @@ const ImageScanner = () => {
           </div>
         </div>
       )}
+
+      <div
+        onClick={() => setsettingModel(true)}
+        className="absolute right-12 bottom-12 bg-white p-3 rounded-full cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,1)] hover:shadow-[0_4px_20px_rgba(0,0,0,1)] transition-all duration-300"
+      >
+        <IoSettings
+          className={`text-[35px] transition-transform duration-500 ${
+            settingModel ? "rotate-90" : "rotate-0"
+          }`}
+        />
+      </div>
+      <SettingModel
+        setsettingModel={setsettingModel}
+        settingModel={settingModel}
+        token={token}
+        templateId={templateId}
+      />
     </div>
   );
 };
