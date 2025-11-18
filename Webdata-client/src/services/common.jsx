@@ -292,6 +292,7 @@ export const updateCsvData = async (obj) => {
     return response.data;
   } catch (error) {
     console.log(error);
+    return error
   }
 };
 

@@ -20,22 +20,20 @@ const AdminAssined = () => {
   const [taskEditId, setTaskEditId] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [taskType, setTaskType] = useState("ALL");
-  const [loading,setLoading] = useState(false)
-  const [taskstatus, settaskstatus] = useState()
+  const [loading, setLoading] = useState(false);
+  const [taskstatus, settaskstatus] = useState();
   const navigate = useNavigate();
+  const [downloadBox, setdownloadBox] = useState(null);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
         const token = JSON.parse(localStorage.getItem("userData"));
-        const response = await axios.get(
-          `${window.SERVER_IP}/assignedTasks`,
-          {
-            headers: {
-              token: token,
-            },
-          }
-        );
+        const response = await axios.get(`${window.SERVER_IP}/assignedTasks`, {
+          headers: {
+            token: token,
+          },
+        });
         const AssignedData = response.data.assignedData;
 
         // const verifiedUser = await onGetVerifiedUserHandler();
@@ -202,7 +200,7 @@ const AdminAssined = () => {
     }
 
     try {
-      setLoading(true)
+      setLoading(true);
       const response = await fetch(
         `${window.SERVER_IP}/download/csv/${currentTaskData.id}`,
         {
@@ -217,6 +215,8 @@ const AdminAssined = () => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
+
+      console.log(response);
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -241,10 +241,100 @@ const AdminAssined = () => {
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
+      setdownloadBox(null)
     } catch (error) {
       console.error("Error downloading the file:", error);
-    }finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onSelectedDownloadHandler = async (currentTaskData) => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        `${window.SERVER_IP}/download/separatecsv/${currentTaskData.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            token: token,
+          },
+        }
+      );
+      console.log(
+        response.headers.get("x-incomplete-tasks"),
+        response.headers.get("x-incomplete-count")
+      
+      );
+      // debug: print all headers (see console)
+      // console.log("Response ", response);
+      // response.headers.forEach((value, key) => {
+      //   console.log("header:", key, "=>", value);
+      // });
+
+      // Handle failed responses (server returns JSON error)
+      if (!response.ok) {
+        let errorMessage = "Download failed.";
+        try {
+          const data = await response.json();
+          errorMessage = data.message || data.error || errorMessage;
+        } catch (_) {}
+        toast.error(errorMessage);
+        return;
+      }
+
+      // ✅ Check warning headers (use lowercase keys)
+      const hasWarning = response.headers.get("x-incomplete-tasks");
+      if (hasWarning === "true") {
+        const count = response.headers.get("x-incomplete-count") || 0;
+        toast.warning(
+          `⚠ Warning: ${count} task(s) are incomplete. CSV will still be downloaded.`,{autoClose: 10000},
+        );
+      }
+
+      // Proceed to download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+
+      // Extract filename from headers (lowercase key)
+      const contentDisposition = response.headers.get("content-disposition");
+      let filename = currentTaskData?.taskName || "download.csv";
+
+      if (
+        contentDisposition &&
+        contentDisposition.toLowerCase().includes("attachment")
+      ) {
+        // support filename="name" and RFC5987 filename*=UTF-8''name
+        let match =
+          /filename\*=(?:UTF-8'')?([^;]+)/i.exec(contentDisposition) ||
+          /filename="?([^;"\n]+)"?/i.exec(contentDisposition);
+
+        if (match && match[1]) {
+          try {
+            filename = decodeURIComponent(match[1].replace(/['"]/g, ""));
+          } catch {
+            filename = match[1].replace(/['"]/g, "");
+          }
+        }
+      }
+
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+
+      // Cleanup
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      setdownloadBox(null)
+    } catch (error) {
+      console.error("Error downloading the file:", error);
+      toast.error("Something went wrong during download.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -252,9 +342,7 @@ const AdminAssined = () => {
     // console.log(currentTask);
     try {
       const data = await axios.post(
-        `${window.SERVER_IP}/taskupdation/${parseInt(
-          currentTask.id
-        )}`,
+        `${window.SERVER_IP}/taskupdation/${parseInt(currentTask.id)}`,
         { taskStatus: false },
         {
           headers: {
@@ -262,8 +350,8 @@ const AdminAssined = () => {
           },
         }
       );
-      console.log(data.data)
-      settaskstatus(data.data)
+      console.log(data.data);
+      settaskstatus(data.data);
       const updatedTasks = compareTask.map((task) => {
         if (task.id === currentTask.id) {
           return { ...task, taskStatus: false };
@@ -443,6 +531,9 @@ const AdminAssined = () => {
                         taskType={taskType}
                         selectedDate={selectedDate}
                         taskStatus={taskstatus}
+                        onSelectedDownloadHandler={onSelectedDownloadHandler}
+                        setdownloadBox={setdownloadBox}
+                        downloadBox={downloadBox}
                       />
                     </div>
                   </div>

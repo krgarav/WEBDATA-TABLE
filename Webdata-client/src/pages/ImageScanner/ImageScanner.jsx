@@ -95,7 +95,6 @@ const ImageScanner = () => {
                 fieldRange: data.fieldRange,
                 fieldLength: data.fieldLength,
                 dataFieldType: data.dataFieldType,
-             
               };
               return newObj;
             }
@@ -119,7 +118,7 @@ const ImageScanner = () => {
       }
     }
   }, []);
-// console.log(selectedCoordinateData)
+  console.log(templatePermissions);
   useEffect(() => {
     if (imageURL && imageURL.length > 0) {
       setImage(imageURL[currentImageIndex]);
@@ -366,7 +365,7 @@ const ImageScanner = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-
+    
     if (!templatePermissions.patternDefinition) {
       toast.error("Please select the pattern");
       return;
@@ -792,6 +791,7 @@ const ImageScanner = () => {
         settingModel={settingModel}
         token={token}
         templateId={templateId}
+        templatePermissions={templatePermissions}
       />
     </div>
   );

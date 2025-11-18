@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { MdOutlineRestartAlt } from "react-icons/md";
-import { FaCloudDownloadAlt, FaRegEdit } from "react-icons/fa";
+import { FaCloudDownloadAlt, FaRegEdit, FaChevronDown } from "react-icons/fa";
 import { MdOutlineTaskAlt } from "react-icons/md";
 import axios from "axios";
 import {
@@ -13,12 +13,15 @@ const AdminMatchingTasks = ({
   onCompleteHandler,
   matchingTask,
   onDownloadHandler,
+  onSelectedDownloadHandler,
   setTaskEdit,
   setTaskEditId,
   taskType,
   selectedDate,
   setMatchingTask,
   taskstatus,
+  setdownloadBox,
+  downloadBox,
 }) => {
   const token = JSON.parse(localStorage.getItem("userData"));
   const [status, setstatus] = useState({});
@@ -30,7 +33,10 @@ const AdminMatchingTasks = ({
   const toggleReassignBox = (taskId) => {
     setOpenBox(null);
     setActiveTaskId((prev) => (prev === taskId ? null : taskId));
-    console.log(activeTaskId)
+    console.log(activeTaskId);
+  };
+  const toggleDownloadBox = (taskId) => {
+    setdownloadBox((prev) => (prev === taskId ? null : taskId));
   };
 
   const toggleBox = (taskId) => {
@@ -91,11 +97,14 @@ const AdminMatchingTasks = ({
   };
 
   const completeHandler = async (taskId) => {
-    const response = await axios.get(`${window.SERVER_IP}/submitTask/${taskId}`, {
-      headers: {
-        token: token,
-      },
-    });
+    const response = await axios.get(
+      `${window.SERVER_IP}/submitTask/${taskId}`,
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
     setMatchingTask((prev) =>
       prev.map((task) => {
         if (task.id == taskId) {
@@ -156,15 +165,13 @@ const AdminMatchingTasks = ({
     console.log("matchingTask updated:", matchingTask);
   }, [matchingTask]);
 
-  console.log({"allusers":allusers,"taskData":filteredTasks});
+  console.log({ allusers: allusers, taskData: filteredTasks });
 
   return (
     <div>
       {filteredTasks?.map((taskData) => (
-        
         <div key={taskData.id} className="flex  justify-center">
           <div className="whitespace-nowrap w-[100px] py-2">
-         
             <div className="text-center text-md ">{taskData.templateName}</div>
           </div>
           <div className="whitespace-nowrap w-[100px] py-2">
@@ -264,7 +271,10 @@ const AdminMatchingTasks = ({
               <div className="absolute  w-[250px] h-[250px] z-20 bg-white shadow-lg border border-gray-300 rounded-xl flex justify-center items-center flex-col gap-10">
                 <div className="overflow-y-auto h-[310px]">
                   {allusers?.map((user, i) => {
-                    if (user.role !== "Admin"&& user.userName!==taskData.userName) {
+                    if (
+                      user.role !== "Admin" &&
+                      user.userName !== taskData.userName
+                    ) {
                       return (
                         <label
                           key={user.id}
@@ -325,7 +335,10 @@ const AdminMatchingTasks = ({
           </div>
           <div className="whitespace-nowrap text-center w-[100px] py-2">
             <button
-              onClick={() => onDownloadHandler(taskData)}
+              type="button"
+              onClick={() =>
+                taskData.taskStatus && toggleDownloadBox(taskData.id)
+              }
               className={`rounded-3xl px-4 py-1 font-semibold ${
                 taskData.taskStatus
                   ? "bg-indigo-500 text-white border border-indigo-500"
@@ -334,7 +347,44 @@ const AdminMatchingTasks = ({
               disabled={!taskData.taskStatus}
             >
               <FaCloudDownloadAlt />
+              {/* <FaChevronDown className="text-xs" /> */}
             </button>
+
+            {/* menu */}
+            {downloadBox === taskData.id && (
+              <div
+                role="menu"
+                aria-label="Download options"
+                className="absolute  mt-2 w-[fit-content] rounded-lg bg-white shadow-lg border ring-1 ring-black/5 z-50"
+              >
+                <ul className="py-1">
+                  <li>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        onDownloadHandler(taskData);
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-indigo-50 hover:text-indigo-700"
+                    >
+                      Download Combined CSV
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        onSelectedDownloadHandler(taskData);
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-indigo-50 hover:text-indigo-700"
+                    >
+                      Download Selected CSV
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
           <div
             onClick={() => {

@@ -1,7 +1,7 @@
 // const Sequelize = require("sequelize");
 const { app } = require("electron");
 const dotenv = require("dotenv");
-dotenv.config({ path: app.getAppPath() + "/.env" });
+// dotenv.config({ path: app.getAppPath() + "/.env" });
 // const sequelize = new Sequelize("omrusermanagement", "root", "12345678", {
 //   dialect: "mysql",
 //   host: "localhost",

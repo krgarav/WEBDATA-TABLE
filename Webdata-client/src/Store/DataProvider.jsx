@@ -26,6 +26,7 @@ const initialData = {
 
 const DataProvider = (props) => {
   const [dataState, setDataState] = useState(initialData);
+  console.log(dataState)
 
   const addToCsvHeaderHandler = (data) => {
     setDataState((item) => {
@@ -189,6 +190,7 @@ const DataProvider = (props) => {
   };
 
   const modifyTemplateDataHandler = (templateData) => {
+    console.log(templateData)
     setDataState((item) => {
       return {
         ...item,

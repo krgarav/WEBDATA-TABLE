@@ -243,9 +243,22 @@ const DataMapping = () => {
       editedData: editedData,
       updatedData: mergedData,
     };
-    const res = await updateCsvData(obj);
-    nextHandler();
-    console.log(res);
+
+    
+      const res = await updateCsvData(obj);
+
+      if(res.status===400){
+        console.log(res.response.data)
+        res.response.data.errors.map((err)=>{
+          toast.warning(err.message,{autoClose:7000})
+        })
+      }else{
+
+        nextHandler();
+      }
+      console.log(res);
+    
+    
   };
 
   const zoomInHandler = () => {
@@ -264,7 +277,7 @@ const DataMapping = () => {
       imageRef.current.style.transformOrigin = "initial";
     }
   };
-  console.log(templateData);
+  console.log(invalidMap);
   return (
     <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-[100vh] pt-16">
       <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-600 dataEntry ">
