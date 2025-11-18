@@ -237,6 +237,7 @@ const CsvUploader = () => {
         toast.warning("No image found.");
         return;
       }
+      console.log(response.data.template)
       const data = response.data.template;
       const templateData = {
         templateData: {

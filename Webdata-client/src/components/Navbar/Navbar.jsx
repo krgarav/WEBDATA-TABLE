@@ -215,6 +215,7 @@ export default function Navbar() {
                       className={`text-lg px-2 xl:px-4 rounded-3xl py-1 no-underline ${active}`}
                       onClick={() => {
                         setIsUserMenuOpen(false);
+                        datactx.modifyTemplateData(null)
                       }}
                     >
                       {item.name}

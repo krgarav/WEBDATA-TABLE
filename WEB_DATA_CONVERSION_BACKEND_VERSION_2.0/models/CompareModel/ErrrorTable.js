@@ -33,7 +33,7 @@ const ErrorTable = sequelize.define("errorTable", {
     allowNull: false,
   },
   Corrected: {
-    type: Sequelize.STRING,
+    type: Sequelize.TEXT,
   },
   CorrectedBy: {
     type: Sequelize.STRING,

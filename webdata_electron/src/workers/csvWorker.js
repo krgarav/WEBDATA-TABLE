@@ -4,7 +4,7 @@ const csvParser = require("csv-parser");
 const { createObjectCsvWriter } = require("csv-writer");
 
 try {
-    console.log("Worker started with data:", workerData);
+    // console.log("Worker started with data:", workerData);
 
     const { originalFilePath, errorFilePath, correctedCsvFilePath, updates, email } = workerData;
 

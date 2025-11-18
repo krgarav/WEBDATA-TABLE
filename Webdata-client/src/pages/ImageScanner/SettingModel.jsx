@@ -3,7 +3,13 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { FaSadCry } from "react-icons/fa";
 
-const SettingModel = ({ settingModel, setsettingModel, token, templateId }) => {
+const SettingModel = ({
+  settingModel,
+  setsettingModel,
+  token,
+  templateId,
+  templatePermissions,
+}) => {
   const [templateData, settemplateData] = useState();
   //   const [items, setItems] = useState([]);
   //   const [original, setOriginal] = useState([]);
@@ -45,7 +51,7 @@ const SettingModel = ({ settingModel, setsettingModel, token, templateId }) => {
 
     // Example update logic (modify as needed)
     settemplateData((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [type]: checked } :item))
+      prev.map((item) => (item.id === id ? { ...item, [type]: checked } : item))
     );
   };
   const handleSubmit = async () => {
@@ -80,7 +86,7 @@ const SettingModel = ({ settingModel, setsettingModel, token, templateId }) => {
     }
   };
 
-  console.log(templateData);
+  console.log(templatePermissions);
   return (
     <>
       {settingModel && (
@@ -103,57 +109,126 @@ const SettingModel = ({ settingModel, setsettingModel, token, templateId }) => {
             </span>
 
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-              {templateData.filter((field)=>field.fieldType==="formField"&&field).map((data, index) => (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "8px",
+                  padding: "12px",
+                  border: "1px solid #ddd",
+                  borderRadius: "8px",
+                  background: "#f9f9f9",
+                  width: "100%",
+                }}
+              >
+                {/* Pattern Definition */}
                 <div
-                  key={index}
-                  className="flex justify-between items-center p-5 border-b border-gray-300"
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "8px 10px",
+                    background: "white",
+                    borderRadius: "6px",
+                    border: "1px solid #eee",
+                  }}
                 >
-                  {/* Left Side - Attribute */}
-                  <span className="text-xl font-medium">{data.attribute}</span>
-
-                  {/* Right Side - Checkboxes */}
-                  <div className="flex gap-10 items-center">
-                    {/* Pattern */}
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={data.pattern}
-                        onChange={(e) =>
-                          handleCheckboxChange(e, "pattern", data.id)
-                        }
-                        className="w-5 h-5"
-                      />
-                      <span className="text-lg">Pattern</span>
-                    </label>
-
-                    {/* Blank */}
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={data.blank}
-                        onChange={(e) =>
-                          handleCheckboxChange(e, "blank", data.id)
-                        }
-                        className="w-5 h-5"
-                      />
-                      <span className="text-lg">Blank</span>
-                    </label>
-
-                    {/* Empty */}
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={data.empty}
-                        onChange={(e) =>
-                          handleCheckboxChange(e, "empty", data.id)
-                        }
-                        className="w-5 h-5"
-                      />
-                      <span className="text-lg">Empty</span>
-                    </label>
-                  </div>
+                  <label style={{ fontWeight: "600", color: "#333" }}>
+                    Pattern Definition:
+                  </label>
+                  <span
+                    style={{
+                      color: "#555",
+                      marginLeft: "10px",
+                      fontSize: "25px",
+                    }}
+                  >
+                    {templatePermissions.patternDefinition || "— Not Defined —"}
+                  </span>
                 </div>
-              ))}
+
+                {/* Blank Definition */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "8px 10px",
+                    background: "white",
+                    borderRadius: "6px",
+                    border: "1px solid #eee",
+                  }}
+                >
+                  <label style={{ fontWeight: "600", color: "#333" }}>
+                    Blank Definition:
+                  </label>
+                  <span
+                    style={{
+                      color: "#555",
+                      marginLeft: "10px",
+                      fontSize: "25px",
+                    }}
+                  >
+                    {templatePermissions.blankDefination || "— Not Defined —"}
+                  </span>
+                </div>
+              </div>
+
+              {templateData
+                .filter((field) => field.fieldType === "formField" && field)
+                .map((data, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center p-5 border-b border-gray-300"
+                  >
+                    {/* Left Side - Attribute */}
+                    <span className="text-xl font-medium">
+                      {data.attribute}
+                    </span>
+
+                    {/* Right Side - Checkboxes */}
+                    <div className="flex gap-10 items-center">
+                      {/* Pattern */}
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={data.pattern}
+                          onChange={(e) =>
+                            handleCheckboxChange(e, "pattern", data.id)
+                          }
+                          className="w-5 h-5"
+                        />
+                        <span className="text-lg">Pattern</span>
+                      </label>
+
+                      {/* Blank */}
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={data.blank}
+                          onChange={(e) =>
+                            handleCheckboxChange(e, "blank", data.id)
+                          }
+                          className="w-5 h-5"
+                        />
+                        <span className="text-lg">Blank</span>
+                      </label>
+
+                      {/* Empty */}
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={data.empty}
+                          onChange={(e) =>
+                            handleCheckboxChange(e, "empty", data.id)
+                          }
+                          className="w-5 h-5"
+                        />
+                        <span className="text-lg">Empty</span>
+                      </label>
+                    </div>
+                  </div>
+                ))}
               <div className="flex justify-center m-5">
                 <button
                   onClick={handleSubmit}

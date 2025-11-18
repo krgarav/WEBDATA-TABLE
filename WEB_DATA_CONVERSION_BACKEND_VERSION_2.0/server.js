@@ -56,7 +56,12 @@ const { swaggerUi, swaggerSpec } = require("./swagger");
 // }
 
 //middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: "*", // or specific domain
+    exposedHeaders: ["X-Incomplete-Tasks", "X-Incomplete-Count","Content-Disposition"],
+  })
+);
 app.use(express.json());
 app.use(bodyParser.json({ extended: false }));
 app.use(bodyParser.urlencoded({ extended: false }));

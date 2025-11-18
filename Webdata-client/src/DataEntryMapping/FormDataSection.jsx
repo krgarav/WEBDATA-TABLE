@@ -46,10 +46,10 @@ const FormDataEntrySection = ({
 
   const patternDef = templateData?.[0]?.patternDefinition ?? "";
   const blankDef = templateData?.[0]?.blankDefination ?? "";
-    const blank = blankDef==="space"&& " "
+    const blank = blankDef==="space"? " ": blankDef
   // If it's an addition (not deletion), enforce forbidden rules.
-
-   if(newValue.includes(patternDef)|| newValue.includes(blank)){
+console.log(blank)
+   if(newValue.includes(patternDef)|| newValue.includes(patternDef)){
      setInvalidMap(prev=>({...prev,[key]:true}))
 
    }else{
@@ -145,7 +145,7 @@ const FormDataEntrySection = ({
 
 
 
-  // console.log(imageData);
+  console.log(templateData);
   // console.log(formData);
   // console.log(invalidMap);
   return (
@@ -168,7 +168,7 @@ const FormDataEntrySection = ({
                 </label>
                 <input
                   ref={(el) => {
-                    if (value === " " || value === "*" || value.includes("*") || value.includes(templateData?.[0]?.patternDefinition) || value.includes(templateData?.[0]?.blankDefinition)) {
+                    if (value === " " || value === "*" || value.includes("*") || value.includes(templateData?.[0]?.patternDefinition) || value.includes(templateData?.[0]?.blankDefination)) {
                       inputRefs.current[key] = el;
                     } else {
                       delete inputRefs.current[key]; // Clean up any previous ref
@@ -178,7 +178,7 @@ const FormDataEntrySection = ({
                   value={value || ""}
                   onChange={(e) => handleInputChange(key, e.target.value)}
                   className={`mt-1 border-none p-2 focus:border-transparent text-center rounded-lg focus:outline-none focus:ring-0 sm:text-sm w-48 ${
-                     value.includes(templateData?.[0]?.patternDefinition) || value.includes(templateData?.[0]?.blankDefinition)
+                     value.includes(templateData?.[0]?.patternDefinition) || value.includes(templateData?.[0]?.blankDefination)
                       ? "bg-red-500"
                       : ""
                   } `}

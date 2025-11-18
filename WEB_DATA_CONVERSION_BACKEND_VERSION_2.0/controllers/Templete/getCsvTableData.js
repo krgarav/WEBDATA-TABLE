@@ -110,7 +110,7 @@ const getCsvTableData = async (req, res) => {
       attributes: ["key", "value"],
     });
 
-    console.log(columns);
+    // console.log(columns);
     const metaData = await MetaData.findAll({
       where: {
         templeteId: templeteId,
@@ -177,7 +177,7 @@ const getCsvTableData = async (req, res) => {
         });
         const imageName = resultTwo[imageColName];
         const baseName = path.basename(imageName);
-        console.log(baseName);
+        // console.log(baseName);
         const formData = {};
         const questionData = {};
 

@@ -2,6 +2,7 @@ const Assigndata = require("../../models/TempleteModel/assigndata");
 const Templete = require("../../models/TempleteModel/templete");
 const { Parser } = require("json2csv"); // For converting JSON to CSV
 const sequelize = require("../../utils/database");
+const assignTask = require("../CompareCsv/assignTask");
 
 const downloadMergedCsv = async (req, res) => {
   try {
@@ -20,6 +21,7 @@ const downloadMergedCsv = async (req, res) => {
       where: { templeteId: assigndata.templeteId },
     });
 
+
     // Fetch all assigned data tables in parallel
     const assignedDataResults = await Promise.all(
       allAssignedData.map((assign) =>
@@ -28,8 +30,8 @@ const downloadMergedCsv = async (req, res) => {
         })
       )
     );
-
     const mergedAssignedData = assignedDataResults.flat();
+
 
     const maintableName = template.csvTableName;
 
@@ -37,6 +39,8 @@ const downloadMergedCsv = async (req, res) => {
     const [columns] = await sequelize.query(
       `SHOW COLUMNS FROM \`${maintableName}\``
     );
+
+    //  console.log(columns)
     const columnNames = columns
       .map((col) => `\`${col.Field}\``)
       .filter((col) => col !== "`id`")
@@ -49,12 +53,13 @@ const downloadMergedCsv = async (req, res) => {
         type: sequelize.QueryTypes.SELECT,
       }
     );
-
+// console.log(mainData)
     // Merge the data based on parentId
     const mergedData = mainData.map((row) => {
       const matchedRow = mergedAssignedData.find(
         (assigned) => Number(assigned.parentId) === Number(row.id)
       );
+   
       return matchedRow
         ? {
             ...row,
