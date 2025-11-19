@@ -9,6 +9,7 @@ const SettingModel = ({
   token,
   templateId,
   templatePermissions,
+  selectedCoordinates
 }) => {
   const [templateData, settemplateData] = useState();
   //   const [items, setItems] = useState([]);
@@ -40,7 +41,7 @@ const SettingModel = ({
       settemplateData(data.data?.templetedata);
     };
     fetchTempData();
-  }, [templateId]);
+  }, [templateId,selectedCoordinates]);
 
   const handleCheckboxChange = (e, type, id) => {
     const checked = e.target.checked;

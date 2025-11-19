@@ -190,13 +190,13 @@ const DataProvider = (props) => {
   };
 
   const modifyTemplateDataHandler = (templateData) => {
-    console.log(templateData)
     setDataState((item) => {
       return {
         ...item,
         templateData: templateData,
       };
     });
+    console.log(dataState)
   };
   const setbackendIPHandler = (ip) => {
     setDataState((item) => {

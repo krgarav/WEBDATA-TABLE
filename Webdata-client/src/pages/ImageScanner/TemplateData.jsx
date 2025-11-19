@@ -86,7 +86,8 @@ const TemplateData = ({
                         <MdDelete
                           onClick={() => {
                             setRemoveModal(true);
-                            setRemoveId(data.fId);
+                            setRemoveId(data);
+                            // console.log(data)
                           }}
                           className="mx-auto text-red-500 text-xl hover:text-2xl hover:font-bold cursor-pointer"
                         />
