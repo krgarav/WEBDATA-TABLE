@@ -48,6 +48,7 @@ const getCsvRowData = require("../controllers/Templete/getCsvRowData");
 const updateDuplicateData = require("../controllers/Templete/updateDuplicateData");
 const templateDataPatch = require("../controllers/Templete/templateDataPatch");
 const downloadSeparateCsv = require("../controllers/Templete/downloadSeparateCsv")
+const deleteTemplateData = require('../controllers/Templete/deleteTemplateData')
 
 const router = express.Router();
 
@@ -69,6 +70,7 @@ router.get(
 
 router.post("/updated/details", authMiddleware, updatedDetails); //userId
 router.post("/edit/template/:id", authMiddleware, editTemplateData); //template Id
+router.delete("/delete/templatedata/:id",authMiddleware,deleteTemplateData)
 router.post("/get/templetes", authMiddleware, getTemplete);
 // router.post("/get/csvdata", authMiddleware, getCsvData);
 router.post("/get/image", authMiddleware, getImage);

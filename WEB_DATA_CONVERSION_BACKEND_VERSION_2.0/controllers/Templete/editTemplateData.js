@@ -20,6 +20,8 @@ const editTemplateData = async (req, res) => {
       include: [ImageData, MetaData],
     });
 
+    // console.log(template.templetedata)
+
     if (!template) {
       return res.status(404).json({ message: "Template not found" });
     }

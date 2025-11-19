@@ -69,6 +69,7 @@ const ImageScanner = () => {
 
   const token = JSON.parse(localStorage.getItem("userData"));
   const templateId = JSON.parse(localStorage.getItem("templeteId"));
+  const editFlag = localStorage.getItem("editModel")
   const imageRef = useRef(null);
   const navigate = useNavigate();
   const imageURL = JSON.parse(localStorage.getItem("images"));
@@ -91,6 +92,7 @@ const ImageScanner = () => {
                 pageNo: data.pageNo,
                 fieldType: data.fieldType,
                 fId: index,
+                Id:data.id,
                 attribute: data.attribute,
                 fieldRange: data.fieldRange,
                 fieldLength: data.fieldLength,
@@ -118,7 +120,8 @@ const ImageScanner = () => {
       }
     }
   }, []);
-  console.log(templatePermissions);
+  console.log(selectedCoordinates)
+  // console.log(templatePermissions);
   useEffect(() => {
     if (imageURL && imageURL.length > 0) {
       setImage(imageURL[currentImageIndex]);
@@ -307,7 +310,9 @@ const ImageScanner = () => {
     };
 
     if (selectedCoordinateData) {
+      console.log(selectedCoordinateData)
       const updatedObj = {
+        Id:selectedCoordinateData.Id,
         attribute:
           fieldType === "formField"
             ? inputField
@@ -345,23 +350,31 @@ const ImageScanner = () => {
       min: "",
       max: "",
     });
-    console.log(selectType);
+    // console.log(selectType);
 
     setOpen(false);
     setSelectedCoordinateData(null);
     toast.success("Coordinate successfully added.");
   };
 
-  const onRemoveSelectedHandler = () => {
+  const onRemoveSelectedHandler = async() => {
     const newArray = selectedCoordinates.filter(
-      (data) => data.fId !== removeId
+      (data) => data.fId !== removeId.fId
     );
+    // console.log(removeId)
+   const response= await axios.delete(`${window.SERVER_IP}/delete/templatedata/${removeId.Id}`,{
+      headers:{
+        token:token
+      }
+    })
+    console.log(response.data)
     setSelectedCoordinates(newArray);
     toast.success("Successfully deleted coordinate.");
     setRemoveId("");
     setRemoveModal(false);
     setSelection(null);
   };
+  console.log(selectedCoordinates)
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -431,7 +444,6 @@ const ImageScanner = () => {
         concatenatedString = "1-2-3-4";
       }
     }
-
     const data = {
       templateData: {
         name: templateData.name,
@@ -442,16 +454,18 @@ const ImageScanner = () => {
         isPermittedToEdit: templatePermissions.isPermittedToEdit,
       },
       templateId: dataCtx?.templateData?.templateData?.id
-        ? dataCtx?.templateData?.templateData?.id
-        : undefined,
+      ? dataCtx?.templateData?.templateData?.id
+      : undefined,
       metaData: [...selectedCoordinates],
     };
-
+    
+    console.log(data)
     const formData = new FormData();
 
     // Convert data object to JSON string and append it
     formData.append("data", JSON.stringify(data));
 
+    console.log(imageURL)
     // Append the binary data of each image directly to FormData under the key "images"
     imageURL.forEach((imageData, index) => {
       const contentType = imageData.split(";")[0].split(":")[1];
@@ -461,7 +475,6 @@ const ImageScanner = () => {
       });
       formData.append("images", file);
     });
-
     // Append the array of image files under the key "images"
     try {
       console.log(formData);
@@ -595,6 +608,7 @@ const ImageScanner = () => {
       }));
     }
     setSelectedCoordinateData(selectedCoordinate);
+    console.log(selectedCoordinate)
     setOpen(true);
   };
   console.log(selectedtemplate);
@@ -776,7 +790,7 @@ const ImageScanner = () => {
         </div>
       )}
 
-      <div
+      {editFlag==="true"&&<div
         onClick={() => setsettingModel(true)}
         className="absolute right-12 bottom-12 bg-white p-3 rounded-full cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,1)] hover:shadow-[0_4px_20px_rgba(0,0,0,1)] transition-all duration-300"
       >
@@ -785,14 +799,15 @@ const ImageScanner = () => {
             settingModel ? "rotate-90" : "rotate-0"
           }`}
         />
-      </div>
-      <SettingModel
+      </div>}
+     { <SettingModel
         setsettingModel={setsettingModel}
         settingModel={settingModel}
         token={token}
         templateId={templateId}
         templatePermissions={templatePermissions}
-      />
+        selectedCoordinates={selectedCoordinates}
+      />}
     </div>
   );
 };

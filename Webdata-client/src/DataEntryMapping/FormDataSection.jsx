@@ -179,7 +179,7 @@ console.log(blank)
                   onChange={(e) => handleInputChange(key, e.target.value)}
                   className={`mt-1 border-none p-2 focus:border-transparent text-center rounded-lg focus:outline-none focus:ring-0 sm:text-sm w-48 ${
                      value.includes(templateData?.[0]?.patternDefinition) || value.includes(templateData?.[0]?.blankDefination)
-                      ? "bg-red-500"
+                      ? "bg-red-500 text-white"
                       : ""
                   } `}
                   onFocus={() => setColumnName(key)}

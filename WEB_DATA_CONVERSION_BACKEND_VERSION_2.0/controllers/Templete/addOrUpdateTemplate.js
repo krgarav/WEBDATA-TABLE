@@ -129,30 +129,39 @@ const addOrUpdateTemplate = async (req, res) => {
     }
 
     // Add new metadata
-   await Promise.all(
+    console.log(metaData)
+  await Promise.all(
   metaData.map(async (current) => {
-    const existing = await MetaData.findOne({
-      where: {
-        templeteId: template.id,              // must match id
-        attribute: current.attribute // must match attribute
-      },
-    });
+    const recordId = current.id ?? current.Id;  // handle both cases
 
-    if (existing) {
-      // ✔ UPDATE if both id & attribute match
-      return existing.update({
-        ...current,
-        templeteId: template.id,
-      });
-    } else {
-      // ✔ CREATE new record otherwise
+    if (!recordId) {
+      // No ID → NEW ROW → directly create
       return MetaData.create({
         ...current,
         templeteId: template.id,
       });
     }
+
+    // If ID exists → try to update
+    const existing = await MetaData.findOne({
+      where: { id: recordId },
+    });
+
+    if (existing) {
+      return existing.update({
+        ...current,
+        templeteId: template.id,
+      });
+    }
+
+    // ID given but row not found → create a new one
+    return MetaData.create({
+      ...current,
+      templeteId: template.id,
+    });
   })
 );
+
 
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: "No images were uploaded" });
