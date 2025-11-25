@@ -52,7 +52,9 @@ async function insertDataIntoTable(tableName, data) {
     .join(",");
 
   // Step 4: Execute the SQL INSERT
-  const query = `INSERT INTO \`${tableName}\` (${columns.join(",")}) VALUES ${values};`;
+  const query = `INSERT INTO \`${tableName}\` (${columns.join(
+    ","
+  )}) VALUES ${values};`;
   await sequelize.query(query, { type: QueryTypes.INSERT });
 
   return columnsForRead;
@@ -232,18 +234,30 @@ async function processAndInsertCSV(mergedRecords) {
   // Collect all unique headers from the merged data
   let allHeaders = new Set();
   mergedRecords.forEach((record) => {
-    Object.keys(record).forEach((key) => allHeaders.add(key));
+    Object.keys(record).forEach((key) => allHeaders.add(key.trim()));
   });
 
   const headersArray = Array.from(allHeaders);
+  console.log(allHeaders);
   const { tableName, DynamicModel } = await createDynamicTable(headersArray);
 
   // Ensure each record has all headers
   const formattedRecords = mergedRecords.map((record) => {
     let formattedRecord = {};
+
     headersArray.forEach((header) => {
-      formattedRecord[header] = record[header] ?? null; // Fill missing columns with null
+      let value = record[header];
+
+      // Trim only if the value is a string
+      if (typeof value === "string") {
+        value = value.trim();
+      }
+
+      formattedRecord[header] = value ?? null;
+
+      console.log(value);
     });
+
     return formattedRecord;
   });
 
@@ -310,7 +324,7 @@ async function mergeCSVFiles(fileNames) {
  */
 const handleUpload = async (req, res) => {
   // Step 1: Check user role
-  console.log(req)
+  // console.log(req)
   const userRole = req.role;
   if (userRole !== "Admin") {
     return res
@@ -415,7 +429,7 @@ const handleUpload = async (req, res) => {
           // template.mergedTableName = tableName;
 
           const createdFile = await Files.create({
-            startIndex : 1,
+            startIndex: 1,
             totalFiles: mergedData.length,
             csvFileTable: tableName,
             csvFile: csvFileName,
@@ -441,16 +455,16 @@ const handleUpload = async (req, res) => {
           // }
         } else {
           const [result] = await sequelize.query(
-            `SELECT COUNT(*) AS count FROM \`${templateTable.csvTableName}\``, 
+            `SELECT COUNT(*) AS count FROM \`${templateTable.csvTableName}\``,
             { type: sequelize.QueryTypes.SELECT }
-        );
+          );
           const csvJson = await csvToJson(csvFilePath);
           const columns = await insertDataIntoTable(
             templateTable.csvTableName,
             csvJson
           );
           const createdFile = await Files.create({
-            startIndex:result.count,
+            startIndex: result.count,
             totalFiles: csvJson.length,
             csvFile: csvFileName,
             zipFile: `${timestamp}_${zipFileName}`,

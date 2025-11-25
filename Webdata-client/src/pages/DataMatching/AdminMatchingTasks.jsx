@@ -236,7 +236,7 @@ const AdminMatchingTasks = ({
               <button></button>
             </div>
           </div>
-          <div className="whitespace-nowrap text-center w-[100px] py-2">
+          <div className=" relative whitespace-nowrap text-center w-[100px] py-2">
             <button
               onClick={() => {
                 // gettask(taskData);
@@ -333,7 +333,7 @@ const AdminMatchingTasks = ({
               </div>
             )}
           </div>
-          <div className="whitespace-nowrap text-center w-[100px] py-2">
+          <div className=" relative whitespace-nowrap text-center w-[100px] py-2 ">
             <button
               type="button"
               onClick={() =>
@@ -355,7 +355,7 @@ const AdminMatchingTasks = ({
               <div
                 role="menu"
                 aria-label="Download options"
-                className="absolute  mt-2 w-[fit-content] rounded-lg bg-white shadow-lg border ring-1 ring-black/5 z-50"
+                className="absolute mt-2 w-fit rounded-lg bg-white shadow-lg border ring-1 ring-black/5 z-[5000] max-h-[calc(100vh-100px)] "
               >
                 <ul className="py-1">
                   <li>

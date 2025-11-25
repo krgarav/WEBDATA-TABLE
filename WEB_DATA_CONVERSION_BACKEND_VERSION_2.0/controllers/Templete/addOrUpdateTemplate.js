@@ -129,7 +129,7 @@ const addOrUpdateTemplate = async (req, res) => {
     }
 
     // Add new metadata
-    console.log(metaData)
+    // console.log(metaData)
   await Promise.all(
   metaData.map(async (current) => {
     const recordId = current.id ?? current.Id;  // handle both cases

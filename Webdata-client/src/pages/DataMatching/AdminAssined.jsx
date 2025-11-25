@@ -405,7 +405,7 @@ const AdminAssined = () => {
   };
 
   return (
-    <div className="h-[100vh] flex justify-center items-center bg-gradient-to-r from-blue-400 to-blue-600 templatemapping pt-16">
+    <div className="h-[100vh] flex justify-center items-center bg-gradient-to-r from-blue-400 to-blue-600 templatemapping pt-16 z-0">
       <div className="">
         {/* MAIN SECTION  */}
         <section className=" lg:mx-auto max-w-6xl px-8 py-10 bg-white rounded-xl w-[100vw]">
