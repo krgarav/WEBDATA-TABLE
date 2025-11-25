@@ -8,14 +8,14 @@ const csvToJson = require("../../services/csv_to_json");
 
 const handleData = async (req, res) => {
   const userRole = req.role;
-  console.log(userRole)
+  // console.log(userRole)
   if (userRole !== "Admin") {
     return res
       .status(500)
       .json({ message: "You don't have access for performing this action" });
   }
   const { mappedData ,templateId} = req.body;
-  console.log(templateId)
+  // console.log(templateId)
   try {
     // if (!mappedData.fileId) {
     //   return res.status(400).json({ error: "File not provided" });

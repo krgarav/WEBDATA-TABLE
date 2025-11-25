@@ -1,7 +1,7 @@
 // controllers/Templete/templateDataPatch.js
 const path = require("path");
 const MetaData = require("../../models/TempleteModel/metadata.js");
-console.log(MetaData);
+// console.log(MetaData);
 // PATCH /api/attributes/batch
 // body: { updates: [{ id, pattern?, blank?, empty? }, ...] }
 const templateDataPatch = async (req, res) => {
@@ -39,7 +39,7 @@ const templateDataPatch = async (req, res) => {
         if(blank===null) updateFields.blank = false;
         if (empty !== undefined) updateFields.empty = empty;
         if(empty===null) updateFields.empty = false;
-        console.log(updateFields);
+        // console.log(updateFields);
         // Skip if nothing to update
         if (Object.keys(updateFields).length === 0) {
           return { id, skipped: true, reason: "no fields to update" };

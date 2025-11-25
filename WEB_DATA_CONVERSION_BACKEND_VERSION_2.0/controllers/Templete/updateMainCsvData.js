@@ -147,10 +147,10 @@ WHERE
       }
     );
 
-    console.log(updatedData);
+    // console.log(updatedData);
 
     const results = validateUpdatedData(joinedData, updatedData);
-    console.log(results);
+    // console.log(results);
 
     if (!results.valid) {
       // Use a network-style response (status + message + errors)

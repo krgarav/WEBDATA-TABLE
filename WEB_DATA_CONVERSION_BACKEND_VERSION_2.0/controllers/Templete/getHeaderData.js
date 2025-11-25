@@ -40,7 +40,7 @@ const getHeaderData = (req, res, next) => {
         const headers = Object.keys(data[0]);
         const rowCount = data.length;
 
-        console.log("rowData", data.length);
+        // console.log("rowData", data.length);
 
         res.status(200).json({ headers, rowCount });
       } else {

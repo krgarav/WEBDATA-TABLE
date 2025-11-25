@@ -18,7 +18,7 @@ const getMappedData = async (req, res) => {
     // console.log(transformedData);
     res.status(200).json(transformedData);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
