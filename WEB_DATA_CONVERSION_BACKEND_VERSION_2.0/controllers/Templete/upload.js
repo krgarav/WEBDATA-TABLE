@@ -18,47 +18,103 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // Function to insert data into a table
-async function insertDataIntoTable(tableName, data) {
+// async function insertDataIntoTable(tableName, data) {
+//   if (!data || data.length === 0) return;
+
+//   // Step 1: Trim spaces from column names for all rows
+//   const normalizedData = data.map((row) => {
+//     const normalizedRow = {};
+//     Object.keys(row).forEach((key) => {
+//       const trimmedKey = key.trim(); // Trim spaces from column name
+//       normalizedRow[trimmedKey] = row[key];
+//     });
+//     return normalizedRow;
+//   });
+
+//   // Step 2: Get column names from the first row (already trimmed)
+//   const columnsForRead = Object.keys(normalizedData[0]);
+//   const columns = columnsForRead.map((col) => `\`${col}\``); // Backticks handle special chars
+
+//   // Step 3: Build values string safely, escaping quotes
+//   const values = normalizedData
+//     .map(
+//       (row) =>
+//         `(${columnsForRead
+//           .map(
+//             (col) =>
+//               `'${(row[col] !== undefined ? row[col] : "")
+//                 .toString()
+//                 .replace(/\\/g, "\\\\")
+//                 .replace(/'/g, "\\'")}'`
+//           )
+//           .join(",")})`
+//     )
+//     .join(",");
+
+//   // Step 4: Execute the SQL INSERT
+//   const query = `INSERT INTO \`${tableName}\` (${columns.join(
+//     ","
+//   )}) VALUES ${values};`;
+//   await sequelize.query(query, { type: QueryTypes.INSERT });
+
+//   return columnsForRead;
+// }
+async function insertDataIntoTable(tableName, data, batchSize = 500) {
   if (!data || data.length === 0) return;
 
-  // Step 1: Trim spaces from column names for all rows
+  // Step 1: Normalize column names and trim spaces
   const normalizedData = data.map((row) => {
     const normalizedRow = {};
     Object.keys(row).forEach((key) => {
-      const trimmedKey = key.trim(); // Trim spaces from column name
+      const trimmedKey = key.trim();
       normalizedRow[trimmedKey] = row[key];
     });
     return normalizedRow;
   });
 
-  // Step 2: Get column names from the first row (already trimmed)
+  // Step 2: Get column names from the first row
   const columnsForRead = Object.keys(normalizedData[0]);
-  const columns = columnsForRead.map((col) => `\`${col}\``); // Backticks handle special chars
+  const columns = columnsForRead.map((col) => `\`${col}\``);
 
-  // Step 3: Build values string safely, escaping quotes
-  const values = normalizedData
-    .map(
-      (row) =>
-        `(${columnsForRead
-          .map(
-            (col) =>
-              `'${(row[col] !== undefined ? row[col] : "")
-                .toString()
-                .replace(/\\/g, "\\\\")
-                .replace(/'/g, "\\'")}'`
-          )
-          .join(",")})`
-    )
-    .join(",");
+  // Step 3: Insert in batches
+  for (let i = 0; i < normalizedData.length; i += batchSize) {
+    const batch = normalizedData.slice(i, i + batchSize);
 
-  // Step 4: Execute the SQL INSERT
-  const query = `INSERT INTO \`${tableName}\` (${columns.join(
-    ","
-  )}) VALUES ${values};`;
-  await sequelize.query(query, { type: QueryTypes.INSERT });
+    // Build batch VALUES SQL
+    const values = batch
+      .map(
+        (row) =>
+          `(${columnsForRead
+            .map((col) => {
+              let val = row[col] ?? "";
+
+              // Convert to string & escape characters safely
+              if (typeof val === "string") {
+                val = val
+                  .trim()
+                  .replace(/\\/g, "\\\\") // Escape backslashes
+                  .replace(/'/g, "\\'"); // Escape single-quotes
+              }
+
+              return `'${val}'`;
+            })
+            .join(",")})`
+      )
+      .join(",");
+
+    const query = `INSERT INTO \`${tableName}\` (${columns.join(
+      ","
+    )}) VALUES ${values};`;
+
+    // Execute batch insert
+    await sequelize.query(query, { type: QueryTypes.INSERT });
+
+    console.log(`Inserted batch: ${i} → ${i + batch.length}`);
+  }
 
   return columnsForRead;
 }
+
 /**
  * Function to process the uploaded CSV file
  * - Reads the CSV file from the specified path
@@ -226,45 +282,96 @@ async function createDynamicTable(headers) {
 }
 
 // Function to read CSV files and insert into the dynamic table
+// async function processAndInsertCSV(mergedRecords) {
+//   if (!mergedRecords || mergedRecords.length === 0) {
+//     throw new Error("No valid data found in the merged CSV data.");
+//   }
+
+//   // Collect all unique headers from the merged data
+//   let allHeaders = new Set();
+//   mergedRecords.forEach((record) => {
+//     Object.keys(record).forEach((key) => allHeaders.add(key.trim()));
+//   });
+
+//   const headersArray = Array.from(allHeaders);
+//   // console.log(allHeaders);
+//   const { tableName, DynamicModel } = await createDynamicTable(headersArray);
+
+//   // Ensure each record has all headers
+//   const formattedRecords = mergedRecords.map((record) => {
+//     let formattedRecord = {};
+
+//     headersArray.forEach((header) => {
+//       let value = record[header];
+
+//       // Trim only if the value is a string
+//       if (typeof value === "string") {
+//         value = value.trim();
+//       }
+
+//       formattedRecord[header] = value ?? null;
+
+//       // console.log(value);
+//     });
+
+//     return formattedRecord;
+//   });
+
+//   await DynamicModel.bulkCreate(formattedRecords);
+
+//   return { tableName, headersArray };
+// }
+
+
 async function processAndInsertCSV(mergedRecords) {
   if (!mergedRecords || mergedRecords.length === 0) {
     throw new Error("No valid data found in the merged CSV data.");
   }
 
-  // Collect all unique headers from the merged data
+  // Collect all unique sanitized headers
   let allHeaders = new Set();
   mergedRecords.forEach((record) => {
     Object.keys(record).forEach((key) => allHeaders.add(key.trim()));
   });
 
   const headersArray = Array.from(allHeaders);
-  console.log(allHeaders);
+
+  // Create dynamic table
   const { tableName, DynamicModel } = await createDynamicTable(headersArray);
 
-  // Ensure each record has all headers
+  // Format rows: ensure every record has all headers
   const formattedRecords = mergedRecords.map((record) => {
-    let formattedRecord = {};
+    const formattedRecord = {};
 
     headersArray.forEach((header) => {
       let value = record[header];
 
-      // Trim only if the value is a string
-      if (typeof value === "string") {
-        value = value.trim();
-      }
+      if (typeof value === "string") value = value.trim();
 
       formattedRecord[header] = value ?? null;
-
-      console.log(value);
     });
 
     return formattedRecord;
   });
 
-  await DynamicModel.bulkCreate(formattedRecords);
+  // Insert in batches
+  const BATCH_SIZE = 500;
+
+  for (let i = 0; i < formattedRecords.length; i += BATCH_SIZE) {
+    const chunk = formattedRecords.slice(i, i + BATCH_SIZE);
+
+    // console.log(
+    //   `Inserting batch ${Math.ceil(i / BATCH_SIZE) + 1} / ${Math.ceil(
+    //     formattedRecords.length / BATCH_SIZE
+    //   )}`
+    // );
+
+    await DynamicModel.bulkCreate(chunk, { ignoreDuplicates: true });
+  }
 
   return { tableName, headersArray };
 }
+
 async function mergeCSVFiles(fileNames) {
   let headersSet = new Set(); // Stores headers from the first file
   let mergedRecords = [];
@@ -459,10 +566,20 @@ const handleUpload = async (req, res) => {
             { type: sequelize.QueryTypes.SELECT }
           );
           const csvJson = await csvToJson(csvFilePath);
-          const columns = await insertDataIntoTable(
-            templateTable.csvTableName,
-            csvJson
-          );
+          const batches = chunkArray(csvJson, 500); // split CSV rows into 500 rows each
+          let columns = null;
+
+          for (let i = 0; i < batches.length; i++) {
+            console.log(`Inserting batch ${i + 1} of ${batches.length}`);
+
+            // const batchColumns = await insertDataIntoTable(
+            //   templateTable.csvTableName,
+            //   batches[i] // send only one batch
+            // );
+
+            // Save columns once (same for all batches)
+            // if (!columns) columns = batchColumns;
+          }
           const createdFile = await Files.create({
             startIndex: result.count,
             totalFiles: csvJson.length,
@@ -491,4 +608,11 @@ const handleUpload = async (req, res) => {
   });
 };
 
+function chunkArray(array, size) {
+  const chunks = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
+}
 module.exports = handleUpload;

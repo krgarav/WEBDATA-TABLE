@@ -227,7 +227,9 @@ WHERE
       type: sequelize.QueryTypes.UPDATE,
     });
 
-    res.status(200).json({ message: "Data updated successfully" });
+    res.status(200).json({
+      message: "Data updated successfully", // if your validator returns status, keep it; fallback to ERROR
+    });
   } catch (error) {
     console.error("Error updating data:", error);
     res.status(500).json({ message: "Failed to update data", error });

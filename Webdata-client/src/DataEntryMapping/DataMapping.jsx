@@ -22,7 +22,7 @@ const DataMapping = () => {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [editedData, setEditedData] = useState([]);
   const [templateData, settemplateData] = useState([]);
- 
+
   const [invalidMap, setInvalidMap] = useState(); // { key: boolean }
   console.log(invalidMap);
   const imageRef = useRef(null);
@@ -83,11 +83,9 @@ const DataMapping = () => {
   useEffect(() => {
     setFormData(Array.isArray(data.formdata) ? data.formdata : [data.formdata]);
   }, [data]);
-// console.log(templateData?.[0]?.patternDefinition)
-// console.log(templateData?.[0]?.blankDefination)
-// console.log(formData)
-
-
+  // console.log(templateData?.[0]?.patternDefinition)
+  // console.log(templateData?.[0]?.blankDefination)
+  // console.log(formData)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -216,23 +214,18 @@ const DataMapping = () => {
   };
 
   const saveHandler = async (updatedData) => {
+    //   const hasInvalid = Object.values(invalidMap).some(v => v === true);
 
-  //   const hasInvalid = Object.values(invalidMap).some(v => v === true);
+    // if (hasInvalid) {
+    //  toast.error("formField still has error")
+    //  return
+    // }
 
-  // if (hasInvalid) {
-  //  toast.error("formField still has error")
-  //  return
-  // }
-
-  
-    
     const mergedData = {
       ...(Array.isArray(formData) && formData.length > 0
         ? formData[0]
         : formData),
       ...updatedData,
-
-      
     };
     // console.log(updatedData);
     const obj = {
@@ -244,21 +237,23 @@ const DataMapping = () => {
       updatedData: mergedData,
     };
 
-    
-      const res = await updateCsvData(obj);
-
-      if(res.status===400){
-        console.log(res.response.data)
-        res.response.data.errors.map((err)=>{
-          toast.warning(err.message,{autoClose:7000})
-        })
-      }else{
-
-        nextHandler();
-      }
+    const res = await updateCsvData(obj);
+    // console.log(res)
+    if (res.status >= 400 && res.status <= 600) {
       console.log(res);
-    
-    
+      if (Array.isArray(res?.response?.data?.errors)) {
+        res?.response?.data?.errors.map((err) => {
+          toast.warning(err.message, { autoClose: 7000 });
+        });
+      }else{
+        const msg =  res?.response?.data?.message || "Something went wrong!";
+         toast.warning(msg, { autoClose: 7000 });
+      }
+    } else {
+      
+      nextHandler();
+    }
+    console.log(res);
   };
 
   const zoomInHandler = () => {
