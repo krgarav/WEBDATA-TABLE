@@ -99,6 +99,7 @@ app.get("/GetImage", (req, res) => {
     }
   });
 });
+
 // Swagger docs route
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Handle all other routes and serve 'index.html'

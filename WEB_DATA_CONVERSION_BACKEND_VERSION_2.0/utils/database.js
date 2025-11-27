@@ -1,29 +1,16 @@
-// const Sequelize = require("sequelize");
-
-// const sequelize = new Sequelize("omrusermanagement", "root", "12345678", {
-//   dialect: "mysql",
-//   host: "localhost",
-// });
-
-// module.exports = sequelize;
-
-// const Sequelize = require("sequelize");
-
-// const sequelize = new Sequelize("omrscannerduplex", "root", "root", {
-//   dialect: "mysql",
-//   host: "localhost",
-// });
-
 const Sequelize = require("sequelize");
+require("dotenv").config();
 
-
-
-
-const sequelize = new Sequelize("webdatatable", "root", "123abc123", {
-  dialect: "mysql",
-  host: "localhost",
-  logging: false,
-  timezone: "+05:30",
-});
+const sequelize = new Sequelize(
+  process.env.SQL_DATABASE_NAME,
+  process.env.SQL_USER,
+  process.env.SQL_PASS,
+  {
+    dialect: "mysql",
+    host: process.env.SQL_HOST || "localhost", // Optional if always localhost
+    logging: false,
+    timezone: "+05:30",
+  }
+);
 
 module.exports = sequelize;
