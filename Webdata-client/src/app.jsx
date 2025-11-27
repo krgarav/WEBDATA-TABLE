@@ -44,6 +44,7 @@ function App() {
     const fetchUserData = async () => {
       try {
         const response = await onGetVerifiedUserHandler();
+        console.log(response);
         setUser(response);
       } catch (error) {
         console.log(error.message);
@@ -54,6 +55,7 @@ function App() {
 
   const role = user?.user?.role;
   const permissions = user?.user?.permissions;
+  console.log(permissions)
 
   return (
     <Router>

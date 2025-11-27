@@ -239,24 +239,25 @@ async function startServer() {
   try {
     await createDatabaseIfNotExists(); // Ensure the database exists
     await sequelize.sync({ force: !true }); // Sync database schema
-    await sequelize.sync({ alter: true });
+    // await sequelize.sync({ alter: true });
     // Check if admin user exists
     const adminUser = await User.findOne({ where: { role: "Admin" } });
     if (!adminUser) {
       const hashedPassword = await bcrypt.hash("123456", 12);
+      const permissions =  {
+          dataEntry: true,
+          comparecsv: true,
+          csvuploader: true,
+          createTemplate: true,
+          resultGenerator: true,
+        }
       await User.create({
         userName: "admin",
         mobile: "1234567891",
         password: hashedPassword,
         role: "Admin",
         email: "admin@gmail.com",
-        permissions: {
-          dataEntry: true,
-          comparecsv: true,
-          csvuploader: true,
-          createTemplate: true,
-          resultGenerator: true,
-        },
+        permissions: permissions,
       });
       console.log("Admin user created.");
     }
