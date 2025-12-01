@@ -572,13 +572,13 @@ const handleUpload = async (req, res) => {
           for (let i = 0; i < batches.length; i++) {
             console.log(`Inserting batch ${i + 1} of ${batches.length}`);
 
-            // const batchColumns = await insertDataIntoTable(
-            //   templateTable.csvTableName,
-            //   batches[i] // send only one batch
-            // );
+            const batchColumns = await insertDataIntoTable(
+              templateTable.csvTableName,
+              batches[i] // send only one batch
+            );
 
             // Save columns once (same for all batches)
-            // if (!columns) columns = batchColumns;
+            if (!columns) columns = batchColumns;
           }
           const createdFile = await Files.create({
             startIndex: result.count,

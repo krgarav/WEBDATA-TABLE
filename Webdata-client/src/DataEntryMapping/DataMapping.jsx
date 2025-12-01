@@ -63,22 +63,22 @@ const DataMapping = () => {
   //   invalidIndex.current = 0; // Reset the index when currentIndex changes
   // }, [currentIndex]);
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.ctrlKey && event.key === "ArrowLeft") {
-        prevHandler();
-      }
-      if (event.ctrlKey && event.key === "ArrowRight") {
-        nextHandler();
-      }
-    };
+  // useEffect(() => {
+  //   const handleKeyDown = (event) => {
+  //     if (event.ctrlKey && event.key === "ArrowLeft") {
+  //       prevHandler();
+  //     }
+  //     if (event.ctrlKey && event.key === "ArrowRight") {
+  //       nextHandler();
+  //     }
+  //   };
 
-    window.addEventListener("keydown", handleKeyDown);
+  //   window.addEventListener("keydown", handleKeyDown);
 
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener("keydown", handleKeyDown);
+  //   };
+  // }, []);
 
   useEffect(() => {
     setFormData(Array.isArray(data.formdata) ? data.formdata : [data.formdata]);
