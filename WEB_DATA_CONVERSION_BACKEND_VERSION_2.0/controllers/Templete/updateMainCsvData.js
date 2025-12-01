@@ -13,13 +13,11 @@ function validateUpdatedData(joinedData = [], updatedData = {}) {
     if (row.key) permMap[row.key.toString().toUpperCase()] = row;
   });
 
-  // Treat values containing only whitespace as empty
   const isEffectivelyEmpty = (val) => {
     if (val === null || val === undefined) return true;
     return String(val).trim() === "";
   };
 
-  // Normalize blankDefinition into something to test (or null if nothing meaningful)
   const blankDefToTest = (blankDef) => {
     if (blankDef === null || blankDef === undefined) return null;
     const d = String(blankDef).trim().toLowerCase();
@@ -30,32 +28,30 @@ function validateUpdatedData(joinedData = [], updatedData = {}) {
     return String(blankDef);
   };
 
-  // Case-insensitive contains (literal substring search)
   const ciContains = (value, sub) => {
     if (value === null || value === undefined) return false;
     if (sub === null || sub === undefined) return false;
-    return (
-      String(value).toLowerCase().indexOf(String(sub).toLowerCase()) !== -1
-    );
+    return String(value).toLowerCase().includes(String(sub).toLowerCase());
   };
 
   Object.keys(updatedData).forEach((rawKey) => {
     const key = rawKey.toString().toUpperCase();
     const row = permMap[key];
-    if (!row) return; // no permission info -> skip
+    if (!row) return;
 
-    // keep previous behavior: only validate form fields
-    if (row.fieldType && row.fieldType.toString().toLowerCase() !== "formfield")
-      return;
+    if (row.fieldType && row.fieldType.toLowerCase() !== "formfield") return;
 
     const value = updatedData[rawKey];
+    const strVal = String(value);
 
-    // Bits: interpret 1/true as ALLOWED, 0/false as NOT allowed
-    const emptyBit = Boolean(Number(row.empty)); // true => allowed to be empty
-    const blankBit = Boolean(Number(row.blank)); // true => blank allowed
-    const patternBit = Boolean(Number(row.pattern)); // true => pattern allowed
+    // Bits
+    const emptyBit = Boolean(Number(row.empty));
+    const blankBit = Boolean(Number(row.blank));
+    const patternBit = Boolean(Number(row.pattern));
 
-    // 1) empty check
+    // -------------------------
+    // 1) EMPTY CHECK
+    // -------------------------
     if (!emptyBit && isEffectivelyEmpty(value)) {
       errors.push({
         key: rawKey,
@@ -64,28 +60,30 @@ function validateUpdatedData(joinedData = [], updatedData = {}) {
       });
     }
 
-    // 2) blank check
+    // -------------------------
+    // 2) BLANK CHECK
+    // -------------------------
     const blankRaw =
       row.blankDefinition ?? row.blankDefination ?? row.blankDef ?? null;
     const blankDef = blankDefToTest(blankRaw);
-    if (!blankBit && blankDef !== null) {
-      if (ciContains(value, blankDef)) {
-        errors.push({
-          key: rawKey,
-          message: `Field "${rawKey}" contains disallowed blank token (${String(
-            blankRaw
-          )}).`,
-          reason: "blank",
-          blankDefinition: blankRaw,
-        });
-      }
+
+    if (!blankBit && blankDef !== null && ciContains(value, blankDef)) {
+      errors.push({
+        key: rawKey,
+        message: `Field "${rawKey}" contains disallowed blank token (${String(
+          blankRaw
+        )}).`,
+        reason: "blank",
+        blankDefinition: blankRaw,
+      });
     }
 
-    // 3) PATTERN check (literal substring match of entire patternDefinition)
-    // NOTE: we no longer special-case '*' — if patternDefinition is '*' and pattern bit is NOT allowed,
-    // we will check for the literal '*' within the value (so '21*901' will be caught).
+    // -------------------------
+    // 3) PATTERN CHECK
+    // -------------------------
     const patRaw =
       row.patternDefinition ?? row.patternDef ?? row.pattern ?? null;
+
     if (!patternBit && patRaw !== null && String(patRaw).trim() !== "") {
       if (ciContains(value, patRaw)) {
         errors.push({
@@ -98,6 +96,96 @@ function validateUpdatedData(joinedData = [], updatedData = {}) {
         });
       }
     }
+
+    // --------------------------------------------------------
+    // 4) FIELD LENGTH VALIDATION
+    // --------------------------------------------------------
+    const maxLen = row.fieldLength ? Number(row.fieldLength) : null;
+    if (maxLen && strVal.length > maxLen) {
+      errors.push({
+        key: rawKey,
+        message: `Field "${rawKey}" exceeds maximum length of ${maxLen}.`,
+        reason: "length",
+      });
+    }
+
+    // --------------------------------------------------------
+    // 5) DATA FIELD TYPE VALIDATION (NOW ALLOW PATTERN + BLANK)
+    // --------------------------------------------------------
+    if (row.dataFieldType) {
+      const type = row.dataFieldType.toLowerCase();
+
+      let cleaned = strVal;
+
+      // keep allowed pattern chars
+      if (patternBit && patRaw != null) {
+        cleaned = cleaned.split(String(patRaw)).join("");
+      }
+
+      // keep allowed blank chars
+      if (blankBit && blankDef != null) {
+        cleaned = cleaned.split(String(blankDef)).join("");
+      }
+
+      if (type === "number" && !/^[0-9]*$/.test(cleaned)) {
+        errors.push({
+          key: rawKey,
+          message: `Field "${rawKey}" must contain only numbers (allowed pattern/blank excluded).`,
+          reason: "dataFieldType",
+        });
+      }
+
+      if (type === "text" && !/^[a-zA-Z ]*$/.test(cleaned)) {
+        errors.push({
+          key: rawKey,
+          message: `Field "${rawKey}" must contain only alphabetic characters (allowed pattern/blank excluded).`,
+          reason: "dataFieldType",
+        });
+      }
+
+      if (type === "alphanumeric" && !/^[a-zA-Z0-9]*$/.test(cleaned)) {
+        errors.push({
+          key: rawKey,
+          message: `Field "${rawKey}" must contain only alphanumeric characters (allowed pattern/blank excluded).`,
+          reason: "dataFieldType",
+        });
+      }
+    }
+
+    // --------------------------------------------------------
+    // 6) FIELD RANGE VALIDATION (AFTER REMOVING EXCEPTIONS)
+    // --------------------------------------------------------
+    if (row.fieldRange && row.fieldRange !== "0") {
+      const rangeParts = row.fieldRange.split("--");
+      if (rangeParts.length === 2) {
+        let cleaned = strVal;
+
+        if (patternBit && patRaw != null) {
+          cleaned = cleaned.split(String(patRaw)).join("");
+        }
+        if (blankBit && blankDef != null) {
+          cleaned = cleaned.split(String(blankDef)).join("");
+        }
+
+        const min = Number(rangeParts[0]);
+        const max = Number(rangeParts[1]);
+        const numValue = Number(cleaned);
+
+        if (isNaN(numValue)) {
+          errors.push({
+            key: rawKey,
+            message: `Field "${rawKey}" must be numeric to validate range.`,
+            reason: "range",
+          });
+        } else if (numValue < min || numValue > max) {
+          errors.push({
+            key: rawKey,
+            message: `Field "${rawKey}" must be between ${min} and ${max}.`,
+            reason: "range",
+          });
+        }
+      }
+    }
   });
 
   return {
@@ -105,6 +193,8 @@ function validateUpdatedData(joinedData = [], updatedData = {}) {
     errors,
   };
 }
+
+
 
 const updateMainCsvData = async (req, res) => {
   try {
@@ -125,6 +215,9 @@ const updateMainCsvData = async (req, res) => {
     t.blank,
     t.empty,
     t.fieldType,
+    t.dataFieldType,
+    t.fieldRange,
+    t.fieldLength,
 
     -- templete table (only these two columns)
     tp.patternDefinition,
@@ -147,7 +240,8 @@ WHERE
       }
     );
 
-    // console.log(updatedData);
+    console.log(joinedData);
+    console.log(updatedData);
 
     const results = validateUpdatedData(joinedData, updatedData);
     // console.log(results);

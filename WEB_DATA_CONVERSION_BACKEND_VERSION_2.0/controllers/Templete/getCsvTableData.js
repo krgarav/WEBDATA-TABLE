@@ -26,11 +26,11 @@ async function createDynamicTable(headers) {
     ) {
       columns[normalizedHeader] = { type: DataTypes.TEXT }; // Large text-based columns
     } else if (normalizedHeader.toLowerCase().includes("barcode")) {
-      columns[normalizedHeader] = { type: DataTypes.STRING(100) }; // Reduce barcode size
+      columns[normalizedHeader] = { type: DataTypes.TEXT('long') }; // Reduce barcode size
     } else if (normalizedHeader.match(/^q[0-9]+$/i)) {
-      columns[normalizedHeader] = { type: DataTypes.STRING(10) }; // Short answers (e.g., A, B, C, D, etc.)
+      columns[normalizedHeader] = { type: DataTypes.TEXT('long') }; // Short answers (e.g., A, B, C, D, etc.)
     } else {
-      columns[normalizedHeader] = { type: DataTypes.STRING(100) }; // Default reduced VARCHAR size
+      columns[normalizedHeader] = { type: DataTypes.TEXT('long') }; // Default reduced VARCHAR size
     }
   });
 
