@@ -24,6 +24,14 @@ const User = sequelize.define(
     permissions: {
       type: DataTypes.JSON,
       allowNull: false,
+      get() {
+        const raw = this.getDataValue("permissions");
+        try {
+          return typeof raw === "string" ? JSON.parse(raw) : raw;
+        } catch {
+          return raw;
+        }
+      },
     },
     role: {
       type: DataTypes.STRING,
@@ -47,8 +55,5 @@ const User = sequelize.define(
     ],
   }
 );
-
-
-
 
 module.exports = User;

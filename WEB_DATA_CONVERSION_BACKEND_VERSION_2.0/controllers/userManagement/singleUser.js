@@ -5,7 +5,7 @@ const secretKey = "omrscanner";
 
 const getSingleUser = async (req, res) => {
   const { token } = req.headers;
-  const user = req.user
+  const user = req.user;
   // console.log(user,"userdata")
   try {
     // const decoded = await jwt.verify(token, secretKey);
@@ -28,13 +28,12 @@ const getSingleUser = async (req, res) => {
     // },
 
     // );
-
+    // console.log(typeof user.permissions);
     res.status(200).json({ message: "User retrieved successfully", user });
   } catch (err) {
-    console.error('Token verification failed:', err.message);
+    console.error("Token verification failed:", err.message);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
 module.exports = getSingleUser;
-
