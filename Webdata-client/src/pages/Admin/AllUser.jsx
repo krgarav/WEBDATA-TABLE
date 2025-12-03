@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  Fragment,
-  useRef,
-} from "react";
+import React, { useState, useEffect, Fragment, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Dialog, Transition } from "@headlessui/react";
@@ -24,7 +19,7 @@ export function AllUser() {
   const token = JSON.parse(localStorage.getItem("userData"));
   const [currentUser, setCurrentUser] = useState(null);
   const [removeUserId, setRemoveUserId] = useState("");
-  const [taskType, setTaskType] = useState("ALL")
+  const [taskType, setTaskType] = useState("ALL");
   const [confirmationModal, setConfirmationModal] = useState(false);
 
   useEffect(() => {
@@ -32,17 +27,16 @@ export function AllUser() {
       try {
         const response = await onGetVerifiedUserHandler();
         setCurrentUser(response.user);
-      } catch (error) { }
+      } catch (error) {}
     };
     fetchUser();
   }, []);
 
-
   useEffect(() => {
     if (!confirmationModal) {
-      setRemoveUserId("")
+      setRemoveUserId("");
     }
-  }, [setConfirmationModal, confirmationModal])
+  }, [setConfirmationModal, confirmationModal]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -60,7 +54,7 @@ export function AllUser() {
 
   const onModelHandler = async (user) => {
     if (currentUser?.role === "Moderator" || currentUser?.role === "Operator") {
-      toast.warning("You don't have access to perform this operation.")
+      toast.warning("You don't have access to perform this operation.");
       return;
     }
     setOpen(true);
@@ -118,7 +112,7 @@ export function AllUser() {
 
   const handleDeleteUser = async () => {
     if (currentUser?.role === "Moderator" || currentUser?.role === "Operator") {
-      toast.warning("You don't have access to perform this operation.")
+      toast.warning("You don't have access to perform this operation.");
       return;
     }
     try {
@@ -181,17 +175,18 @@ export function AllUser() {
     navigate(`/updated-details/${id}`);
   };
 
-
-  const filteredUsers = taskType === "ALL"
-    ? users
-    : taskType === "admin"
-      ? users?.filter(user => user?.role === "Admin")
+  const filteredUsers =
+    taskType === "ALL"
+      ? users
+      : taskType === "admin"
+      ? users?.filter((user) => user?.role === "Admin")
       : taskType === "operator"
-        ? users?.filter(user => user?.role === "Operator")
-        : taskType === "moderator"
-          ? users?.filter(user => user?.role === "Moderator")
-          : users
-
+      ? users?.filter((user) => user?.role === "Operator")
+      : taskType === "moderator"
+      ? users?.filter((user) => user?.role === "Moderator")
+      : users;
+  // console.log(filteredUsers[0].permissions);
+  // console.log(Object.entries(filteredUsers[0].permissions))
 
   return (
     <div className="flex justify-center items-center bg-gradient-to-r from-blue-400 to-blue-600 h-[100vh] pt-20">
@@ -200,7 +195,7 @@ export function AllUser() {
           <div>
             <h2 className="text-3xl font-semibold">All Users</h2>
           </div>
-          {currentUser?.role === "Admin" &&
+          {currentUser?.role === "Admin" && (
             <div>
               <button
                 type="button"
@@ -209,35 +204,44 @@ export function AllUser() {
               >
                 Add New User
               </button>
-            </div>}
+            </div>
+          )}
         </div>
         <div>
           <div className="hidden sm:block mt-4">
             <nav className="flex gap-6" aria-label="Tabs">
               <button
                 onClick={() => setTaskType("All")}
-                className={`shrink-0 rounded-lg p-2 text-sm border-2  font-medium ${taskType === "All" && "bg-sky-100 text-sky-600"} hover:bg-sky-100 hover:text-gray-700`}
+                className={`shrink-0 rounded-lg p-2 text-sm border-2  font-medium ${
+                  taskType === "All" && "bg-sky-100 text-sky-600"
+                } hover:bg-sky-100 hover:text-gray-700`}
               >
                 ALL USERS
               </button>
 
               <button
                 onClick={() => setTaskType("admin")}
-                className={`shrink-0 rounded-lg p-2 text-sm border-2  font-medium ${taskType === "admin" && "bg-sky-100 text-sky-600"} hover:bg-sky-100 hover:text-gray-700`}
+                className={`shrink-0 rounded-lg p-2 text-sm border-2  font-medium ${
+                  taskType === "admin" && "bg-sky-100 text-sky-600"
+                } hover:bg-sky-100 hover:text-gray-700`}
               >
                 ADMIN
               </button>
 
               <button
                 onClick={() => setTaskType("operator")}
-                className={`shrink-0 border-2  rounded-lg ${taskType === "operator" && "bg-sky-100 text-sky-600"} p-2 text-sm font-medium hover:bg-sky-100`}
+                className={`shrink-0 border-2  rounded-lg ${
+                  taskType === "operator" && "bg-sky-100 text-sky-600"
+                } p-2 text-sm font-medium hover:bg-sky-100`}
                 aria-current="page"
               >
                 OPERATOR
               </button>
               <button
                 onClick={() => setTaskType("moderator")}
-                className={`shrink-0 border-2  rounded-lg ${taskType === "moderator" && "bg-sky-100 text-sky-600"} p-2 text-sm font-medium hover:bg-sky-100`}
+                className={`shrink-0 border-2  rounded-lg ${
+                  taskType === "moderator" && "bg-sky-100 text-sky-600"
+                } p-2 text-sm font-medium hover:bg-sky-100`}
                 aria-current="page"
               >
                 MODERATOR
@@ -371,8 +375,8 @@ export function AllUser() {
                           <Link to="#" className="text-red-600">
                             <RiDeleteBin6Line
                               onClick={() => {
-                                setRemoveUserId(user.id)
-                                setConfirmationModal(true)
+                                setRemoveUserId(user.id);
+                                setConfirmationModal(true);
                               }}
                             />
                           </Link>

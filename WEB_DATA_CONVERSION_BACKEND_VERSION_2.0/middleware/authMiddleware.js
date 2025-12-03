@@ -24,6 +24,7 @@ const authMiddleware = async (req, res, next) => {
     req.permissions = user.permissions;
     req.role = user.role;
     req.userId = user.id;
+    console.log( typeof req.permissions)
     next();
   } catch (error) {
     res.status(401).json({ message: "Unauthorized - Invalid Token" });
