@@ -21,10 +21,10 @@ function validateUpdatedData(joinedData = [], updatedData = {}) {
   const blankDefToTest = (blankDef) => {
     if (blankDef === null || blankDef === undefined) return null;
     const d = String(blankDef).trim().toLowerCase();
-    if (d === "") return null;
+    // if (d === "") return null;
     if (d === "space") return " ";
-    if (d === "tab") return "\t";
-    if (d === "newline" || d === "nl" || d === "line") return "\n";
+    // if (d === "tab") return "\t";
+    // if (d === "newline" || d === "nl" || d === "line") return "\n";
     return String(blankDef);
   };
 
@@ -155,37 +155,50 @@ function validateUpdatedData(joinedData = [], updatedData = {}) {
     // --------------------------------------------------------
     // 6) FIELD RANGE VALIDATION (AFTER REMOVING EXCEPTIONS)
     // --------------------------------------------------------
-    if (row.fieldRange && row.fieldRange !== "0") {
-      const rangeParts = row.fieldRange.split("--");
-      if (rangeParts.length === 2) {
-        let cleaned = strVal;
+    // if (row.fieldRange && row.fieldRange !== "0") {
+    //   const rangeParts = row.fieldRange.split("--");
 
-        if (patternBit && patRaw != null) {
-          cleaned = cleaned.split(String(patRaw)).join("");
-        }
-        if (blankBit && blankDef != null) {
-          cleaned = cleaned.split(String(blankDef)).join("");
-        }
+    //   if (rangeParts.length === 2) {
+    //     let cleaned = strVal;
 
-        const min = Number(rangeParts[0]);
-        const max = Number(rangeParts[1]);
-        const numValue = Number(cleaned);
+    //     // Remove pattern
+    //     if (patternBit && patRaw != null) {
+    //       cleaned = cleaned.split(String(patRaw)).join("");
+    //     }
 
-        if (isNaN(numValue)) {
-          errors.push({
-            key: rawKey,
-            message: `Field "${rawKey}" must be numeric to validate range.`,
-            reason: "range",
-          });
-        } else if (numValue < min || numValue > max) {
-          errors.push({
-            key: rawKey,
-            message: `Field "${rawKey}" must be between ${min} and ${max}.`,
-            reason: "range",
-          });
-        }
-      }
-    }
+    //     // Remove blank default
+    //     if (blankBit && blankDef != null) {
+    //       cleaned = cleaned.split(String(blankDef)).join("");
+    //     }
+
+    //     // Trim spaces after removing pattern/blank
+    //     cleaned = cleaned.trim();
+
+    //     // ✅ If cleaned becomes empty → skip range validation (NO ERROR)
+    //     if (cleaned === "") {
+    //       return; // allow blank or pattern-only input
+    //     }
+
+    //     const min = Number(rangeParts[0]);
+    //     const max = Number(rangeParts[1]);
+    //     const numValue = Number(cleaned);
+
+    //     // Validate only if numeric
+    //     if (isNaN(numValue)) {
+    //       errors.push({
+    //         key: rawKey,
+    //         message: `Field "${rawKey}" must be numeric to validate range.`,
+    //         reason: "range",
+    //       });
+    //     } else if (numValue < min || numValue > max) {
+    //       errors.push({
+    //         key: rawKey,
+    //         message: `Field "${rawKey}" must be between ${min} and ${max}.`,
+    //         reason: "range",
+    //       });
+    //     }
+    //   }
+    // }
   });
 
   return {
@@ -194,12 +207,10 @@ function validateUpdatedData(joinedData = [], updatedData = {}) {
   };
 }
 
-
-
 const updateMainCsvData = async (req, res) => {
   try {
     const { templateId, parentId, updatedData, editedData, taskId } = req.body;
-    // console.log(updatedData)
+    console.log(req.body)
 
     const joinedData = await sequelize.query(
       `SELECT 
@@ -240,8 +251,8 @@ WHERE
       }
     );
 
-    console.log(joinedData);
-    console.log(updatedData);
+    // console.log(joinedData);
+    // console.log(updatedData);
 
     const results = validateUpdatedData(joinedData, updatedData);
     // console.log(results);
@@ -263,8 +274,20 @@ WHERE
     }
 
     const assignedTask = await Assigndata.findByPk(taskId);
+    // console.log(assignedTask)
     const { tableName } = assignedTask;
     const result = Object.assign({}, ...editedData);
+    // console.log("result: ");
+    // console.log(result);
+    if (
+      typeof result !== "object" ||
+      result === null ||
+      Array.isArray(result)
+    ) {
+      return res
+        .status(400)
+        .json({ status: 400, message: "Invalid result object" });
+    }
     // Step 1: Fetch existing Corrected data
     const [existingData] = await sequelize.query(
       `SELECT Corrected FROM ${tableName} WHERE parentId = :parentId`,
@@ -273,7 +296,7 @@ WHERE
         type: sequelize.QueryTypes.SELECT,
       }
     );
-
+// console.log(existingData)
     // Step 2: Parse existing data (handle null case)
     let correctedData = {};
     if (existingData?.Corrected) {

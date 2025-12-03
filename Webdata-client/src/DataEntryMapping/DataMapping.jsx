@@ -16,6 +16,7 @@ const DataMapping = () => {
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
 
   const [data, setData] = useState([]);
+  const [loadingData, setLoadingData] = useState(true);
   const [imageData, setImageData] = useState([]);
   const [currentIndex, setCurrenIndex] = useState(null);
   const [formData, setFormData] = useState([]);
@@ -90,6 +91,7 @@ const DataMapping = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+         setLoadingData(true);
         const response = await axios.post(
           `${window.SERVER_IP}/get/csvdata`,
           { taskData: taskData },
@@ -99,15 +101,18 @@ const DataMapping = () => {
             },
           }
         );
-        console.log(response.data);
+
         setData(response.data);
+        console.log(response.data);
       } catch (error) {
         toast.error(error?.message);
+      }finally{
+        setLoadingData(false);
       }
     };
     fetchData();
   }, [currentIndex]);
-  console.log(data);
+  // console.log(data);
   useEffect(() => {
     const handleTabKey = (e) => {
       if (e.key === "Tab") {
@@ -221,39 +226,57 @@ const DataMapping = () => {
     //  return
     // }
 
-    const mergedData = {
-      ...(Array.isArray(formData) && formData.length > 0
-        ? formData[0]
-        : formData),
-      ...updatedData,
-    };
-    // console.log(updatedData);
-    const obj = {
-      taskId: taskData.id,
-      templateId: taskData.templeteId,
-      parentId: data.id,
-      id: data,
-      editedData: editedData,
-      updatedData: mergedData,
-    };
-
-    const res = await updateCsvData(obj);
-    // console.log(res)
-    if (res.status >= 400 && res.status <= 600) {
-      console.log(res);
-      if (Array.isArray(res?.response?.data?.errors)) {
-        res?.response?.data?.errors.map((err) => {
-          toast.warning(err.message, { autoClose: 7000 });
-        });
-      }else{
-        const msg =  res?.response?.data?.message || "Something went wrong!";
-         toast.warning(msg, { autoClose: 7000 });
-      }
-    } else {
+    console.log(loadingData)
+    console.log(data)
+     if (loadingData) {
       
-      nextHandler();
-    }
-    console.log(res);
+    toast.warning("Data is still loading... please wait!");
+    return;
+  }
+
+    // if (Array.isArray(data) && data.length === 0) {
+    //   console.log(data);
+    //   toast.warning(`Data not sufficient of ${data?.id}`);
+    //   return;
+    // } 
+      const mergedData = {
+        ...(Array.isArray(formData) && formData.length > 0
+          ? formData[0]
+          : formData),
+        ...updatedData,
+      };
+      // console.log(updatedData);
+      const obj = {
+        taskId: taskData.id,
+        templateId: taskData.templeteId,
+        parentId: data.id,
+        id: data,
+        editedData: editedData,
+        updatedData: mergedData,
+      };
+      console.log(data.id);
+      console.log(obj);
+
+      const res = await updateCsvData(obj);
+      console.log(res);
+      if (res.status >= 400 && res.status <= 600) {
+        // console.log(res);
+        if (Array.isArray(res?.response?.data?.errors)) {
+          res?.response?.data?.errors.map((err) => {
+            toast.warning(err.message, { autoClose: 7000 });
+          });
+        } else {
+          const msg = res?.response?.data?.message || "Something went wrong!";
+          toast.warning(msg, { autoClose: 7000 });
+        }
+      } else {
+        if (res.data.message === "Data updated successfully") {
+          nextHandler();
+          // setData([]);
+        }
+      }
+      //   // console.log(res);
+    
   };
 
   const zoomInHandler = () => {
