@@ -92,7 +92,7 @@ function debounce(func, delay) {
   // Create a debounced save function that always uses latest editableData
   const debouncedSave = debounce(() => {
     saveHandler(editableData);
-  }, 100);
+  }, 300);
 
   const handleAltSKey = (e) => {
     if (e.altKey && e.key.toLowerCase() === "s") {
