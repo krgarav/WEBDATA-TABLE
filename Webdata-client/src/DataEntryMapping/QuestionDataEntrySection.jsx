@@ -24,7 +24,8 @@ const QuestionDataEntrySection = ({
   const [templateHeader, settemplateHeader] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
-    setEditableData(data.questionData);
+    console.log(data)
+    setEditableData(data?.questionData);
     setEditedData([]);
   }, [data]);
   console.log({data:data, setImageData:setImageData, saveHandler:saveHandler, setEditedData:setEditedData, taskData:taskData});
@@ -34,6 +35,39 @@ const QuestionDataEntrySection = ({
   //   );
   // }, [data]);
   // console.log(data.questionData);
+
+
+//throttling
+
+function throttle(func, delay) {
+  let lastCall = 0;
+
+  return function (...args) {
+    const now = Date.now();
+
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      func.apply(this, args);
+    }
+  };
+}
+
+
+//debouncing
+
+function debounce(func, delay) {
+  let timer;
+
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  };
+}
+
+
+
   useEffect(() => {
     const fetchTemplate = async () => {
       try {
@@ -55,18 +89,24 @@ const QuestionDataEntrySection = ({
   allowedOptions.push(templateHeader[0]?.patternDefinition);
   // console.log(parseInt(taskData.templeteId))
   useEffect(() => {
-    const handleAltSKey = (e) => {
-      if (e.altKey && e.key.toLowerCase() === "s") {
-        e.preventDefault(); // Prevents browser default action
-        saveHandler(editableData); // Call save function directly
-      }
-    };
+  // Create a debounced save function that always uses latest editableData
+  const debouncedSave = debounce(() => {
+    saveHandler(editableData);
+  }, 100);
 
-    document.addEventListener("keydown", handleAltSKey);
-    return () => {
-      document.removeEventListener("keydown", handleAltSKey);
-    };
-  }, [editableData, saveHandler]); // Ensure latest state values
+  const handleAltSKey = (e) => {
+    if (e.altKey && e.key.toLowerCase() === "s") {
+      e.preventDefault();
+      debouncedSave();
+    }
+  };
+
+  document.addEventListener("keyup", handleAltSKey);
+
+  return () => {
+    document.removeEventListener("keyup", handleAltSKey);
+  };
+}, [editableData]); // Ensure latest state values
 
   const handleInputChange = (key, newValue) => {
     // ✅ Remove any character not in the allowed list
@@ -155,6 +195,7 @@ const QuestionDataEntrySection = ({
       // Reset any necessary state or perform cleanup here
     }
   };
+  const debouncedSave = debounce(() => saveHandler(editableData), 100);
 
   console.log(editableData);
   return (
@@ -169,9 +210,7 @@ const QuestionDataEntrySection = ({
           </label>
           <div>
             <button
-              onClick={() => {
-                saveHandler(editableData);
-              }}
+              onClick={debouncedSave}
               className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-200 ease-in-out mr-5"
               id="update"
             >
