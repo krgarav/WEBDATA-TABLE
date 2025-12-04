@@ -210,7 +210,9 @@ function validateUpdatedData(joinedData = [], updatedData = {}) {
 const updateMainCsvData = async (req, res) => {
   try {
     const { templateId, parentId, updatedData, editedData, taskId } = req.body;
-    console.log(req.body)
+    // console.log(req.body)
+    console.log(parentId)
+    console.log(editedData)
 
     const joinedData = await sequelize.query(
       `SELECT 
@@ -279,15 +281,15 @@ WHERE
     const result = Object.assign({}, ...editedData);
     // console.log("result: ");
     // console.log(result);
-    if (
-      typeof result !== "object" ||
-      result === null ||
-      Array.isArray(result)
-    ) {
-      return res
-        .status(400)
-        .json({ status: 400, message: "Invalid result object" });
-    }
+    // if (
+    //   typeof result !== "object" ||
+    //   result === null ||
+    //   Array.isArray(result)
+    // ) {
+    //   return res
+    //     .status(400)
+    //     .json({ status: 400, message: "Invalid result object" });
+    // }
     // Step 1: Fetch existing Corrected data
     const [existingData] = await sequelize.query(
       `SELECT Corrected FROM ${tableName} WHERE parentId = :parentId`,
