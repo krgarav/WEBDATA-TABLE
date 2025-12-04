@@ -16,6 +16,7 @@ const DataMapping = () => {
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
 
   const [data, setData] = useState([]);
+  const [prevData, setprevData] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
   const [imageData, setImageData] = useState([]);
   const [currentIndex, setCurrenIndex] = useState(null);
@@ -30,34 +31,37 @@ const DataMapping = () => {
   const inputRefs = useRef({});
   const invalidIndex = useRef(0);
   const inputIndexRef = useRef(null);
+  const tempdata = useRef();
   console.log(inputRefs);
-  useEffect(() => {
-    const enableFullscreen = () => {
-      const element = document.documentElement;
-      if (!document.fullscreenElement) {
-        element.requestFullscreen?.() ||
-          element.mozRequestFullScreen?.() ||
-          element.webkitRequestFullscreen?.() ||
-          element.msRequestFullscreen?.();
-      }
-    };
 
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        enableFullscreen();
-      }
-    };
+  const saveRanRef = useRef(false);
+  // useEffect(() => {
+  //   const enableFullscreen = () => {
+  //     const element = document.documentElement;
+  //     if (!document.fullscreenElement) {
+  //       element.requestFullscreen?.() ||
+  //         element.mozRequestFullScreen?.() ||
+  //         element.webkitRequestFullscreen?.() ||
+  //         element.msRequestFullscreen?.();
+  //     }
+  //   };
 
-    // Run fullscreen logic when component mounts
-    enableFullscreen();
+  //   const handleVisibilityChange = () => {
+  //     if (document.visibilityState === "visible") {
+  //       enableFullscreen();
+  //     }
+  //   };
 
-    // Listen for visibility change to restore fullscreen if needed
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+  //   // Run fullscreen logic when component mounts
+  //   enableFullscreen();
 
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [currentIndex]);
+  //   // Listen for visibility change to restore fullscreen if needed
+  //   document.addEventListener("visibilitychange", handleVisibilityChange);
+
+  //   return () => {
+  //     document.removeEventListener("visibilitychange", handleVisibilityChange);
+  //   };
+  // }, [currentIndex]);
 
   // useEffect(() => {
   //   inputRefs.current = {};
@@ -82,16 +86,9 @@ const DataMapping = () => {
   // }, []);
 
   useEffect(() => {
-    setFormData(Array.isArray(data.formdata) ? data.formdata : [data.formdata]);
-  }, [data]);
-  // console.log(templateData?.[0]?.patternDefinition)
-  // console.log(templateData?.[0]?.blankDefination)
-  // console.log(formData)
-
-  useEffect(() => {
     const fetchData = async () => {
       try {
-         setLoadingData(true);
+        setLoadingData(true);
         const response = await axios.post(
           `${window.SERVER_IP}/get/csvdata`,
           { taskData: taskData },
@@ -101,17 +98,25 @@ const DataMapping = () => {
             },
           }
         );
-
+        tempdata.current = response.data;
         setData(response.data);
         console.log(response.data);
       } catch (error) {
         toast.error(error?.message);
-      }finally{
+      } finally {
         setLoadingData(false);
       }
     };
     fetchData();
   }, [currentIndex]);
+
+  useEffect(() => {
+    setFormData(Array.isArray(data.formdata) ? data.formdata : [data.formdata]);
+  }, [data]);
+  // console.log(templateData?.[0]?.patternDefinition)
+  // console.log(templateData?.[0]?.blankDefination)
+  // console.log(formData)
+
   // console.log(data);
   useEffect(() => {
     const handleTabKey = (e) => {
@@ -225,31 +230,22 @@ const DataMapping = () => {
     //  toast.error("formField still has error")
     //  return
     // }
+    console.log("update called");
+    // console.log(data);
+    console.log(editedData)
 
-    console.log(loadingData)
-    console.log(data)
-     if (loadingData) {
-      
-    toast.warning("Data is still loading... please wait!");
-    return;
-  }
-
-    // if (Array.isArray(data) && data.length === 0) {
-    //   console.log(data);
-    //   toast.warning(`Data not sufficient of ${data?.id}`);
-    //   return;
-    // } 
+   
       const mergedData = {
         ...(Array.isArray(formData) && formData.length > 0
           ? formData[0]
           : formData),
         ...updatedData,
       };
-      // console.log(updatedData);
+      console.log(mergedData);
       const obj = {
         taskId: taskData.id,
         templateId: taskData.templeteId,
-        parentId: data.id,
+        parentId: tempdata.current.currentIndex,
         id: data,
         editedData: editedData,
         updatedData: mergedData,
@@ -270,12 +266,12 @@ const DataMapping = () => {
           toast.warning(msg, { autoClose: 7000 });
         }
       } else {
-        if (res.data.message === "Data updated successfully") {
+        if (res.status === 200) {
           nextHandler();
           // setData([]);
         }
       }
-      //   // console.log(res);
+      // console.log(res);
     
   };
 

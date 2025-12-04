@@ -15,7 +15,7 @@ const QuestionDataEntrySection = ({
   inputIndexRef,
   invalidIndex,
   settemplateData,
-  formData
+  formData,
 }) => {
   const [questionData, setQuestionData] = useState([]);
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
@@ -24,11 +24,17 @@ const QuestionDataEntrySection = ({
   const [templateHeader, settemplateHeader] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
-    console.log(data)
+    console.log(data);
     setEditableData(data?.questionData);
     setEditedData([]);
   }, [data]);
-  console.log({data:data, setImageData:setImageData, saveHandler:saveHandler, setEditedData:setEditedData, taskData:taskData});
+  console.log({
+    data: data,
+    setImageData: setImageData,
+    saveHandler: saveHandler,
+    setEditedData: setEditedData,
+    taskData: taskData,
+  });
   // useEffect(() => {
   //   setQuestionData(
   //     Array.isArray(data.questionData) ? data.questionData : [data.questionData]
@@ -36,37 +42,33 @@ const QuestionDataEntrySection = ({
   // }, [data]);
   // console.log(data.questionData);
 
+  //throttling
 
-//throttling
+  function throttle(func, delay) {
+    let lastCall = 0;
 
-function throttle(func, delay) {
-  let lastCall = 0;
+    return function (...args) {
+      const now = Date.now();
 
-  return function (...args) {
-    const now = Date.now();
+      if (now - lastCall >= delay) {
+        lastCall = now;
+        func.apply(this, args);
+      }
+    };
+  }
 
-    if (now - lastCall >= delay) {
-      lastCall = now;
-      func.apply(this, args);
-    }
-  };
-}
+  //debouncing
 
+  function debounce(func, delay) {
+    let timer;
 
-//debouncing
-
-function debounce(func, delay) {
-  let timer;
-
-  return function (...args) {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      func.apply(this, args);
-    }, delay);
-  };
-}
-
-
+    return function (...args) {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        func.apply(this, args);
+      }, delay);
+    };
+  }
 
   useEffect(() => {
     const fetchTemplate = async () => {
@@ -76,7 +78,9 @@ function debounce(func, delay) {
         settemplateHeader(
           response.filter((a) => a.id === parseInt(taskData.templeteId))
         );
-        settemplateData(response.filter((a) => a.id === parseInt(taskData.templeteId)))
+        settemplateData(
+          response.filter((a) => a.id === parseInt(taskData.templeteId))
+        );
       } catch (error) {
         console.log(error);
       }
@@ -88,25 +92,8 @@ function debounce(func, delay) {
   allowedOptions.push(templateHeader[0]?.blankDefination);
   allowedOptions.push(templateHeader[0]?.patternDefinition);
   // console.log(parseInt(taskData.templeteId))
-  useEffect(() => {
-  // Create a debounced save function that always uses latest editableData
-  const debouncedSave = debounce(() => {
-    saveHandler(editableData);
-  }, 300);
-
-  const handleAltSKey = (e) => {
-    if (e.altKey && e.key.toLowerCase() === "s") {
-      e.preventDefault();
-      debouncedSave();
-    }
-  };
-
-  document.addEventListener("keyup", handleAltSKey);
-
-  return () => {
-    document.removeEventListener("keyup", handleAltSKey);
-  };
-}, [editableData]); // Ensure latest state values
+   const debouncedSave = debounce(() => saveHandler(editableData), 100);
+  
 
   const handleInputChange = (key, newValue) => {
     // ✅ Remove any character not in the allowed list
@@ -147,8 +134,6 @@ function debounce(func, delay) {
   //     toast.error(error?.message);
   //   }
   // };
-
-  
 
   useEffect(() => {
     if (columnName !== "") {
@@ -195,7 +180,25 @@ function debounce(func, delay) {
       // Reset any necessary state or perform cleanup here
     }
   };
-  const debouncedSave = debounce(() => saveHandler(editableData), 100);
+
+  useEffect(() => {
+    // const debouncedSaves = debounce(() => saveHandler(editableData), 100);
+    // Create a debounced save function that always uses latest editableData
+
+    const handleAltSKey = (e) => {
+      if (e.altKey && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        saveHandler(editableData)
+      }
+    };
+
+    document.addEventListener("keyup", handleAltSKey);
+
+    return () => {
+      document.removeEventListener("keyup", handleAltSKey);
+    };
+  }, [editableData,saveHandler]); // Ensure latest state values
+ 
 
   console.log(editableData);
   return (

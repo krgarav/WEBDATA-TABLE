@@ -47,14 +47,14 @@ const ImageDataEntrySection = ({
   return (
     <div className="flex gap-5 justify-center items-center">
       {/* Prev button */}
-      {/* <div
+      <div
         onClick={prevHandler}
         className="text-white px-3 py-8 bg-blue-400 rounded-3xl mx-2 hover:bg-blue-800 text-lg transition-all cursor-pointer"
       >
         <button>
           <GrPrevious />
         </button>
-      </div> */}
+      </div>
 
       {/* Image container */}
       <div>
@@ -120,14 +120,14 @@ const ImageDataEntrySection = ({
       </div>
 
       {/* Next button */}
-      {/* <div
+      <div
         onClick={nextHandler}
         className="text-white px-3 py-8 bg-blue-400 rounded-3xl mx-2 hover:bg-blue-800 text-lg transition-all cursor-pointer"
       >
         <button>
           <MdOutlineArrowForwardIos />
         </button>
-      </div> */}
+      </div>
     </div>
   );
 };
