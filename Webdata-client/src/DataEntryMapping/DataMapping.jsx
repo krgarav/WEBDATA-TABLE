@@ -222,7 +222,7 @@ const DataMapping = () => {
       invalidIndex.current = 0;
     }
   };
-
+console.log(tempdata.current)
   const saveHandler = async (updatedData) => {
     //   const hasInvalid = Object.values(invalidMap).some(v => v === true);
 
@@ -245,7 +245,7 @@ const DataMapping = () => {
       const obj = {
         taskId: taskData.id,
         templateId: taskData.templeteId,
-        parentId: tempdata.current.currentIndex,
+        parentId: tempdata.current.id,
         id: data,
         editedData: editedData,
         updatedData: mergedData,
