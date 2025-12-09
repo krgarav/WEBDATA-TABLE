@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   changeTaskStatus,
   dataEntryMetaData,
@@ -16,6 +16,7 @@ const QuestionDataEntrySection = ({
   invalidIndex,
   settemplateData,
   formData,
+  loadingData,
 }) => {
   const [questionData, setQuestionData] = useState([]);
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
@@ -92,8 +93,7 @@ const QuestionDataEntrySection = ({
   allowedOptions.push(templateHeader[0]?.blankDefination);
   allowedOptions.push(templateHeader[0]?.patternDefinition);
   // console.log(parseInt(taskData.templeteId))
-   const debouncedSave = debounce(() => saveHandler(editableData), 100);
-  
+  const debouncedSave = debounce(() => saveHandler(editableData), 100);
 
   const handleInputChange = (key, newValue) => {
     // ✅ Remove any character not in the allowed list
@@ -181,24 +181,31 @@ const QuestionDataEntrySection = ({
     }
   };
 
-  useEffect(() => {
-    // const debouncedSaves = debounce(() => saveHandler(editableData), 100);
-    // Create a debounced save function that always uses latest editableData
+ const keyBlockedRef = useRef(false);
 
-    const handleAltSKey = (e) => {
-      if (e.altKey && e.key.toLowerCase() === "s") {
-        e.preventDefault();
-        saveHandler(editableData)
-      }
-    };
+useEffect(() => {
+  const handleAltSKey = (e) => {
+    if (loadingData) return; // Prevent save during data loading
 
-    document.addEventListener("keyup", handleAltSKey);
+    if (e.altKey && e.key.toLowerCase() === "s") {
+      e.preventDefault();
 
-    return () => {
-      document.removeEventListener("keyup", handleAltSKey);
-    };
-  }, [editableData,saveHandler]); // Ensure latest state values
- 
+      if (keyBlockedRef.current) return; // Throttle repeated trigger
+      keyBlockedRef.current = true;
+
+      saveHandler(editableData);
+
+      setTimeout(() => {
+        keyBlockedRef.current = false;
+      }, 200);
+    }
+  };
+
+  document.addEventListener("keydown", handleAltSKey);
+  return () => {
+    document.removeEventListener("keydown", handleAltSKey);
+  };
+}, [editableData, saveHandler, loadingData]);
 
   console.log(editableData);
   return (

@@ -3,7 +3,8 @@ const sequelize = require("../../utils/database");
 const updateCurrentIndex = async (req, res) => {
   try {
     console.log("called");
-    const { taskId, direction } = req.body;
+    const { taskId, direction, parentId } = req.body;
+    console.log(parentId);
 
     const assignData = await Assigndata.findByPk(taskId);
     if (!assignData) {
@@ -12,20 +13,36 @@ const updateCurrentIndex = async (req, res) => {
 
     const { min, max, tableName } = assignData;
     const query = `SELECT COUNT(*) AS count FROM \`${tableName}\` `;
+
     const [countId] = await sequelize.query(query, {
       type: sequelize.QueryTypes.SELECT,
     });
-  const count = countId.count;
+
+    const count = countId.count;
     // const [countResult] = await sequelize.query(
     //   `SELECT COUNT(*) AS count FROM ${tableName} `
     // );
     // const count = countResult[0].count;
-
+    // console.log(assignData);
     let updated = false;
 
     if (direction === "next" && assignData.currentIndex < count) {
       assignData.currentIndex += 1;
+
       updated = true;
+      const query1 = `
+  UPDATE ${tableName}
+  SET Corrected_By = :email
+  WHERE parentId = :parentId
+`;
+
+      await sequelize.query(query1, {
+        replacements: {
+          email: req.user.email,
+          parentId,
+        },
+        type: sequelize.QueryTypes.UPDATE,
+      });
     } else if (direction === "prev" && assignData.currentIndex > 1) {
       assignData.currentIndex -= 1;
       updated = true;

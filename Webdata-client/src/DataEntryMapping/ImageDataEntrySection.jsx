@@ -8,6 +8,7 @@ const ImageDataEntrySection = ({
   prevHandler,
   nextHandler,
   imageRef,
+  loadingData,
 }) => {
   const [imageUrl, setImageUrl] = useState("");
   const [zoomLevel] = useState(1); // Keep it normal, no auto shrinking
@@ -17,7 +18,7 @@ const ImageDataEntrySection = ({
   useEffect(() => {
     setImageUrl(`${window.SERVER_IP}/images/${data.imageName}`);
   }, [data]);
-  console.log(imageData)
+  console.log(imageData);
 
   useEffect(() => {
     if (imageData && imageRef.current && imageContainerRef.current) {
@@ -42,19 +43,19 @@ const ImageDataEntrySection = ({
     }
   }, [imageData, imageRef, zoomLevel]);
 
-  console.log(imageData)
+  console.log(imageData);
 
   return (
     <div className="flex gap-5 justify-center items-center">
       {/* Prev button */}
-      {/* <div
+      <div
         onClick={prevHandler}
         className="text-white px-3 py-8 bg-blue-400 rounded-3xl mx-2 hover:bg-blue-800 text-lg transition-all cursor-pointer"
       >
         <button>
           <GrPrevious />
         </button>
-      </div> */}
+      </div>
 
       {/* Image container */}
       <div>
@@ -107,8 +108,8 @@ const ImageDataEntrySection = ({
                 border: "2px solid rgba(0, 123, 255, 0.8)",
                 position: "absolute",
                 backgroundColor: "rgba(0, 123, 255, 0.2)",
-                left: `${imageData.coordinateX }px`,
-                top: `${imageData.coordinateY }px`,
+                left: `${imageData.coordinateX}px`,
+                top: `${imageData.coordinateY}px`,
                 width: `${imageData.width}px`,
                 height: `${imageData.height}px`,
                 borderRadius: "0.25rem",
@@ -120,14 +121,20 @@ const ImageDataEntrySection = ({
       </div>
 
       {/* Next button */}
-      {/* <div
-        onClick={nextHandler}
-        className="text-white px-3 py-8 bg-blue-400 rounded-3xl mx-2 hover:bg-blue-800 text-lg transition-all cursor-pointer"
+      <div
+        onClick={() => {
+          if (loadingData) return; // Prevent click
+          nextHandler();
+        }}
+        className={`text-white px-3 py-8 rounded-3xl mx-2 text-lg transition-all
+              ${
+                loadingData
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-400 hover:bg-blue-800 cursor-pointer"
+              }`}
       >
-        <button>
-          <MdOutlineArrowForwardIos />
-        </button>
-      </div> */}
+        <MdOutlineArrowForwardIos />
+      </div>
     </div>
   );
 };

@@ -210,9 +210,9 @@ function validateUpdatedData(joinedData = [], updatedData = {}) {
 const updateMainCsvData = async (req, res) => {
   try {
     const { templateId, parentId, updatedData, editedData, taskId } = req.body;
-    // console.log(req.body)
-    console.log(parentId)
-    console.log(editedData)
+    // console.log(req.user.email)
+    // console.log(parentId)
+    // console.log(editedData)
 
     const joinedData = await sequelize.query(
       `SELECT 
