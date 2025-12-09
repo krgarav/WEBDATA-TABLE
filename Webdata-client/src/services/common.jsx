@@ -254,7 +254,7 @@ export const dataEntryMetaData = async (templateId, columnName) => {
   }
 };
 
-export const updateCurrentIndex = async (taskId, direction) => {
+export const updateCurrentIndex = async (taskId, direction,parentId) => {
   const token = JSON.parse(localStorage.getItem("userData"));
   // http://localhost:4000/getcsvheaders?templateId=1
   try {
@@ -263,6 +263,7 @@ export const updateCurrentIndex = async (taskId, direction) => {
       {
         taskId: taskId,
         direction: direction,
+        parentId:parentId
       },
       {
         headers: {

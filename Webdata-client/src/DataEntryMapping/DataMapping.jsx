@@ -68,46 +68,59 @@ const DataMapping = () => {
   //   invalidIndex.current = 0; // Reset the index when currentIndex changes
   // }, [currentIndex]);
 
-  // useEffect(() => {
-  //   const handleKeyDown = (event) => {
-  //     if (event.ctrlKey && event.key === "ArrowLeft") {
-  //       prevHandler();
-  //     }
-  //     if (event.ctrlKey && event.key === "ArrowRight") {
-  //       nextHandler();
-  //     }
-  //   };
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (loadingData) return; // Prevent key nav during fetch
 
-  //   window.addEventListener("keydown", handleKeyDown);
+      if (event.ctrlKey && event.key === "ArrowLeft") {
+        event.preventDefault();
+        prevHandler();
+      }
 
-  //   return () => {
-  //     window.removeEventListener("keydown", handleKeyDown);
-  //   };
-  // }, []);
+      if (event.ctrlKey && event.key === "ArrowRight") {
+        event.preventDefault();
+        nextHandler();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [loadingData]);
+  const fetchIdRef = useRef(0);
 
   useEffect(() => {
+    const controller = new AbortController();
+    const fetchId = ++fetchIdRef.current;
+
     const fetchData = async () => {
       try {
         setLoadingData(true);
         const response = await axios.post(
           `${window.SERVER_IP}/get/csvdata`,
-          { taskData: taskData },
-          {
-            headers: {
-              token: token,
-            },
-          }
+          { taskData },
+          { headers: { token }, signal: controller.signal }
         );
+
+        // Ignore outdated request
+        if (fetchId !== fetchIdRef.current) return;
+
         tempdata.current = response.data;
         setData(response.data);
-        console.log(response.data);
-      } catch (error) {
-        toast.error(error?.message);
+      } catch (err) {
+        if (controller.signal.aborted) return;
+        toast.error(err?.message);
       } finally {
-        setLoadingData(false);
+        if (fetchId === fetchIdRef.current) {
+          setLoadingData(false);
+        }
       }
     };
+
     fetchData();
+    return () => controller.abort();
   }, [currentIndex]);
 
   useEffect(() => {
@@ -177,52 +190,49 @@ const DataMapping = () => {
       document.removeEventListener("keydown", handleTabKey);
     };
   }, [formData]);
-
   const prevHandler = async () => {
+    if (loadingData) return; // Prevent skipping during fetch
+
     try {
-      const taskData = localStorage.getItem("taskdata");
-      if (taskData) {
-        const parsedData = JSON.parse(taskData);
-        const taskId = parsedData.id;
-        const res = await updateCurrentIndex(taskId, "prev");
-        if (!res) {
-          toast.error("No Previous Page!!");
-          return;
-        }
-        setCurrenIndex(res);
-        // inputRefs.current = {};
-        // invalidIndex.current = 0;
-      }
-    } catch (error) {
-      console.error(error);
+      const parsed = JSON.parse(localStorage.getItem("taskdata"));
+      const taskId = parsed.id;
+      const res = await updateCurrentIndex(
+        taskId,
+        "prev",
+        tempdata.current?.id
+      );
+      if (!res) return toast.error("No Previous Page!");
+
+      setCurrenIndex(res);
+    } catch (err) {
+      toast.error(err?.message);
     } finally {
       inputRefs.current = {};
       invalidIndex.current = 0;
     }
   };
   const nextHandler = async () => {
+    if (loadingData) return; // Prevent skipping during fetch
+
     try {
-      const taskData = localStorage.getItem("taskdata");
-      if (taskData) {
-        const parsedData = JSON.parse(taskData);
-        const taskId = parsedData.id;
-        const res = await updateCurrentIndex(taskId, "next");
-        if (!res) {
-          toast.error("Last page reached");
-          return;
-        }
-        console.log(res);
-        setCurrenIndex(res);
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error(error);
+      const parsed = JSON.parse(localStorage.getItem("taskdata"));
+      const taskId = parsed.id;
+      const res = await updateCurrentIndex(
+        taskId,
+        "next",
+        tempdata.current?.id
+      );
+      if (!res) return toast.error("Last page reached");
+
+      setCurrenIndex(res);
+    } catch (err) {
+      toast.error(err?.message);
     } finally {
       inputRefs.current = {};
       invalidIndex.current = 0;
     }
   };
-console.log(tempdata.current)
+  console.log(tempdata.current);
   const saveHandler = async (updatedData) => {
     //   const hasInvalid = Object.values(invalidMap).some(v => v === true);
 
@@ -232,47 +242,45 @@ console.log(tempdata.current)
     // }
     console.log("update called");
     // console.log(data);
-    console.log(editedData)
+    console.log(editedData);
 
-   
-      const mergedData = {
-        ...(Array.isArray(formData) && formData.length > 0
-          ? formData[0]
-          : formData),
-        ...updatedData,
-      };
-      console.log(mergedData);
-      const obj = {
-        taskId: taskData.id,
-        templateId: taskData.templeteId,
-        parentId: tempdata.current.id,
-        id: data,
-        editedData: editedData,
-        updatedData: mergedData,
-      };
-      console.log(data.id);
-      console.log(obj);
+    const mergedData = {
+      ...(Array.isArray(formData) && formData.length > 0
+        ? formData[0]
+        : formData),
+      ...updatedData,
+    };
+    console.log(mergedData);
+    const obj = {
+      taskId: taskData.id,
+      templateId: taskData.templeteId,
+      parentId: tempdata.current.id,
+      id: data,
+      editedData: editedData,
+      updatedData: mergedData,
+    };
+    console.log(data.id);
+    console.log(obj);
 
-      const res = await updateCsvData(obj);
-      console.log(res);
-      if (res.status >= 400 && res.status <= 600) {
-        // console.log(res);
-        if (Array.isArray(res?.response?.data?.errors)) {
-          res?.response?.data?.errors.map((err) => {
-            toast.warning(err.message, { autoClose: 7000 });
-          });
-        } else {
-          const msg = res?.response?.data?.message || "Something went wrong!";
-          toast.warning(msg, { autoClose: 7000 });
-        }
-      } else {
-        if (res.status === 200) {
-          nextHandler();
-          // setData([]);
-        }
-      }
+    const res = await updateCsvData(obj);
+    console.log(res);
+    if (res.status >= 400 && res.status <= 600) {
       // console.log(res);
-    
+      if (Array.isArray(res?.response?.data?.errors)) {
+        res?.response?.data?.errors.map((err) => {
+          toast.warning(err.message, { autoClose: 7000 });
+        });
+      } else {
+        const msg = res?.response?.data?.message || "Something went wrong!";
+        toast.warning(msg, { autoClose: 7000 });
+      }
+    } else {
+      if (res.status === 200) {
+        nextHandler();
+        // setData([]);
+      }
+    }
+    // console.log(res);
   };
 
   const zoomInHandler = () => {
@@ -328,6 +336,7 @@ console.log(tempdata.current)
             prevHandler={prevHandler}
             zoomLevel={zoomLevel}
             imageRef={imageRef}
+            loadingData={loadingData}
           />
 
           <QuestionDataEntrySection
@@ -341,6 +350,7 @@ console.log(tempdata.current)
             invalidIndex={invalidIndex}
             settemplateData={settemplateData}
             formData={formData}
+            loadingData={loadingData}
           />
         </div>
       </div>
