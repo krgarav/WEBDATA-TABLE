@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { toast } from "react-toastify";
 import FormDataEntrySection from "./FormDataSection";
 import ButtonDataEntrySection from "./ButtonDataEntrySection";
@@ -24,15 +24,16 @@ const DataMapping = () => {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [editedData, setEditedData] = useState([]);
   const [templateData, settemplateData] = useState([]);
-
+  const [prevdata, setload] = useState(true);
   const [invalidMap, setInvalidMap] = useState(); // { key: boolean }
-  console.log(invalidMap);
+  // console.log(invalidMap);
   const imageRef = useRef(null);
   const inputRefs = useRef({});
   const invalidIndex = useRef(0);
   const inputIndexRef = useRef(null);
   const tempdata = useRef();
-  console.log(inputRefs);
+  const lastKey = useRef(null);
+  // console.log(inputRefs);
 
   const saveRanRef = useRef(false);
   // useEffect(() => {
@@ -131,64 +132,85 @@ const DataMapping = () => {
   // console.log(formData)
 
   // console.log(data);
+
+  // const sortedData = () => {
+  //   if(inputRefs.current.length>0) setload(true) ;
+  //   const invalidKeys = Object.keys(inputRefs.current);
+
+  //   return [...invalidKeys].sort((a, b) => {
+  //     const isAAlphaOnly = /^[A-Za-z]+$/.test(a);
+  //     const isBAlphaOnly = /^[A-Za-z]+$/.test(b);
+
+  //     if (isAAlphaOnly && !isBAlphaOnly) return -1;
+  //     if (!isAAlphaOnly && isBAlphaOnly) return 1;
+
+  //     if (isAAlphaOnly && isBAlphaOnly) return a.localeCompare(b);
+
+  //     const prefixA = a.match(/[A-Za-z]+/)[0];
+  //     const prefixB = b.match(/[A-Za-z]+/)[0];
+
+  //     if (prefixA !== prefixB) return prefixA.localeCompare(prefixB);
+
+  //     const numA = parseInt(a.match(/\d+/)?.[0] || "0", 10);
+  //     const numB = parseInt(b.match(/\d+/)?.[0] || "0", 10);
+
+  //     return numA - numB;
+  //   });
+  // }
+
   useEffect(() => {
     const handleTabKey = (e) => {
-      if (e.key === "Tab") {
-        e.preventDefault(); // Stop normal tab behavior
+      if (e.key !== "Tab") return;
 
-        // Get all keys from inputRefs (which are the keys of invalid inputs)
-        const invalidKeys = Object.keys(inputRefs.current);
-        const sortedData = [...invalidKeys].sort((a, b) => {
-          const isAAlphaOnly = /^[A-Za-z]+$/.test(a); // true if only letters
-          const isBAlphaOnly = /^[A-Za-z]+$/.test(b);
+      e.preventDefault();
 
-          // 🟢 Step 1: Pure alphabets come first
-          if (isAAlphaOnly && !isBAlphaOnly) return -1;
-          if (!isAAlphaOnly && isBAlphaOnly) return 1;
+      const invalidKeys = Object.keys(inputRefs.current);
 
-          // 🟡 Step 2: If both are alphabet-only, sort alphabetically
-          if (isAAlphaOnly && isBAlphaOnly) return a.localeCompare(b);
+      const sortedData = [...invalidKeys].sort((a, b) => {
+        const isAAlphaOnly = /^[A-Za-z]+$/.test(a);
+        const isBAlphaOnly = /^[A-Za-z]+$/.test(b);
 
-          // 🔵 Step 3: Otherwise (both have numbers), sort by prefix then number
-          const prefixA = a.match(/[A-Za-z]+/)[0];
-          const prefixB = b.match(/[A-Za-z]+/)[0];
+        if (isAAlphaOnly && !isBAlphaOnly) return -1;
+        if (!isAAlphaOnly && isBAlphaOnly) return 1;
 
-          if (prefixA !== prefixB) return prefixA.localeCompare(prefixB);
+        if (isAAlphaOnly && isBAlphaOnly) return a.localeCompare(b);
 
-          const numA = parseInt(a.match(/\d+/)?.[0] || "0", 10);
-          const numB = parseInt(b.match(/\d+/)?.[0] || "0", 10);
+        const prefixA = a.match(/[A-Za-z]+/)[0];
+        const prefixB = b.match(/[A-Za-z]+/)[0];
 
-          return numA - numB;
-        });
-        console.log();
-        // Log the refs and keys if you want to debug
-        console.log("inputRefs:", inputRefs.current);
-        console.log("invalidKeys:", sortedData);
+        if (prefixA !== prefixB) return prefixA.localeCompare(prefixB);
 
-        // No invalid inputs? Do nothing
-        if (sortedData.length === 0) return;
+        const numA = parseInt(a.match(/\d+/)?.[0] || "0", 10);
+        const numB = parseInt(b.match(/\d+/)?.[0] || "0", 10);
 
-        // Reset index if out of bounds
-        if (invalidIndex.current >= sortedData.length) {
-          invalidIndex.current = 0;
+        return numA - numB;
+      });
+
+      if (sortedData.length === 0) return;
+
+      // NEW: Use KEY tracking instead of index tracking
+      let nextIndex = 0;
+
+      if (lastKey.current) {
+        const currentIndex = sortedData.indexOf(lastKey.current);
+        if (currentIndex !== -1) {
+          nextIndex = currentIndex + 1;
         }
+      }
 
-        const keyToFocus = sortedData[invalidIndex.current];
-        const element = inputRefs.current[keyToFocus];
+      if (nextIndex >= sortedData.length) nextIndex = 0;
 
-        if (element) {
-          element.focus();
-          invalidIndex.current += 1; // Move to next invalid input for next Tab
-        }
+      const keyToFocus = sortedData[nextIndex];
+      const element = inputRefs.current[keyToFocus];
+
+      if (element) {
+        element.focus();
+        lastKey.current = keyToFocus; // THE FIX
       }
     };
 
-    document.addEventListener("click", () => {});
-
     document.addEventListener("keydown", handleTabKey);
-    return () => {
-      document.removeEventListener("keydown", handleTabKey);
-    };
+    return () => document.removeEventListener("keydown", handleTabKey);
   }, [formData]);
   const prevHandler = async () => {
     if (loadingData) return; // Prevent skipping during fetch
@@ -204,6 +226,7 @@ const DataMapping = () => {
       if (!res) return toast.error("No Previous Page!");
 
       setCurrenIndex(res);
+      lastKey.current = null;
     } catch (err) {
       toast.error(err?.message);
     } finally {
@@ -211,12 +234,22 @@ const DataMapping = () => {
       invalidIndex.current = 0;
     }
   };
+  const nextBlockedRef = useRef(false);
+
   const nextHandler = async () => {
-    if (loadingData) return; // Prevent skipping during fetch
+    // Block when data is loading OR throttled
+    if (loadingData || nextBlockedRef.current) return;
+
+    // Throttle repeated calls (e.g., holding the key)
+    nextBlockedRef.current = true;
+    setTimeout(() => {
+      nextBlockedRef.current = false;
+    }, 200); // same 200ms throttle window
 
     try {
       const parsed = JSON.parse(localStorage.getItem("taskdata"));
       const taskId = parsed.id;
+
       const res = await updateCurrentIndex(
         taskId,
         "next",
@@ -225,6 +258,7 @@ const DataMapping = () => {
       if (!res) return toast.error("Last page reached");
 
       setCurrenIndex(res);
+      lastKey.current = null;
     } catch (err) {
       toast.error(err?.message);
     } finally {
@@ -232,7 +266,7 @@ const DataMapping = () => {
       invalidIndex.current = 0;
     }
   };
-  console.log(tempdata.current);
+  // console.log(tempdata.current);
   const saveHandler = async (updatedData) => {
     //   const hasInvalid = Object.values(invalidMap).some(v => v === true);
 
@@ -240,9 +274,9 @@ const DataMapping = () => {
     //  toast.error("formField still has error")
     //  return
     // }
-    console.log("update called");
+    // console.log("update called");
     // console.log(data);
-    console.log(editedData);
+    // console.log(editedData);
 
     const mergedData = {
       ...(Array.isArray(formData) && formData.length > 0
@@ -250,7 +284,7 @@ const DataMapping = () => {
         : formData),
       ...updatedData,
     };
-    console.log(mergedData);
+    // console.log(mergedData);
     const obj = {
       taskId: taskData.id,
       templateId: taskData.templeteId,
@@ -259,11 +293,11 @@ const DataMapping = () => {
       editedData: editedData,
       updatedData: mergedData,
     };
-    console.log(data.id);
-    console.log(obj);
+    // console.log(data.id);
+    // console.log(obj);
 
     const res = await updateCsvData(obj);
-    console.log(res);
+    // console.log(res);
     if (res.status >= 400 && res.status <= 600) {
       // console.log(res);
       if (Array.isArray(res?.response?.data?.errors)) {
@@ -277,6 +311,7 @@ const DataMapping = () => {
     } else {
       if (res.status === 200) {
         nextHandler();
+        lastKey.current = null;
         // setData([]);
       }
     }
@@ -299,7 +334,7 @@ const DataMapping = () => {
       imageRef.current.style.transformOrigin = "initial";
     }
   };
-  console.log(invalidMap);
+  // console.log(invalidMap);
   return (
     <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-[100vh] pt-16">
       <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-400 to-blue-600 dataEntry ">
@@ -351,6 +386,7 @@ const DataMapping = () => {
             settemplateData={settemplateData}
             formData={formData}
             loadingData={loadingData}
+            lastKey={lastKey}
           />
         </div>
       </div>

@@ -17,12 +17,14 @@ const QuestionDataEntrySection = ({
   settemplateData,
   formData,
   loadingData,
+  lastKey
 }) => {
   const [questionData, setQuestionData] = useState([]);
   const taskData = JSON.parse(localStorage.getItem("taskdata"));
   const [columnName, setColumnName] = useState("");
   const [editableData, setEditableData] = useState(null);
   const [templateHeader, settemplateHeader] = useState([]);
+  // const lastKey = useRef(null);
   const navigate = useNavigate();
   useEffect(() => {
     console.log(data);
@@ -181,31 +183,31 @@ const QuestionDataEntrySection = ({
     }
   };
 
- const keyBlockedRef = useRef(false);
+  const keyBlockedRef = useRef(false);
 
-useEffect(() => {
-  const handleAltSKey = (e) => {
-    if (loadingData) return; // Prevent save during data loading
+  useEffect(() => {
+    const handleAltSKey = (e) => {
+      if (loadingData) return; // Prevent save during data loading
 
-    if (e.altKey && e.key.toLowerCase() === "s") {
-      e.preventDefault();
+      if (e.altKey && e.key.toLowerCase() === "s") {
+        e.preventDefault();
 
-      if (keyBlockedRef.current) return; // Throttle repeated trigger
-      keyBlockedRef.current = true;
+        if (keyBlockedRef.current) return; // Throttle repeated trigger
+        keyBlockedRef.current = true;
 
-      saveHandler(editableData);
+        saveHandler(editableData);
 
-      setTimeout(() => {
-        keyBlockedRef.current = false;
-      }, 200);
-    }
-  };
+        setTimeout(() => {
+          keyBlockedRef.current = false;
+        }, 200);
+      }
+    };
 
-  document.addEventListener("keydown", handleAltSKey);
-  return () => {
-    document.removeEventListener("keydown", handleAltSKey);
-  };
-}, [editableData, saveHandler, loadingData]);
+    document.addEventListener("keydown", handleAltSKey);
+    return () => {
+      document.removeEventListener("keydown", handleAltSKey);
+    };
+  }, [editableData, saveHandler, loadingData]);
 
   console.log(editableData);
   return (
@@ -338,20 +340,19 @@ useEffect(() => {
                         }}
                         onClick={() => {
                           setColumnName(key);
+
                           const invalidKeys = Object.keys(inputRefs.current);
+
                           const sortedData = [...invalidKeys].sort((a, b) => {
-                            const isAAlphaOnly = /^[A-Za-z]+$/.test(a); // true if only letters
+                            const isAAlphaOnly = /^[A-Za-z]+$/.test(a);
                             const isBAlphaOnly = /^[A-Za-z]+$/.test(b);
 
-                            // 🟢 Step 1: Pure alphabets come first
                             if (isAAlphaOnly && !isBAlphaOnly) return -1;
                             if (!isAAlphaOnly && isBAlphaOnly) return 1;
 
-                            // 🟡 Step 2: If both are alphabet-only, sort alphabetically
                             if (isAAlphaOnly && isBAlphaOnly)
                               return a.localeCompare(b);
 
-                            // 🔵 Step 3: Otherwise (both have numbers), sort by prefix then number
                             const prefixA = a.match(/[A-Za-z]+/)[0];
                             const prefixB = b.match(/[A-Za-z]+/)[0];
 
@@ -369,10 +370,14 @@ useEffect(() => {
 
                             return numA - numB;
                           });
-                          console.log(sortedData);
+
+                          // Find index inside new sorted order
                           const currentIndex = sortedData.indexOf(key);
+
                           if (currentIndex !== -1) {
-                            invalidIndex.current = currentIndex;
+                            // Store KEY, not index
+                            lastKey.current = key;
+
                             console.log("Clicked cell index:", currentIndex);
                           }
                         }}
