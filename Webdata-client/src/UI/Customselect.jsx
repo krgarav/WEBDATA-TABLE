@@ -18,7 +18,7 @@ const Customselect = (props) => {
       dataCtx.addToPrimaryKey(selectValue); //taking time to select option how can i improve ??
     }
   }, [selectValue]);
-
+console.log(dataCtx)
   const arr = dataCtx.csvHeader.map((item, index) => {
     return (
       <MenuItem key={index} value={item}>

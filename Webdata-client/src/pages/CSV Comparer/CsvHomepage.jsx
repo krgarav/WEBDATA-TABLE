@@ -140,6 +140,10 @@ const CsvHomepage = () => {
               label="Select Csv Files 2"
               state="second"
               selectedTemplate={selectedTemplate}
+              onTemplateSelect={(item) => {
+                dataCtx.addSecondInputFileName(item);
+                // console.log(item);
+              }}
             />
           </div>
           <div className="flex flex-row justify-between  gap-10 mb-6">

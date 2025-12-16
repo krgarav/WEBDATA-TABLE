@@ -10,9 +10,9 @@ import {
   onGetTaskHandler,
   onGetTemplateHandler,
   onGetVerifiedUserHandler,
-  REACT_APP_IP,
   updateCurrIndexData,
 } from "../../services/common";
+
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { useNavigate } from "react-router-dom";
@@ -69,7 +69,7 @@ const UserCorrectionData = () => {
   const [totalData, setTotalData] = useState(0);
   const task = JSON.parse(localStorage.getItem("taskdata"));
   const navigate = useNavigate();
-
+  console.log(window.APP_IP);
   useEffect(() => {
     const enableFullscreen = () => {
       const element = document.documentElement;
@@ -80,7 +80,7 @@ const UserCorrectionData = () => {
           element.msRequestFullscreen?.();
       }
     };
-
+    console.log(window);
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
         enableFullscreen();
@@ -97,7 +97,7 @@ const UserCorrectionData = () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [currentData]);
- useEffect(() => {
+  useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.ctrlKey && event.key === "ArrowLeft") {
         prevHandler();
@@ -118,7 +118,7 @@ const UserCorrectionData = () => {
   //     const fetchData = async () => {
   //       try {
   //         const response = await axios.post(
-  //           `http://${REACT_APP_IP}:4000/get/csvdata`,
+  //           `http://${window.APP_IP}:4000/get/csvdata`,
   //           { taskData: currentTaskData },
   //           {
   //             headers: {
@@ -209,7 +209,7 @@ const UserCorrectionData = () => {
   // useEffect(() => {
   //   const req = async () => {
   //     const { data } = await axios.post(
-  //       `http://${REACT_APP_IP}:4000/getCompareCsvData/${taskId}`,
+  //       `http://${window.APP_IP}:4000/getCompareCsvData/${taskId}`,
   //       { currentIndex },
   //       {
   //         headers: {
@@ -278,7 +278,7 @@ const UserCorrectionData = () => {
 
   //   try {
   //     await axios.post(
-  //       `http://${REACT_APP_IP}:4000/updatecsvdata/${parseInt(
+  //       `http://${window.APP_IP}:4000/updatecsvdata/${parseInt(
   //         currentTaskData?.fileId
   //       )}`,
   //       {
@@ -602,7 +602,7 @@ const UserCorrectionData = () => {
   const onCompleteHandler = async () => {
     try {
       const response = await axios.get(
-        `http://${REACT_APP_IP}:4000/download/correctedCsv/${taskId}`,
+        `http://${window.APP_IP}:4000/download/correctedCsv/${taskId}`,
         {
           headers: {
             token: token,
@@ -611,7 +611,7 @@ const UserCorrectionData = () => {
       );
 
       await axios.post(
-        `http://${REACT_APP_IP}:4000/taskupdation/${parseInt(
+        `http://${window.APP_IP}:4000/taskupdation/${parseInt(
           currentTaskData?.id
         )}`,
         {
