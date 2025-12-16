@@ -15,7 +15,7 @@ const Input = (props) => {
               complete: (result) => {
                 if (result.data.length > 0) {
                   const headerRow = result.data[0];
-                  // datactx.addToCsvHeader(Object.keys(headerRow));
+                  datactx.addToCsvHeader(Object.keys(headerRow));
                 } else {
                   console.error("Empty file or invalid CSV format");
                 }
@@ -27,6 +27,7 @@ const Input = (props) => {
           datactx.addFirstInputCsvFile(file);
           break;
         case "second":
+          console.log(file.name)
           datactx.addSecondInputFileName(file.name);
           datactx.addSecondInputCsvFile(file);
           break;

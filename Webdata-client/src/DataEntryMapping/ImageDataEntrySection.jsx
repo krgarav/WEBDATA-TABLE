@@ -9,9 +9,10 @@ const ImageDataEntrySection = ({
   nextHandler,
   imageRef,
   loadingData,
+  zoomLevel
 }) => {
   const [imageUrl, setImageUrl] = useState("");
-  const [zoomLevel] = useState(1); // Keep it normal, no auto shrinking
+  // const [zoomLevel] = useState(1); // Keep it normal, no auto shrinking
 
   const imageContainerRef = useRef();
 

@@ -36,33 +36,33 @@ const DataMapping = () => {
   // console.log(inputRefs);
 
   const saveRanRef = useRef(false);
-  // useEffect(() => {
-  //   const enableFullscreen = () => {
-  //     const element = document.documentElement;
-  //     if (!document.fullscreenElement) {
-  //       element.requestFullscreen?.() ||
-  //         element.mozRequestFullScreen?.() ||
-  //         element.webkitRequestFullscreen?.() ||
-  //         element.msRequestFullscreen?.();
-  //     }
-  //   };
+  useEffect(() => {
+    const enableFullscreen = () => {
+      const element = document.documentElement;
+      if (!document.fullscreenElement) {
+        element.requestFullscreen?.() ||
+          element.mozRequestFullScreen?.() ||
+          element.webkitRequestFullscreen?.() ||
+          element.msRequestFullscreen?.();
+      }
+    };
 
-  //   const handleVisibilityChange = () => {
-  //     if (document.visibilityState === "visible") {
-  //       enableFullscreen();
-  //     }
-  //   };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        enableFullscreen();
+      }
+    };
 
-  //   // Run fullscreen logic when component mounts
-  //   enableFullscreen();
+    // Run fullscreen logic when component mounts
+    enableFullscreen();
 
-  //   // Listen for visibility change to restore fullscreen if needed
-  //   document.addEventListener("visibilitychange", handleVisibilityChange);
+    // Listen for visibility change to restore fullscreen if needed
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
-  //   return () => {
-  //     document.removeEventListener("visibilitychange", handleVisibilityChange);
-  //   };
-  // }, [currentIndex]);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [currentIndex]);
 
   // useEffect(() => {
   //   inputRefs.current = {};
@@ -90,6 +90,7 @@ const DataMapping = () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [loadingData]);
+  
   const fetchIdRef = useRef(0);
 
   useEffect(() => {
