@@ -11,7 +11,7 @@ exports.getCsvHeaders=async(req, res)=> {
     }
 
     const filePath = path.join(__dirname, '../', '../', 'csvFile', fileName);
-console.log(filePath)
+// console.log(filePath)
     // Check if file exists
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ error: "File not found." });
