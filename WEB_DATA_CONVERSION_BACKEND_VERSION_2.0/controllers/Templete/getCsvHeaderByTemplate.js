@@ -42,6 +42,7 @@ const getCsvHeaderByTemplate = async (req, res, next) => {
 
         // Extract headers from the first row and trim spaces
         let headers = Object.keys(data[0]).map(header => header.trim());
+        // console.log(headers)
             // console.log(headers)
         // Columns to remove
         const columnsToRemove = [

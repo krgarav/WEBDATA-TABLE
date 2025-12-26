@@ -311,7 +311,7 @@ const compareCsv = async (req, res) => {
 
     for (let j = 0; j < f2.length; j++) {
       if (f2[j][primaryKey] === undefined) {
-        console.log(j);
+        // console.log(j);
       }
       if (isBlank(f2[j][primaryKey])) {
         return res.status(501).send({

@@ -261,7 +261,7 @@ WHERE
 
     if (!results.valid) {
       // Use a network-style response (status + message + errors)
-      return res.status(400).json({
+      return res.status(400).json({   
         valid: false,
         status: results.status ?? "ERROR", // if your validator returns status, keep it; fallback to ERROR
         errors: results.errors || [],

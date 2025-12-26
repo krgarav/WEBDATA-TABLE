@@ -2,9 +2,9 @@ const Assigndata = require("../../models/TempleteModel/assigndata");
 const sequelize = require("../../utils/database");
 const updateCurrentIndex = async (req, res) => {
   try {
-    console.log("called");
+    // console.log("called");
     const { taskId, direction, parentId } = req.body;
-    console.log(parentId);
+    // console.log(parentId);
 
     const assignData = await Assigndata.findByPk(taskId);
     if (!assignData) {

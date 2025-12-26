@@ -109,7 +109,7 @@ async function insertDataIntoTable(tableName, data, batchSize = 500) {
     // Execute batch insert
     await sequelize.query(query, { type: QueryTypes.INSERT });
 
-    console.log(`Inserted batch: ${i} → ${i + batch.length}`);
+    // console.log(`Inserted batch: ${i} → ${i + batch.length}`);
   }
 
   return columnsForRead;
